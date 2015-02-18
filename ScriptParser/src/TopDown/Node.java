@@ -136,6 +136,7 @@ public class Node {
 	
 	//-----------------------------------------basic semantic-----------------------------------
 	
+	//Checks if a node contains 'empty' ieml. 
 	public Boolean IsEmpty() throws Exception {
 				
 		if (isEmpty != null)

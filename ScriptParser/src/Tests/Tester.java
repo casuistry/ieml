@@ -20,20 +20,10 @@ public class Tester {
 	private static BaseInspector inspector = new BaseInspector();
 	
 	public static void main(String[] args) {
-
-		run2();
+		EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
+		emptyNodeTester.RunTest(null, 3);
 	}
 
-	private static void run2() {
-	
-		System.out.println("-------Start tests--------");
-		
-		EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
-		emptyNodeTester.RunTest("*((O:+F:+M:+B:+T:)M:(A:+E:+B:+S:).+(M:+U:)(U:+M:+E:)(O:+O:+T:+F:).)**", 1);
-				       
-		System.out.println("-------End tests----------");
-	}	
-	
 	private static void niveauTest(String big, int lb){
 		try {			
 			String iemlSequence = big == null ? Generator.GetScript(lb) : big;				
@@ -206,12 +196,12 @@ public class Tester {
 			
 			bigString = big == null ? Generator.GetScript(lb).replaceAll("[()*]", "") : big;
 			Node bigRoot = TopDownParser.Parse(bigString);
-			bigRoot.PrintNode("", null);
+			//bigRoot.PrintNode("", null);
 			System.out.println("------------------");
 			
 			smallString = small == null ? Generator.GetScript(ls).replaceAll("[()*]", "") : small;
 			Node smallRoot = TopDownParser.Parse(smallString);
-			smallRoot.PrintNode("", null);
+			//smallRoot.PrintNode("", null);
 			System.out.println("------------------");				         
 
 			Counter diff = Node.GetNumberOfDifferences(bigRoot, smallRoot);	
@@ -234,12 +224,12 @@ public class Tester {
 			
 			bigString = big == null ? Generator.GetScript(lb).replaceAll("[()*]", "") : big;
 			Node bigRoot = TopDownParser.Parse(bigString);
-			bigRoot.PrintNode("", null);
+			//bigRoot.PrintNode("", null);
 			System.out.println("------------------");
 			
 			smallString = small == null ? Generator.GetScript(ls).replaceAll("[()*]", "") : small;
 			Node smallRoot = TopDownParser.Parse(smallString);
-			smallRoot.PrintNode("", null);
+			//smallRoot.PrintNode("", null);
 			System.out.println("------------------");				         
 
 			ArrayList<Node> result = new ArrayList<Node>();
@@ -285,12 +275,12 @@ public class Tester {
 			
 			bigString = big == null ? Generator.GetScript(2).replaceAll("[()*]", "") : big;
 			Node bigRoot = TopDownParser.Parse(bigString);
-			bigRoot.PrintNode("", null);
+			//bigRoot.PrintNode("", null);
 			System.out.println("------------------");
 			
 			smallString = small == null ? Generator.GetScript(1).replaceAll("[()*]", "") : small;
 			Node smallRoot = TopDownParser.Parse(smallString);
-			smallRoot.PrintNode("", null);
+			//smallRoot.PrintNode("", null);
 			System.out.println("------------------");				         
 
 	        String[] f = Utilities.getChunks(smallString);        
@@ -328,12 +318,12 @@ public class Tester {
 			
 			bigString = Generator.GetScript(2).replaceAll("[()*]", "");
 			Node bigRoot = TopDownParser.Parse(bigString);
-			bigRoot.PrintNode("", null);
+			//bigRoot.PrintNode("", null);
 			System.out.println("------------------");
 			
 			smallString = Generator.GetScript(1).replaceAll("[()*]", "");
 			Node smallRoot = TopDownParser.Parse(smallString);
-			smallRoot.PrintNode("", null);
+			//smallRoot.PrintNode("", null);
 			System.out.println("------------------");
 			
 			ArrayList<Node> result = new ArrayList<Node>();

@@ -94,20 +94,6 @@ public class TopDownParser {
 		}
 	}
 	
-	private static void missingSemesException(Node input, ArrayList<String> substrings) throws Exception {
-		
-		StringBuilder builder = new StringBuilder("==> "+input.GetName());
-		builder.append(" parses into ");
-		
-		for (String str : substrings) 
-		{
-			builder.append("{"+str + "} ");	
-		}
-		
-		builder.append("- I was expecting 3 terms");
-		throw new Exception(builder.toString());
-	}
-	
 	private static void missingLayerException(int index) throws Exception{
 		throw new Exception("==> "+ "missing layer " + Generator.LM_R[index]);
 	}

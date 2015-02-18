@@ -10,14 +10,21 @@ public class BaseTester {
 	protected String cleanString;
 	protected Node rootNode;
 	
-	public void run() throws Exception {
-		//override
+	protected void run() throws Exception {
 		System.out.println("No test defined");
 	}
 	
+	protected String getTestName() {
+		return "not specified";
+	}
+	
+	//entry point for tests
 	public void RunTest(String big, int lb)
 	{		
 		try {			
+			
+			System.out.println(getTestName());
+			
 			iemlSequence = big == null ? Generator.GetScript(lb) : big;				
 			//parsing does not care about '*', '(' and ')', but the names of the nodes will include those characters
 			//which will be confusing when printing out a readable name.
@@ -25,9 +32,15 @@ public class BaseTester {
 			rootNode = TopDownParser.Parse(cleanString);
 			
 			run();
+			
+			System.out.println(getTestName());
+			
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+		}
+		finally {
+			
 		}
 	}
 }
