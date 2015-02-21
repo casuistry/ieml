@@ -21,7 +21,7 @@ public class Tester {
 	
 	public static void main(String[] args) {
 		EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
-		emptyNodeTester.RunTest(null, 3);
+		emptyNodeTester.RunTest(null, 6);
 	}
 
 	private static void niveauTest(String big, int lb){

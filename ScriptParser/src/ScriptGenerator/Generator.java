@@ -3,14 +3,11 @@ package ScriptGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import IEMLInterface.IEMLLang;
 
 public class Generator {
 
 	private static Random random = new Random();
-	
-	public static String[] alphabet = new String[]{"S","B","T","U","A","O","M","I","E","F"};
-	public static String[] LM = new String[]{":", ".", "-", "'", ",", "_", ";"};
-	public static String[] LM_R = new String[]{":", "\\.", "-", "'", ",", "_", ";"};
 	
     public static List<String> GetScript(int layer, int count) {
     	
@@ -54,15 +51,15 @@ public class Generator {
 			
 			if (layer == 0) {
 
-				result.append(alphabet[random.nextInt(10)]);
-				result.append(LM[0]);	
+				result.append(IEMLLang.alphabet[random.nextInt(10)]);
+				result.append(IEMLLang.LM[0]);	
 			}
 			else {
 				for (int j=0; j<3; j++){
 					result.append(GetExpression(layer-1, true));
 				}
 				
-				result.append(LM[layer]);	
+				result.append(IEMLLang.LM[layer]);	
 			}
 			
 			if (composite && i < compositeNumber - 1) 

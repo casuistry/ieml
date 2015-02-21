@@ -4,16 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
+import IEMLInterface.IEMLLang;
 import IEMLInterface.TermInterface;
 import Inspector.BaseInspector;
-import ScriptGenerator.Generator;
 import Structures.CompMatch;
 import Structures.Counter;
 import Structures.Utilities;
 
 public class Node {
 		
+	public static AtomicLong TotalNodes = new AtomicLong(0);
+	
 	//predefined descriptors for nodes
 	public static String ATOM = "ATOM"; 	//layer
 	public static String NODE = "NODE"; 	//type of node
@@ -39,11 +42,14 @@ public class Node {
 		name = n;
 		descriptor = desc;
 		layer = l;
+		
+		TotalNodes.getAndIncrement();
 	}
 	public Node(String n, String desc){
-		name = n;
-		descriptor = desc;
-		layer = "-1";
+		this(n, desc, "-1");
+	}
+	public ArrayList<Node> GetNodes(){
+		return nodes;
 	}
 	public void SetLayer(String l){
 		layer = l;
@@ -271,8 +277,8 @@ public class Node {
 					swap = true;
 				}
 				
-				String[] base = Utilities.getChunks(longer.replaceAll("[+" + Generator.LM[0] +"]", ""));
-				String[] frag = Utilities.getChunks(shorter.replaceAll("[+" + Generator.LM[0] +"]", ""));
+				String[] base = Utilities.getChunks(longer.replaceAll("[+" + IEMLLang.LM[0] +"]", ""));
+				String[] frag = Utilities.getChunks(shorter.replaceAll("[+" + IEMLLang.LM[0] +"]", ""));
 				
 				List<int[]> index =	Utilities.convIndex(base.length, frag.length, true);
 							
@@ -409,7 +415,7 @@ public class Node {
 			}
 			
 			if (opcode.isEmpty())
-				builder.append(Generator.LM[GetLayerInt()]);
+				builder.append(IEMLLang.LM[GetLayerInt()]);
 		}		
 		else if (layer.equals(ATOM)){
 			builder.append(name);		

@@ -1,66 +1,103 @@
 package TopDown;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import ScriptGenerator.Generator;
+
+import IEMLInterface.IEMLLang;
+import TopDown.Parser.Mode;
 
 public class TopDownParser {
 	
-	private static Pattern[] patternDetector = new Pattern[] { 
-		Pattern.compile("(\\w+)"),
-		Pattern.compile("(.+?"+Generator.LM_R[0]+"(\\+.+?"+Generator.LM_R[0]+")*)"),
-		Pattern.compile("(.+?"+Generator.LM_R[1]+"(\\+.+?"+Generator.LM_R[1]+")*)"),
-		Pattern.compile("(.+?"+Generator.LM_R[2]+"(\\+.+?"+Generator.LM_R[2]+")*)"),
-		Pattern.compile("(.+?"+Generator.LM_R[3]+"(\\+.+?"+Generator.LM_R[3]+")*)"),
-		Pattern.compile("(.+?"+Generator.LM_R[4]+"(\\+.+?"+Generator.LM_R[4]+")*)"),
-		Pattern.compile("(.+?"+Generator.LM_R[5]+"(\\+.+?"+Generator.LM_R[5]+")*)"),
-		Pattern.compile("(.+?"+Generator.LM_R[6]+"(\\+.+?"+Generator.LM_R[6]+")*)")
-	};
-	private static Pattern[] layerMarkDetectors = new Pattern[] { 
-		Pattern.compile("(\\w+"+Generator.LM_R[0]+")"),
-		Pattern.compile(".+?"+Generator.LM_R[1]),
-		Pattern.compile(".+?"+Generator.LM_R[2]),
-		Pattern.compile(".+?"+Generator.LM_R[3]),
-		Pattern.compile(".+?"+Generator.LM_R[4]),
-		Pattern.compile(".+?"+Generator.LM_R[5]),
-		Pattern.compile(".+?"+Generator.LM_R[6])
-	};
-		
-	private static Matcher matcher;
+	private static int numCores = Runtime.getRuntime().availableProcessors()/2;
+	private static long parsingTime;
+	private static ExecutorService e = Executors.newFixedThreadPool(numCores);
 	
+	public static Pattern[] patternDetector = new Pattern[] { 
+		Pattern.compile("(\\w+)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[0]+"(\\+.+?"+IEMLLang.LM_R[0]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[1]+"(\\+.+?"+IEMLLang.LM_R[1]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[2]+"(\\+.+?"+IEMLLang.LM_R[2]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[3]+"(\\+.+?"+IEMLLang.LM_R[3]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[4]+"(\\+.+?"+IEMLLang.LM_R[4]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[5]+"(\\+.+?"+IEMLLang.LM_R[5]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[6]+"(\\+.+?"+IEMLLang.LM_R[6]+")*)")
+	};
+	public static Pattern[] layerMarkDetectors = new Pattern[] { 
+		Pattern.compile("(\\w+"+IEMLLang.LM_R[0]+")"),
+		Pattern.compile(".+?"+IEMLLang.LM_R[1]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[2]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[3]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[4]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[5]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[6])
+	};
+
 	public static Node Parse(String input) {
-		Node result = new Node(input, Node.ROOT);
-		result.SetLayer(Generator.LM_R.length-1);
-		try {	
-			parse(result, Generator.LM_R.length-1);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
+		
+		int inputLength = input.length();
+		String detectedLayer = input.substring(inputLength-1, inputLength);
+		System.out.println(detectedLayer);				
+		System.out.println(IEMLLang.LMList.indexOf(detectedLayer));
+		
+		Node.TotalNodes.set(0);
+		long startParsing = System.nanoTime();
+		
+		int startingDefaultLayer = IEMLLang.LMList.indexOf(detectedLayer);		
+		Node result = new Node(input, Node.ROOT, Integer.toString(startingDefaultLayer));
+		Parser.Parse(result, startingDefaultLayer, Parser.Mode.Toplevel);
+		
+		ArrayList<Node> children = result.GetNodes();
+		
+		if (children!=null){
+			for (Node n : children){
+				e.execute(new Parser(n, n.GetLayerInt(), Mode.Full));
+			}
+			
+			try {
+				e.shutdown();
+				if (!e.awaitTermination(10, TimeUnit.SECONDS)){
+					System.out.println("Timed out");
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+				
+		parsingTime = System.nanoTime() - startParsing;
+		System.out.println(Node.TotalNodes.get() + " node(s) processed in " + parsingTime/1000000 + " ms. on " + numCores + " cores for length " + inputLength);
 		return result;	
 	}
 	
 	private static void parse(Node input, int index) throws Exception {		
 				
-		if (index < 0 || index >= Generator.LM_R.length) 
+		if (index < 0 || index >= IEMLLang.LM_R.length) 
 			return; 
-		if (index >= patternDetector.length || index >= layerMarkDetectors.length)
-			missingRegexException(index);
+		if (index >= patternDetector.length || index >= layerMarkDetectors.length){
+			throw new Exception("==> "+ "missing regex for index " + index);
+		}
 									
-		// store in substrings all substrings ending with specified layer mark
-		ArrayList<String> substrings = new ArrayList<String>();		
-		matcher = layerMarkDetectors[index].matcher(input.GetName());	
+		ArrayList<String> substrings = new ArrayList<String>();	
+		
+		Matcher matcher = layerMarkDetectors[index].matcher(input.GetName());			
 		while (matcher.find())	
 			substrings.add(matcher.group());
 				
 		if (substrings.size() < 1) {
-			if (input.GetSize() > 0)
-				missingLayerException(index);
+			//nothing at this layer, go down
+			if (input.GetSize() > 0){
+				throw new Exception("==> "+ "missing layer " + IEMLLang.LM_R[index]);
+			}
 			input.SetLayer((index - 1));
 			parse(input, index - 1);
-		}	
-		// multiplication
+		}			
 		else if (substrings.size() == 1){
+			// multiplication
 			substrings.clear();
 			matcher = patternDetector[index].matcher(input.GetName());	
 			
@@ -81,9 +118,9 @@ public class TopDownParser {
 				input.AddNode(newNode);	
 				parse(newNode, index - 1);
 			}
-		}
-		// addition
+		}	
 		else {
+			// addition
 			input.AddNode(new Node("+", Node.OPCODE));
 			for (String str : substrings) 
 			{	
@@ -92,14 +129,6 @@ public class TopDownParser {
 				parse(newNode, index);
 			}
 		}
-	}
-	
-	private static void missingLayerException(int index) throws Exception{
-		throw new Exception("==> "+ "missing layer " + Generator.LM_R[index]);
-	}
-
-	private static void missingRegexException(int index) throws Exception{
-		throw new Exception("==> "+ "missing regex for index " + index);
 	}
 }
 
