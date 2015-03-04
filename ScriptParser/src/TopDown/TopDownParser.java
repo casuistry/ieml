@@ -41,8 +41,8 @@ public class TopDownParser {
 		
 		int inputLength = input.length();
 		String detectedLayer = input.substring(inputLength-1, inputLength);
-		System.out.println(detectedLayer);				
-		System.out.println(IEMLLang.LMList.indexOf(detectedLayer));
+		System.out.print("Based on character: " + detectedLayer);				
+		System.out.println(" layer is: " + IEMLLang.LMList.indexOf(detectedLayer));
 		
 		Node.TotalNodes.set(0);
 		long startParsing = System.nanoTime();
@@ -72,63 +72,6 @@ public class TopDownParser {
 		parsingTime = System.nanoTime() - startParsing;
 		System.out.println(Node.TotalNodes.get() + " node(s) processed in " + parsingTime/1000000 + " ms. on " + numCores + " cores for length " + inputLength);
 		return result;	
-	}
-	
-	private static void parse(Node input, int index) throws Exception {		
-				
-		if (index < 0 || index >= IEMLLang.LM_R.length) 
-			return; 
-		if (index >= patternDetector.length || index >= layerMarkDetectors.length){
-			throw new Exception("==> "+ "missing regex for index " + index);
-		}
-									
-		ArrayList<String> substrings = new ArrayList<String>();	
-		
-		Matcher matcher = layerMarkDetectors[index].matcher(input.GetName());			
-		while (matcher.find())	
-			substrings.add(matcher.group());
-				
-		if (substrings.size() < 1) {
-			//nothing at this layer, go down
-			if (input.GetSize() > 0){
-				throw new Exception("==> "+ "missing layer " + IEMLLang.LM_R[index]);
-			}
-			input.SetLayer((index - 1));
-			parse(input, index - 1);
-		}			
-		else if (substrings.size() == 1){
-			// multiplication
-			substrings.clear();
-			matcher = patternDetector[index].matcher(input.GetName());	
-			
-			while (matcher.find())
-				substrings.add(matcher.group());
-			
-			if (index == 0 && substrings.size() == 1) {
-				Node newNode = new Node(substrings.get(0), Node.NODE, Node.ATOM);
-				input.AddNode(newNode);	
-				return;
-			}
-			
-			input.AddNode(new Node("*", Node.OPCODE));
-			
-			for (String str : substrings) 
-			{	
-				Node newNode = new Node(str, Node.NODE, Integer.toString(index-1));
-				input.AddNode(newNode);	
-				parse(newNode, index - 1);
-			}
-		}	
-		else {
-			// addition
-			input.AddNode(new Node("+", Node.OPCODE));
-			for (String str : substrings) 
-			{	
-				Node newNode = new Node(str, Node.NODE, Integer.toString(index));
-				input.AddNode(newNode);	
-				parse(newNode, index);
-			}
-		}
 	}
 }
 

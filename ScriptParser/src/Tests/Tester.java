@@ -1,30 +1,27 @@
 package Tests;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.PriorityQueue;
-
-import Inspector.BaseInspector;
-import ScriptGenerator.Generator;
-import Structures.Counter;
-import Structures.Utilities;
-import Structures.CompMatch;
-import TopDown.Node;
-import TopDown.TopDownParser;
+import IEMLInterface.ScriptExamples;
 
 
 public class Tester {
 	
-	private static BaseInspector inspector = new BaseInspector();
-	
 	public static void main(String[] args) {
-		EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
-		emptyNodeTester.RunTest(null, 6);
+		
+		TermTester tester = new TermTester();
+		tester.RunTest(ScriptExamples.StudentLearnsMathematics, 6);
+		
+		//ParsingTester parsingTester = new ParsingTester();
+		//parsingTester.RunTest(ScriptExamples.StudentLearnsMathematics, 6);
+		
+		//EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
+		//emptyNodeTester.RunTest(null, 6);
 	}
+}
 
-	private static void niveauTest(String big, int lb){
+
+/*
+ 
+ 	private static void niveauTest(String big, int lb){
 		try {			
 			String iemlSequence = big == null ? Generator.GetScript(lb) : big;				
 			//parsing does not care about '*', '(' and ')', but the names of the nodes will include those characters
@@ -346,4 +343,5 @@ public class Tester {
 			e.printStackTrace();
 		}		
 	}
-}
+ 
+ */

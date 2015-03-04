@@ -28,7 +28,9 @@ public class BaseTester {
 			iemlSequence = big == null ? Generator.GetScript(lb) : big;				
 			//parsing does not care about '*', '(' and ')', but the names of the nodes will include those characters
 			//which will be confusing when printing out a readable name.
-			cleanString = iemlSequence.replaceAll("[()*]", ""); 
+			cleanString = iemlSequence.replaceAll("[()*\\s]", ""); 
+			
+			
 			rootNode = TopDownParser.Parse(cleanString);
 			
 			run();

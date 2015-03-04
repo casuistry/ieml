@@ -33,6 +33,7 @@ public class Node {
 	//-----------------------------------------calculated values-----------------------------------
 	
 	public Boolean isEmpty = null;
+	public boolean isTerm = false;
 	
 	//-----------------------------------------basic methods-----------------------------------
 	
@@ -82,11 +83,14 @@ public class Node {
 	}
 	//name of this node
 	public String GetName(){
+		return GetPrintableName();
 		//need initial "+" to parse properly, clean name is returned in GetPrintableName
-		return name;
+		//return name;
 	}
 	//name of this node (without parsing artifacts)
 	public String GetPrintableName(){
+		if (descriptor.equals(OPCODE))
+			return name; //opcode can be "+", we want to keep it
 		return name.startsWith("+") ? name.substring(1) : name;
 	}
 	//descriptor of this node
@@ -113,7 +117,8 @@ public class Node {
 		
 		return cLayer;
 	}	
-	//Readable representation of a node and its children
+	
+	//Readable representation of a node and its children in a tree-form
 	public void PrintNode(String prepend, BaseInspector inspector){
 		
 		if (nodes != null) {
@@ -129,10 +134,15 @@ public class Node {
 		}		
 	}
 
+	//Readable representation of a node and its children in a list-form
 	public void PrintNodes(String prepend, BaseInspector inspector){
 		
-		System.out.println(inspector.Inspect(this));
-			
+		String toPrint = inspector.Inspect(this);
+		
+		if (toPrint != null){
+			System.out.println(toPrint);
+		}
+
 		if (nodes != null) {
 			for(Node node : nodes){
 				node.PrintNodes(prepend+"\t", inspector);
@@ -173,6 +183,24 @@ public class Node {
 		return isEmpty;
 	}
 	
+	public static void MarkTerms(TermInterface termMap, Node node){
+		
+    	if (termMap.IsTerm(node)){    		
+    		node.isTerm = true;
+    	}
+    	else {
+    		if (node.nodes != null) {
+    			for(Node n : node.nodes){	
+    				MarkTerms(termMap, n);
+    			}
+    		}
+    		else 
+    		{
+    			//Node may be at level 0 but not be a term (depends on the dictionary?)
+    			//throw new Exception("Node is not a term, but has no children");			
+    		}
+    	}
+	}
 	
 	//-----------------------------------------other methods-----------------------------------
 	
@@ -180,9 +208,11 @@ public class Node {
 	//This dictionary will be supplied externally. 
     public static List<Node> GetTerms(Node r) throws Exception {
     	
+    	TermInterface terms = new TermInterface(null);
+    	
     	ArrayList<Node> result = new ArrayList<Node>();
     	
-    	if (TermInterface.IsTerm(r)){    		
+    	if (terms.IsTerm(r)){    		
     		result.add(r);
     	}
     	else {
@@ -210,7 +240,7 @@ public class Node {
     		seq = new String();
     	
     	String opcodeForChildren = node.GetOpcode();
-    	
+    	/*
     	if (TermInterface.IsTerm(node)){      		
     		if (!result.containsKey(seq)){
     			ArrayList<Node> list = new ArrayList<Node>();
@@ -225,7 +255,7 @@ public class Node {
     			GetNiveauSequence(result, subnode, seq);
     		} 
     	}
-    	
+    	*/
     	return result;
     } 
     
