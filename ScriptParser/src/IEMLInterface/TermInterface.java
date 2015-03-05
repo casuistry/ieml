@@ -61,11 +61,11 @@ public class TermInterface {
     		termMap = LoadDictionary(filepath);
     	}
     	   	
-    	if (termMap.containsKey(node.GetPrintableName())) {  //some names might have leading "+"  		
+    	if (termMap.containsKey(node.GetName())) {   		
     		return true;
     	}
     	
-    	if ( (node.GetDescriptor().equals(Node.NODE) || node.GetDescriptor().equals(Node.ROOT)) && node.GetLayerInt() == 0) {
+    	if ( node.GetDescriptor().equals(Node.ATOM) || (node.GetDescriptor().equals(Node.ROOT) && node.GetLayerInt() == 0)) {
     		return true;
     	}
     	

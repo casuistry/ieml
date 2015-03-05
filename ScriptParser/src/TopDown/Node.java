@@ -83,12 +83,6 @@ public class Node {
 	}
 	//name of this node
 	public String GetName(){
-		return GetPrintableName();
-		//need initial "+" to parse properly, clean name is returned in GetPrintableName
-		//return name;
-	}
-	//name of this node (without parsing artifacts)
-	public String GetPrintableName(){
 		if (descriptor.equals(OPCODE))
 			return name; //opcode can be "+", we want to keep it
 		return name.startsWith("+") ? name.substring(1) : name;

@@ -15,8 +15,8 @@ public class TermTester extends BaseTester {
 		
 		TermInterface termInterface = new TermInterface(null);
 		Node.MarkTerms(termInterface, rootNode);	
-		//rootNode.PrintNodes("", new TermInspector(termInterface));
-		rootNode.PrintNode("", new BaseInspector());
+		rootNode.PrintNodes("", new TermInspector(termInterface));
+		//rootNode.PrintNode("", new BaseInspector());
 	}
 	
 	protected String getTestName() {

@@ -12,8 +12,11 @@ public class IEMLLang {
 	
 	//layer marks for regex
 	public static String[] LM_R = new String[]{":", "\\.", "-", "’", ",", "_", ";"};
-	
-	
+		
 	//convenience to find index of a particular layer mark;
 	public static List<String> LMList = Arrays.asList(LM);	
+	
+	public static String GetEmpty(){
+		return "E";
+	}
 }

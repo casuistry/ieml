@@ -5,7 +5,7 @@ import TopDown.Node;
 public class BaseInspector {
 
 	protected String inspect(Node node){
-		StringBuilder builder = new StringBuilder("[" + node.GetDescriptor() + "|" + node.GetPrintableName());
+		StringBuilder builder = new StringBuilder("[" + node.GetDescriptor() + "|" + node.GetName());
 		if (node.GetLayer() != "-1")
 			builder.append("|" + node.GetLayer());
 

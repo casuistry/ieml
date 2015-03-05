@@ -1,6 +1,8 @@
 package Tests;
 
 import IEMLInterface.ScriptExamples;
+import ScriptGenerator.BaseProvider;
+import ScriptGenerator.EmptyProvider;
 
 
 public class Tester {
@@ -8,7 +10,10 @@ public class Tester {
 	public static void main(String[] args) {
 		
 		TermTester tester = new TermTester();
-		tester.RunTest(ScriptExamples.StudentLearnsMathematics, 6);
+		tester.RunTest(null, 3, new BaseProvider());			
+		
+		//NullTester tester = new NullTester();
+		//tester.RunTest(null, 3, new EmptyProvider());
 		
 		//ParsingTester parsingTester = new ParsingTester();
 		//parsingTester.RunTest(ScriptExamples.StudentLearnsMathematics, 6);
