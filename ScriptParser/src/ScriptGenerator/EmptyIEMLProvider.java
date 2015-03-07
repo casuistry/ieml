@@ -2,7 +2,7 @@ package ScriptGenerator;
 
 import IEMLInterface.IEMLLang;
 
-public class EmptyProvider extends BaseProvider {
+public class EmptyIEMLProvider extends BaseIEMLProvider {
 	
 	public String GetLetter() {
 		return IEMLLang.GetEmpty();

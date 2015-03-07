@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import IEMLInterface.IEMLLang;
+import IEMLInterface.StructureRule;
 import TopDown.Parser.Mode;
 
 public class TopDownParser {
@@ -69,6 +70,14 @@ public class TopDownParser {
 			}
 		}
 				
+		StructureRule rule = new StructureRule();
+		String error = rule.ApplyRule(result);
+		
+		if (error != null)
+			System.out.println(error);
+		else 
+			System.out.println("Passed " + rule.GetName());
+		
 		parsingTime = System.nanoTime() - startParsing;
 		System.out.println(Node.TotalNodes.get() + " node(s) processed in " + parsingTime/1000000 + " ms. on " + numCores + " cores for length " + inputLength);
 		return result;	

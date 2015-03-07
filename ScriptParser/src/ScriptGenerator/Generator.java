@@ -7,16 +7,15 @@ import IEMLInterface.IEMLLang;
 
 public class Generator {
 
-	private static Random random = new Random();
-	
-    public static List<String> GetScript(int layer, int count, BaseProvider provider) {
+	//returns a list of expressions
+    public static List<String> GetScript(int layer, int count, BaseIEMLProvider provider, GeneratorConfigurator configurator) {
     	
     	List<String> list = new ArrayList<String>();
     	
     	for (int i=0;i<count;i++){
     		String result;
 			try {
-				result = GetScript(layer, provider);
+				result = GetScript(layer, provider, configurator);
 				list.add(result);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -26,23 +25,25 @@ public class Generator {
     	return list;
     }
     
-	public static String GetScript(int layer, BaseProvider provider) throws Exception {
+    //returns an expression
+	public static String GetScript(int layer, BaseIEMLProvider provider, GeneratorConfigurator configurator) throws Exception {
 		
 		StringBuilder result = new StringBuilder("*");
-		result.append(GetExpression(layer, provider));	
+		result.append(GetExpression(layer, provider, configurator));	
 		result.append("**");
 		return result.toString();
 	}
 		
-	public static String GetExpression(int layer, BaseProvider provider) throws Exception {
+	//returns a sequence
+	public static String GetExpression(int layer, BaseIEMLProvider provider, GeneratorConfigurator configurator) throws Exception {
 		
 		if (layer < 0 || layer >= 7 ) 
 			throw new Exception();
 		
 		StringBuilder result = new StringBuilder();
 		
-		boolean composite = random.nextBoolean() && provider.IsCompositeValid();		
-		int compositeNumber = composite ? 1 + random.nextInt(5) : 1;
+		boolean composite = configurator.random.nextBoolean() && provider.IsCompositeValid();		
+		int compositeNumber = composite ? 1 + configurator.random.nextInt(5) : 1;
 		
 		if (composite && (compositeNumber > 1)) 
 			result.append("(");
@@ -56,7 +57,7 @@ public class Generator {
 			}
 			else {
 				for (int j=0; j<3; j++){
-					result.append(GetExpression(layer-1, provider));
+					result.append(GetExpression(layer-1, provider, configurator));
 				}
 				
 				result.append(provider.GetLayerMark(layer));	

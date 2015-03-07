@@ -46,9 +46,11 @@ public class Node {
 		
 		TotalNodes.getAndIncrement();
 	}
+	
 	public Node(String n, String desc){
 		this(n, desc, "-1");
 	}
+	
 	public ArrayList<Node> GetNodes(){
 		return nodes;
 	}

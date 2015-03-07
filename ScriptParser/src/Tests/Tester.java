@@ -1,22 +1,26 @@
 package Tests;
 
 import IEMLInterface.ScriptExamples;
-import ScriptGenerator.BaseProvider;
-import ScriptGenerator.EmptyProvider;
+import ScriptGenerator.BaseIEMLProvider;
+import ScriptGenerator.EmptyIEMLProvider;
+import ScriptGenerator.GeneratorConfigurator;
 
 
 public class Tester {
 	
 	public static void main(String[] args) {
 		
-		TermTester tester = new TermTester();
-		tester.RunTest(null, 3, new BaseProvider());			
+		//RuleTester tester = new RuleTester();
+		//tester.RunTest(null, 6, new BaseIEMLProvider(), null);
+		
+		//TermTester tester = new TermTester();
+		//tester.RunTest(null, 3, new BaseIEMLProvider(), null);			
 		
 		//NullTester tester = new NullTester();
-		//tester.RunTest(null, 3, new EmptyProvider());
+		//tester.RunTest(null, 3, new EmptyIEMLProvider(), null);
 		
-		//ParsingTester parsingTester = new ParsingTester();
-		//parsingTester.RunTest(ScriptExamples.StudentLearnsMathematics, 6);
+		ParsingTester parsingTester = new ParsingTester();
+		parsingTester.RunTest(null, 6, new BaseIEMLProvider(), null);
 		
 		//EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
 		//emptyNodeTester.RunTest(null, 6);

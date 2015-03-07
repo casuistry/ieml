@@ -4,7 +4,7 @@ import java.util.Random;
 
 import IEMLInterface.IEMLLang;
 
-public class BaseProvider {
+public class BaseIEMLProvider {
 
 	private Random random = new Random();
 	
