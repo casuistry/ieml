@@ -13,11 +13,11 @@ public class BaseTester {
 	protected Node rootNode;
 	
 	protected void run() throws Exception {
-		System.out.println("No test defined");
+
 	}
 	
 	protected String getTestName() {
-		return "not specified";
+		return "BaseTester";
 	}
 	
 	protected GeneratorConfigurator GetGeneratorConfigurator(){

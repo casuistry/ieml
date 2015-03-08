@@ -9,7 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import IEMLInterface.IEMLLang;
-import IEMLInterface.StructureRule;
+import Rules.RuleEngine;
+import Rules.StructureRule;
 import TopDown.Parser.Mode;
 
 public class TopDownParser {
@@ -39,6 +40,8 @@ public class TopDownParser {
 	};
 
 	public static Node Parse(String input) {
+		
+		RuleEngine rules = new RuleEngine();
 		
 		int inputLength = input.length();
 		String detectedLayer = input.substring(inputLength-1, inputLength);
@@ -70,13 +73,7 @@ public class TopDownParser {
 			}
 		}
 				
-		StructureRule rule = new StructureRule();
-		String error = rule.ApplyRule(result);
-		
-		if (error != null)
-			System.out.println(error);
-		else 
-			System.out.println("Passed " + rule.GetName());
+		rules.RunRules(result);
 		
 		parsingTime = System.nanoTime() - startParsing;
 		System.out.println(Node.TotalNodes.get() + " node(s) processed in " + parsingTime/1000000 + " ms. on " + numCores + " cores for length " + inputLength);

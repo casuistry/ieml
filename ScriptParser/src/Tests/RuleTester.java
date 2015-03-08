@@ -1,7 +1,7 @@
 package Tests;
 
-import IEMLInterface.StructureRule;
 import Inspector.BaseInspector;
+import Rules.StructureRule;
 
 public class RuleTester extends BaseTester {
 	

@@ -1,7 +1,8 @@
-package IEMLInterface;
+package Rules;
 
 import java.util.ArrayList;
 
+import IEMLInterface.IEMLLang;
 import TopDown.Node;
 
 public class StructureRule extends BaseIEMLRule {

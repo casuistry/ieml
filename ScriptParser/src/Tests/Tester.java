@@ -10,6 +10,9 @@ public class Tester {
 	
 	public static void main(String[] args) {
 		
+		BaseTester baseTester = new BaseTester();
+		baseTester.RunTest(null, 6, new BaseIEMLProvider(), null);
+		
 		//RuleTester tester = new RuleTester();
 		//tester.RunTest(null, 6, new BaseIEMLProvider(), null);
 		
@@ -19,8 +22,8 @@ public class Tester {
 		//NullTester tester = new NullTester();
 		//tester.RunTest(null, 3, new EmptyIEMLProvider(), null);
 		
-		ParsingTester parsingTester = new ParsingTester();
-		parsingTester.RunTest(null, 6, new BaseIEMLProvider(), null);
+		//ParsingTester parsingTester = new ParsingTester();
+		//parsingTester.RunTest(null, 6, new BaseIEMLProvider(), null);
 		
 		//EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
 		//emptyNodeTester.RunTest(null, 6);
