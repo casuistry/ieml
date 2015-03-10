@@ -1,5 +1,6 @@
 package IEMLInterface;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -23,15 +24,20 @@ public class TermInterface {
 		
 		Pattern pattern = Pattern.compile("\"([^\"]*)\"");
 		
-		String defaultPath = "C:\\git\\ieml\\Resources\\Dictionary\\ieml_basic_lexicon_2015_02_19_14_41.csv";
+		String defaultPath = "C:\\git\\ieml\\Resources\\Dictionary\\std_dict.csv";
 		
 		String usePath = filepath != null ? filepath : defaultPath;
+		
+		File f = new File(usePath);
+		if (!f.exists()) {
+			Helper.ProcessDictionary(null);
+		}
 		
 		List<String> result = Helper.ReadFile(usePath);
 		
 		for (String s : result){
 			
-			String[] temps = new String[3];
+			String[] temps = new String[2];
 			int index = 0;
 			
 			Matcher matcher = pattern.matcher(s);			
@@ -39,14 +45,13 @@ public class TermInterface {
 				temps[index++] = matcher.group();
 			}
 			
-			if (temps[1] == null || temps[2] == null){
-				//System.out.println(temps[0].replaceAll("\"", ""));
-			}
-			else {
-				String entry = temps[0].replaceAll("\"", "");
-				String means = temps[1].replaceAll("\"", "");
-				map.put(entry, means);
-			}
+			String entry = temps[0].replaceAll("\"", "");
+			String means = temps[1].replaceAll("\"", "");
+			map.put(entry, means);
+		}
+		
+		for (String key : map.keySet()){	
+			System.out.println(key + " " + map.get(key));
 		}
 		
 		return map;

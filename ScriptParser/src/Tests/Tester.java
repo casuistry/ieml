@@ -10,14 +10,14 @@ public class Tester {
 	
 	public static void main(String[] args) {
 		
-		BaseTester baseTester = new BaseTester();
-		baseTester.RunTest(null, 6, new BaseIEMLProvider(), null);
+		//BaseTester baseTester = new BaseTester();
+		//baseTester.RunTest(null, 6, new BaseIEMLProvider(), null);
 		
 		//RuleTester tester = new RuleTester();
 		//tester.RunTest(null, 6, new BaseIEMLProvider(), null);
 		
-		//TermTester tester = new TermTester();
-		//tester.RunTest(null, 3, new BaseIEMLProvider(), null);			
+		TermTester tester = new TermTester();
+		tester.RunTest(null, 3, new BaseIEMLProvider(), null);			
 		
 		//NullTester tester = new NullTester();
 		//tester.RunTest(null, 3, new EmptyIEMLProvider(), null);
