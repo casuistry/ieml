@@ -11,12 +11,8 @@ public class TermTester extends BaseTester {
 
 	protected void run() throws Exception
 	{
-		System.out.println(iemlSequence);
-		
-		TermInterface termInterface = new TermInterface(null);
-		Node.MarkTerms(termInterface, rootNode);	
-		//rootNode.PrintNodes("", new TermInspector(termInterface));
-		//rootNode.PrintNode("", new BaseInspector());
+		System.out.println(iemlSequence);	
+		rootNode.PrintNodes("", new BaseInspector());
 	}
 	
 	protected String getTestName() {

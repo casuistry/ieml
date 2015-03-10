@@ -17,7 +17,7 @@ public class Tester {
 		//tester.RunTest(null, 6, new BaseIEMLProvider(), null);
 		
 		TermTester tester = new TermTester();
-		tester.RunTest(null, 3, new BaseIEMLProvider(), null);			
+		tester.RunTest(ScriptExamples.StudentLearnsMathematics, 3, new BaseIEMLProvider(), null, null);			
 		
 		//NullTester tester = new NullTester();
 		//tester.RunTest(null, 3, new EmptyIEMLProvider(), null);

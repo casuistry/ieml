@@ -50,10 +50,6 @@ public class TermInterface {
 			map.put(entry, means);
 		}
 		
-		for (String key : map.keySet()){	
-			System.out.println(key + " " + map.get(key));
-		}
-		
 		return map;
 	}
 	

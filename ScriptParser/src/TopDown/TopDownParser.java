@@ -39,7 +39,7 @@ public class TopDownParser {
 		Pattern.compile(".+?"+IEMLLang.LM_R[6])
 	};
 
-	public static Node Parse(String input) {
+	public static Node Parse(String input, Mode mode) {
 		
 		RuleEngine rules = new RuleEngine();
 		
@@ -59,7 +59,7 @@ public class TopDownParser {
 		
 		if (children!=null){
 			for (Node n : children){
-				e.execute(new Parser(n, n.GetLayerInt(), Mode.Full));
+				e.execute(new Parser(n, n.GetLayerInt(), mode));
 			}
 			
 			try {

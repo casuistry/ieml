@@ -1,25 +1,33 @@
 package TopDown;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 
 import IEMLInterface.IEMLLang;
+import IEMLInterface.TermInterface;
 
 public class Parser implements Runnable {
 
-	private Node startNode;
-	private int startIndex;
-	private Mode startMode;
+	private Node startNode; // root node
+	private int startIndex; // estimate of layer
+	private Mode startMode; // parsing mode
+	
+	private HashMap<String, String> terms;
 	
 	public enum Mode {
-		Toplevel,
-		Full
+		Toplevel, // non-recursive
+		Full,     // recursive
+		TermOnly, // stops at terms
 	}
 	
 	public Parser(Node n, int i, Mode m){
 		this.startNode = n;
 		this.startIndex = i;
 		this.startMode = m;		
+		
+		if (startMode == Mode.TermOnly)
+			terms = TermInterface.LoadDictionary(null);
 	}
 	
 	public void run() {
@@ -89,6 +97,10 @@ public class Parser implements Runnable {
 				
 				if (mode == Mode.Full)
 					parse(newNode, index - 1, mode);
+				else if (mode == Mode.TermOnly){
+					if (!terms.containsKey(str))
+						parse(newNode, index - 1, mode);
+				}
 			}
 		}	
 		else {
@@ -101,6 +113,10 @@ public class Parser implements Runnable {
 				
 				if (mode == Mode.Full)
 					parse(newNode, index - 1, mode);
+				else if (mode == Mode.TermOnly){
+					if (!terms.containsKey(str))
+						parse(newNode, index - 1, mode);
+				}
 			}
 		}
 	}

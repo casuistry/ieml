@@ -136,7 +136,7 @@ public class Node {
 		String toPrint = inspector.Inspect(this);
 		
 		if (toPrint != null){
-			System.out.println(toPrint);
+			System.out.println(prepend + toPrint);
 		}
 
 		if (nodes != null) {
