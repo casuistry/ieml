@@ -16,7 +16,7 @@ public class TopDownParser {
 	private static long parsingTime;
 	private static ExecutorService e = Executors.newFixedThreadPool(numCores);
 	
-	public static Node Parse(String input, Mode mode) {
+	public static Node Parse(String input, ParserConfigurator config) {
 		
 		RuleEngine rules = new RuleEngine();
 		
@@ -30,13 +30,15 @@ public class TopDownParser {
 		
 		int startingDefaultLayer = IEMLLang.LMList.indexOf(detectedLayer);		
 		Node result = Node.GetNewNode(input, startingDefaultLayer);
-		Parser.Parse(result, startingDefaultLayer, Parser.Mode.Toplevel);
+		ParserConfigurator pc = new ParserConfigurator();
+		pc._Mode = Mode.Toplevel;		
+		Parser.Parse(result, startingDefaultLayer, pc);
 		
 		ArrayList<Node> children = result.GetNodes();
 		
 		if (children!=null){
 			for (Node n : children){
-				e.execute(new Parser(n, n.GetLayer(), mode));
+				e.execute(new Parser(n, n.GetLayer(), config));
 			}
 			
 			try {

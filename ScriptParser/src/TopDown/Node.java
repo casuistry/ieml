@@ -177,34 +177,7 @@ public class Node {
     	}
 	}
 	
-	//-----------------------------------------other methods-----------------------------------
-	
-	//Gets all the "terms" of the supplied node. A term is defined in a dictionary.
-	//This dictionary will be supplied externally. 
-    public static List<Node> GetTerms(Node r) throws Exception {
-    	
-    	TermInterface terms = new TermInterface(null);
-    	
-    	ArrayList<Node> result = new ArrayList<Node>();
-    	
-    	if (terms.IsTerm(r)){    		
-    		result.add(r);
-    	}
-    	else {
-    		if (r.nodes != null) {
-    			for(Node node : r.nodes){		
-    				result.addAll(GetTerms(node));
-    			}
-    		}
-    		else 
-    		{
-    			//Node may be at level 0 but not be a term (depends on the dictionary?)
-    			//throw new Exception("Node is not a term, but has no children");			
-    		}
-    	}
-
-        return result;
-    }  
+	//-----------------------------------------other methods----------------------------------- 
     
 	public static Counter GetNumberOfDifferences(Node a, Node b) throws Exception{
 		

@@ -17,7 +17,7 @@ public class TermInspector extends BaseInspector {
 		if (!node.isTerm)
 			return null;
 		
-		StringBuilder builder = new StringBuilder(node.GetName() + "\t[" + termInterface.termMap.get(node.GetName()) + "]");
+		StringBuilder builder = new StringBuilder(node.GetName() + "\t[" + termInterface.GetMapping(node.GetName()) + "]");
 		return builder.toString();
 	}
 }

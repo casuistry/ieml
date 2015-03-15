@@ -1,7 +1,6 @@
 package TopDown;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,9 +31,9 @@ public class Parser implements Runnable {
 	
 	private Node startNode; // root node
 	private int startIndex; // estimate of layer
-	private Mode startMode; // parsing mode
+	private ParserConfigurator config; 
 	
-	private HashMap<String, String> terms;
+	private TermInterface terms;
 	
 	public enum Mode {
 		Toplevel, // non-recursive
@@ -42,27 +41,25 @@ public class Parser implements Runnable {
 		TermOnly, // stops at terms
 	}
 	
-	public Parser(Node n, int i, Mode m){
+	public Parser(Node n, int i, ParserConfigurator config){
 		this.startNode = n;
 		this.startIndex = i;
-		this.startMode = m;		
-		
-		if (startMode == Mode.TermOnly)
-			terms = TermInterface.LoadDictionary(null);
+		this.config = config;				
+		this.terms = TermInterface.getInstance(config._TermFilePath);		
 	}
 	
 	public void run() {
 		try {	
-			parse(startNode, startIndex, startMode);
+			parse(startNode, startIndex);
 			System.out.println(Thread.currentThread().getName());
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 	}
 
-	public static void Parse(Node n, int i, Mode m){
+	public static void Parse(Node n, int i, ParserConfigurator config){
 		try {	
-			Parser p = new Parser(n, i, m);
+			Parser p = new Parser(n, i, config);
 			p.parse();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -70,10 +67,12 @@ public class Parser implements Runnable {
 	}
 	
 	private void parse() throws Exception {
-		parse(startNode, startIndex, startMode);
+		parse(startNode, startIndex);
 	}
 	
-	private void parse(Node input, int index, Mode mode) throws Exception {		
+	private void parse(Node input, int index) throws Exception {		
+		
+		Mode mode = config._Mode;
 		
 		if (!IEMLLang.IsLayerValid(index)) 
 			return; 
@@ -108,7 +107,10 @@ public class Parser implements Runnable {
 			
 			if (index == 0 && substrings.size() == 1) {
 				//atom
-				input.AddNode(Node.GetNewNode(substrings.get(0), index));
+				Node newNode = Node.GetNewNode(substrings.get(0), index);				
+				if (terms.IsTerm(newNode))
+					newNode.isTerm = true;				
+				input.AddNode(newNode);
 				return;
 			}
 			
@@ -120,10 +122,12 @@ public class Parser implements Runnable {
 				input.AddNode(newNode);	
 				
 				if (mode == Mode.Full)
-					parse(newNode, index - 1, mode);
+					parse(newNode, index - 1);
 				else if (mode == Mode.TermOnly){
-					if (!terms.containsKey(str))
-						parse(newNode, index - 1, mode);
+					if (terms.IsTerm(newNode))
+						newNode.isTerm = true;
+					else
+						parse(newNode, index - 1);						
 				}
 			}
 		}	
@@ -137,10 +141,12 @@ public class Parser implements Runnable {
 				input.AddNode(newNode);	
 				
 				if (mode == Mode.Full)
-					parse(newNode, index - 1, mode);
+					parse(newNode, index - 1);
 				else if (mode == Mode.TermOnly){
-					if (!terms.containsKey(str))
-						parse(newNode, index - 1, mode);
+					if (terms.IsTerm(newNode))
+						newNode.isTerm = true;
+					else
+						parse(newNode, index - 1);	
 				}
 			}
 		}

@@ -7,19 +7,52 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import TopDown.Node;
+import TopDown.ParserConfigurator;
 import Utilities.Helper;
 
 public class TermInterface {
 	
-	String filepath = null;
-	public HashMap<String, String> termMap = null;
-	
-	public TermInterface(String filepath) {
-		this.filepath = filepath;
-	}
-	
+    private static HashMap<String, TermInterface> map = new HashMap<String, TermInterface>();
+    
+    public static synchronized TermInterface getInstance(String filepath) {
+    	
+    	if (!map.containsKey(filepath)){
+    		TermInterface t = new TermInterface(filepath);
+    		map.put(filepath, t);
+    	}
+    	
+    	return map.get(filepath);
+    }
+    
+    private HashMap<String, String> termMap = null;
+    
+    private TermInterface(String filepath) {
+    	termMap = LoadDictionary(filepath);
+    }
+    	
+    public boolean IsTerm(Node node){
+    	
+    	if (node == null)
+    		return false;
+    	   	
+    	if (termMap.containsKey(node.GetName()))
+    		return true;
+    	
+    	if (node.IsPrimitive())
+    		return true;
+    	
+    	return false;
+    }
+    
+    public String GetMapping(String key){
+    	if (termMap.containsKey(key))
+    		return termMap.get(key);
+    	else
+    		return "No mapping";
+    }
+    
 	public static HashMap<String, String> LoadDictionary(String filepath){
-	
+		
 		HashMap<String, String> map = new HashMap<String, String>();
 		
 		Pattern pattern = Pattern.compile("\"([^\"]*)\"");
@@ -52,21 +85,4 @@ public class TermInterface {
 		
 		return map;
 	}
-	
-    public boolean IsTerm(Node node){
-    	
-    	if (node == null)
-    		return false;
-    	
-    	if (termMap == null)
-    		termMap = LoadDictionary(filepath);
-    	   	
-    	if (termMap.containsKey(node.GetName()))
-    		return true;
-    	
-    	if (node.IsPrimitive())
-    		return true;
-    	
-    	return false;
-    }
 }

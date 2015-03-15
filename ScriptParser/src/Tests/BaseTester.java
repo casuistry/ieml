@@ -47,7 +47,7 @@ public class BaseTester {
 			//which will be confusing when printing out a readable name.
 			cleanString = iemlSequence.replaceAll("[()*\\s]", ""); 			
 			
-			rootNode = TopDownParser.Parse(cleanString, pConf._Mode);
+			rootNode = TopDownParser.Parse(cleanString, pConf);
 			
 			run();
 			
