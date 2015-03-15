@@ -3,12 +3,33 @@ package TopDown;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import IEMLInterface.IEMLLang;
 import IEMLInterface.TermInterface;
 
 public class Parser implements Runnable {
 
+	public static Pattern[] patternDetector = new Pattern[] { 
+		Pattern.compile("(\\w+)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[0]+"(\\+.+?"+IEMLLang.LM_R[0]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[1]+"(\\+.+?"+IEMLLang.LM_R[1]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[2]+"(\\+.+?"+IEMLLang.LM_R[2]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[3]+"(\\+.+?"+IEMLLang.LM_R[3]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[4]+"(\\+.+?"+IEMLLang.LM_R[4]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[5]+"(\\+.+?"+IEMLLang.LM_R[5]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[6]+"(\\+.+?"+IEMLLang.LM_R[6]+")*)")
+	};
+	public static Pattern[] layerMarkDetectors = new Pattern[] { 
+		Pattern.compile("(\\w+"+IEMLLang.LM_R[0]+")"),
+		Pattern.compile(".+?"+IEMLLang.LM_R[1]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[2]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[3]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[4]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[5]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[6])
+	};
+	
 	private Node startNode; // root node
 	private int startIndex; // estimate of layer
 	private Mode startMode; // parsing mode
@@ -54,45 +75,48 @@ public class Parser implements Runnable {
 	
 	private void parse(Node input, int index, Mode mode) throws Exception {		
 		
-		if (index < 0 || index >= IEMLLang.LM_R.length) 
+		if (!IEMLLang.IsLayerValid(index)) 
 			return; 
-		if (index >= TopDownParser.patternDetector.length || index >= TopDownParser.layerMarkDetectors.length){
+		
+		if (index >= patternDetector.length || index >= layerMarkDetectors.length){
 			throw new Exception("==> "+ "missing regex for index " + index);
 		}
 									
 		ArrayList<String> substrings = new ArrayList<String>();	
 		
-		Matcher matcher = TopDownParser.layerMarkDetectors[index].matcher(input.GetName());			
+		Matcher matcher = layerMarkDetectors[index].matcher(input.GetName());			
 		while (matcher.find())	
 			substrings.add(matcher.group());
-				
+			
+		//discover the highest layer
+		//TODO: run if 'mode' says it should
 		if (substrings.size() < 1) {
 			//nothing at this layer, go down
-			if (input.GetSize() > 0){
+			//if (input.GetSize() > 0){
 				throw new Exception("==> "+ "missing layer " + IEMLLang.LM_R[index]);
-			}
-			input.SetLayer((index - 1));
-			parse(input, index - 1, mode);
+			//}
+			//input.SetLayer((index - 1));
+			//parse(input, index - 1, mode);
 		}			
 		else if (substrings.size() == 1){
 			// multiplication
 			substrings.clear();
-			matcher = TopDownParser.patternDetector[index].matcher(input.GetName());	
+			matcher = patternDetector[index].matcher(input.GetName());	
 			
 			while (matcher.find())
 				substrings.add(matcher.group());
 			
 			if (index == 0 && substrings.size() == 1) {
-				Node newNode = new Node(substrings.get(0), Node.NODE, Node.ATOM);
-				input.AddNode(newNode);	
+				//atom
+				input.AddNode(Node.GetNewNode(substrings.get(0), index));
 				return;
 			}
 			
-			input.AddNode(new Node("*", Node.OPCODE));
+			input.AddNode(Node.GetNewOpcodeNode(IEMLLang.Multiplication));
 			
 			for (String str : substrings) 
 			{	
-				Node newNode = new Node(str, Node.NODE, Integer.toString(index-1));
+				Node newNode = Node.GetNewNode(str, index-1);				
 				input.AddNode(newNode);	
 				
 				if (mode == Mode.Full)
@@ -105,10 +129,11 @@ public class Parser implements Runnable {
 		}	
 		else {
 			// addition
-			input.AddNode(new Node("+", Node.OPCODE));
+			input.AddNode(Node.GetNewOpcodeNode(IEMLLang.Addition));
+			
 			for (String str : substrings) 
 			{	
-				Node newNode = new Node(str, Node.NODE, Integer.toString(index));
+				Node newNode = Node.GetNewNode(str, index);
 				input.AddNode(newNode);	
 				
 				if (mode == Mode.Full)

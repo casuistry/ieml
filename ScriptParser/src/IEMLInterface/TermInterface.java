@@ -58,17 +58,14 @@ public class TermInterface {
     	if (node == null)
     		return false;
     	
-    	if (termMap == null){
+    	if (termMap == null)
     		termMap = LoadDictionary(filepath);
-    	}
     	   	
-    	if (termMap.containsKey(node.GetName())) {   		
+    	if (termMap.containsKey(node.GetName()))
     		return true;
-    	}
     	
-    	if ( node.GetDescriptor().equals(Node.ATOM) || (node.GetDescriptor().equals(Node.ROOT) && node.GetLayerInt() == 0)) {
+    	if (node.IsPrimitive())
     		return true;
-    	}
     	
     	return false;
     }

@@ -5,8 +5,10 @@ import TopDown.Node;
 public class BaseInspector {
 
 	protected String inspect(Node node){
-		StringBuilder builder = new StringBuilder("[" + node.GetDescriptor() + "|" + node.GetName());
-		if (node.GetLayer() != "-1")
+		
+		StringBuilder builder = new StringBuilder("[" + node.GetName());
+		
+		if (node.GetLayer() >= 0)
 			builder.append("|" + node.GetLayer());
 
 		builder.append("]");

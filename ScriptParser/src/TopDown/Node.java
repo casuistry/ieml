@@ -1,7 +1,6 @@
 package TopDown;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,17 +16,17 @@ public class Node {
 		
 	public static AtomicLong TotalNodes = new AtomicLong(0);
 	
-	//predefined descriptors for nodes
-	public static String ATOM = "ATOM"; 	//layer
-	public static String NODE = "NODE"; 	//type of node
-	public static String ROOT = "ROOT"; 	//type of node
-	public static String OPCODE = "OPCODE"; //type of node
+	public static int DefaultLayer = -2;
+	public static int OpcodeLayer = -1;
 	
 	//data for Node class with default values
-	private String name = "NO_NAME";
-	private String descriptor = "NO_DESC";
-	private String layer = "-1";	
+	private String name = "NO_NAME";	
+	//-2 is not set, -1 is opcode, 0 through n are layers
+	private int layer = DefaultLayer;	
+	
+	//children
 	private ArrayList<Node> nodes = null;	
+	//parent
 	private Node parent = null;
 	
 	//-----------------------------------------calculated values-----------------------------------
@@ -37,99 +36,81 @@ public class Node {
 	
 	//-----------------------------------------basic methods-----------------------------------
 	
-	//(substrings.get(0), Node.NODE, Node.ATOM);
-	//i.e string fragment, descriptor (node, opcode, root), layer
-	public Node(String n, String desc, String l){
-		name = n;
-		descriptor = desc;
-		layer = l;
-		
-		TotalNodes.getAndIncrement();
+	public static Node GetNewOpcodeNode(String s){
+		if (IEMLLang.IsOpcodeValid(s))
+			return new Node(s, OpcodeLayer);
+		return null;
 	}
 	
-	public Node(String n, String desc){
-		this(n, desc, "-1");
+	public static Node GetNewNode(String s, int l){
+		if (s != null && IEMLLang.IsLayerValid(l))
+			return new Node(s, l);
+		return null;
+	}
+	
+	private Node(String n, int l) {
+		
+		TotalNodes.getAndIncrement();
+		
+		name = n;
+		layer = l;
+	}
+	
+	public boolean IsPrimitive(){
+		return (layer == 0 && (nodes == null || nodes.size() == 0));
+	}
+	
+	public boolean IsOpcode(){
+		return (layer == OpcodeLayer);
 	}
 	
 	public ArrayList<Node> GetNodes(){
 		return nodes;
 	}
-	public void SetLayer(String l){
-		layer = l;
-	}
-	public void SetLayer(int l){		
-		layer = Integer.toString(l);
-	}
+	
 	public void SetParent(Node n){
 		parent = n;
 	}
+	
 	public Node GetParent(){
 		return parent;
 	}
+	
 	public void AddNode(Node n){
 		if (nodes == null)
 			nodes = new ArrayList<Node>();
 		n.SetParent(this);		
 		nodes.add(n);
 	}
+	
 	//get the opcode affecting children of this node (can be null)
 	public String GetOpcode(){
+		
+		if (IsOpcode())
+			return GetName();
+		
 		if (nodes!=null){
 			for (Node n : nodes){
-				if (n.GetDescriptor().equals(OPCODE)){
+				if (n.IsOpcode()){
 					return n.GetName();
 				}
 			}
 		}
 		return null;
 	}
+	
 	//name of this node
 	public String GetName(){
-		if (descriptor.equals(OPCODE))
+		if (IsOpcode())
 			return name; //opcode can be "+", we want to keep it
 		return name.startsWith("+") ? name.substring(1) : name;
 	}
-	//descriptor of this node
-	public String GetDescriptor(){
-		return descriptor;
-	}
-	//number of children of this node
-	public int GetSize(){
-		if (nodes == null)
-			return 0;
-		return nodes.size();
-	}
+
 	//layer of this node
-    public String GetLayer(){
+    public int GetLayer(){
 		return layer;
 	}
-    //layer of this node as an integer
-	public int GetLayerInt(){
-		int cLayer = -1;
-		try {			
-			cLayer = Integer.parseInt(layer);
-		}
-		catch (Exception e) {}
-		
-		return cLayer;
-	}	
 	
-	//Readable representation of a node and its children in a tree-form
-	public void PrintNode(String prepend, BaseInspector inspector){
-		
-		if (nodes != null) {
-			StringBuilder builder = new StringBuilder(prepend);
-			builder.append(inspector.Inspect(this));
-			builder.append(" = ");
-			for(Node node : nodes){
-				// descent
-				node.PrintNode(prepend+"\t", inspector);
-				builder.append(inspector.Inspect(node));
-			}
-			System.out.println(builder.toString());
-		}		
-	}
-
 	//Readable representation of a node and its children in a list-form
 	public void PrintNodes(String prepend, BaseInspector inspector){
 		
@@ -154,16 +135,14 @@ public class Node {
 		if (isEmpty != null)
 			return isEmpty;
 		
-		String d = GetDescriptor();
-		
-		if (GetLayer().equals(ATOM)){
+		if (layer == 0){
 			if (GetName().equals("E"))
 				isEmpty = true;
 			else 
 				isEmpty = false;
 		}
 		else {
-			if (d.equals(NODE) || d.equals(ROOT)) {
+			if (!IsOpcode()) {
 				for (Node n : nodes){		
 					Boolean b = n.IsEmpty();
 					if (b != null){
@@ -225,64 +204,14 @@ public class Node {
     	}
 
         return result;
-    }
-    
-    public static HashMap<String, ArrayList<Node>> GetNiveauSequence(HashMap<String, ArrayList<Node>> result, Node node, String seq){
-    	
-    	if (result == null)
-    		result = new HashMap<String, ArrayList<Node>>();
-    	
-    	if (seq == null)
-    		seq = new String();
-    	
-    	String opcodeForChildren = node.GetOpcode();
-    	/*
-    	if (TermInterface.IsTerm(node)){      		
-    		if (!result.containsKey(seq)){
-    			ArrayList<Node> list = new ArrayList<Node>();
-    			result.put(seq, list);
-    		}
-    		
-    		result.get(seq).add(node);
-    	}
-    	else if (node.nodes != null && opcodeForChildren != null) {
-    		seq += opcodeForChildren;
-    		for (Node subnode : node.nodes){
-    			GetNiveauSequence(result, subnode, seq);
-    		} 
-    	}
-    	*/
-    	return result;
-    } 
-    
-    //find "niveau" for a term, i.e sequence of additions and/or multiplications 
-    //from the term to the root node
-    public static String GetNiveau(Node n){
-    	
-    	StringBuilder result = new StringBuilder();
-    	
-    	Node p = n.GetParent();
-    	
-    	if (p == null)
-    		return result.toString();
-    	 		    	    	
-		for (Node c : p.nodes){
-			if (c.GetDescriptor().equals(OPCODE)){
-				result.append(c.GetName());
-				result.append(GetNiveau(p));
-				break;
-			}
-		}   
-		
-		return result.toString();
-    }
+    }  
     
 	public static Counter GetNumberOfDifferences(Node a, Node b) throws Exception{
 		
 		Counter result = new Counter();
 		
-		int layer_a = a.GetLayerInt();
-		int layer_b = b.GetLayerInt();
+		int layer_a = a.GetLayer();
+		int layer_b = b.GetLayer();
 		
 		if (layer_a == layer_b){
 			
@@ -356,7 +285,6 @@ public class Node {
 							result.min = t;
 					}
 					
-					//TODO: how do we count erasures???
 					return result;
 				}
 				//if base is of form x+x+...+x and frag of form yyy then:
@@ -391,83 +319,4 @@ public class Node {
 			
 		return result;
 	}
-			
-	public List<String> Reconstruct(int layer){
-		
-		ArrayList<String> result = new ArrayList<String>();
-		
-		int currentLayer = GetLayerInt();
-		
-		if (layer > currentLayer){
-			return result;
-		}
-		else if (layer < currentLayer){
-			if (nodes != null) {
-				for(Node node : nodes){			
-					if (node.descriptor.equals(NODE)){
-						result.addAll(node.Reconstruct(layer));
-					}
-				}
-			}
-		}
-		else {
-			if (result.size() == 0){
-				result.add(Reconstruct());
-			}
-		}
-		
-		return result;		
-	}
-	
-	public String Reconstruct(){
-	
-		StringBuilder builder = new StringBuilder();
-		
-		if (nodes != null) {
-
-			String opcode = "";
-			
-			for(Node node : nodes){
-				
-				if (node.descriptor.equals(OPCODE)){
-					opcode = node.name.equals("+") ? "+" : "";
-					continue;
-				}
-				
-				if (builder.length() > 0)
-					builder.append(opcode);
-				
-				builder.append(node.Reconstruct());
-			}
-			
-			if (opcode.isEmpty())
-				builder.append(IEMLLang.LM[GetLayerInt()]);
-		}		
-		else if (layer.equals(ATOM)){
-			builder.append(name);		
-		}
-		
-		return builder.toString();
-	}
-	
-	//Recursively descend the tree to find node(s) of specified layer
-	//Return empty result (something wrong), result of length 1 (same layer), 
-	//result of length 3 (script of form xyz) or result of length multiple of 
-	//3 (script of form xyz + abc)
-	public static void GetNodesAtLayer(Node n, int l, ArrayList<Node> result){
-				 			
-		if (n != null && n.nodes != null && l >= 0 && l <= 6){
-			
-			int currentlayer = n.GetLayerInt();
-			
-			if  (currentlayer > l){
-				for(Node node : n.nodes){
-					GetNodesAtLayer(node, l, result);
-				}
-			}
-			else if (currentlayer == l){
-				result.add(n);
-			}
-		}
-	}	
 }

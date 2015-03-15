@@ -1,16 +1,13 @@
 package TopDown;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import IEMLInterface.IEMLLang;
 import Rules.RuleEngine;
-import Rules.StructureRule;
 import TopDown.Parser.Mode;
 
 public class TopDownParser {
@@ -19,26 +16,6 @@ public class TopDownParser {
 	private static long parsingTime;
 	private static ExecutorService e = Executors.newFixedThreadPool(numCores);
 	
-	public static Pattern[] patternDetector = new Pattern[] { 
-		Pattern.compile("(\\w+)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[0]+"(\\+.+?"+IEMLLang.LM_R[0]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[1]+"(\\+.+?"+IEMLLang.LM_R[1]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[2]+"(\\+.+?"+IEMLLang.LM_R[2]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[3]+"(\\+.+?"+IEMLLang.LM_R[3]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[4]+"(\\+.+?"+IEMLLang.LM_R[4]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[5]+"(\\+.+?"+IEMLLang.LM_R[5]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[6]+"(\\+.+?"+IEMLLang.LM_R[6]+")*)")
-	};
-	public static Pattern[] layerMarkDetectors = new Pattern[] { 
-		Pattern.compile("(\\w+"+IEMLLang.LM_R[0]+")"),
-		Pattern.compile(".+?"+IEMLLang.LM_R[1]),
-		Pattern.compile(".+?"+IEMLLang.LM_R[2]),
-		Pattern.compile(".+?"+IEMLLang.LM_R[3]),
-		Pattern.compile(".+?"+IEMLLang.LM_R[4]),
-		Pattern.compile(".+?"+IEMLLang.LM_R[5]),
-		Pattern.compile(".+?"+IEMLLang.LM_R[6])
-	};
-
 	public static Node Parse(String input, Mode mode) {
 		
 		RuleEngine rules = new RuleEngine();
@@ -52,14 +29,14 @@ public class TopDownParser {
 		long startParsing = System.nanoTime();
 		
 		int startingDefaultLayer = IEMLLang.LMList.indexOf(detectedLayer);		
-		Node result = new Node(input, Node.ROOT, Integer.toString(startingDefaultLayer));
+		Node result = Node.GetNewNode(input, startingDefaultLayer);
 		Parser.Parse(result, startingDefaultLayer, Parser.Mode.Toplevel);
 		
 		ArrayList<Node> children = result.GetNodes();
 		
 		if (children!=null){
 			for (Node n : children){
-				e.execute(new Parser(n, n.GetLayerInt(), mode));
+				e.execute(new Parser(n, n.GetLayer(), mode));
 			}
 			
 			try {
@@ -68,7 +45,6 @@ public class TopDownParser {
 					System.out.println("Timed out");
 				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

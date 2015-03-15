@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class IEMLLang {
-
+	
 	public static String[] alphabet = new String[]{"S","B","T","U","A","O","M","I","E","F"};
 	
 	//layer marks
@@ -21,5 +21,20 @@ public class IEMLLang {
 	
 	public static String GetEmpty(){
 		return "E";
+	}
+	
+	public static boolean IsOpcodeValid(String opcode){
+		if (opcode != null && (
+				opcode.equals(IEMLLang.Addition) || opcode.equals(IEMLLang.Multiplication))) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean IsLayerValid(int layer){
+		if (layer >= 0 && layer <= IEMLLang.LM_R.length) {
+			return true;
+		}
+		return false;
 	}
 }
