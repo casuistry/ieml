@@ -107,7 +107,7 @@ public class Parser implements Runnable {
 			
 			if (index == 0 && substrings.size() == 1) {
 				//atom
-				Node newNode = Node.GetNewNode(substrings.get(0), index);				
+				Node newNode = Node.GetNewNode(input.GetName(), index);
 				if (terms.IsTerm(newNode))
 					newNode.isTerm = true;				
 				input.AddNode(newNode);

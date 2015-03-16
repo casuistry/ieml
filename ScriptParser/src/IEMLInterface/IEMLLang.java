@@ -18,6 +18,7 @@ public class IEMLLang {
 	
 	//convenience to find index of a particular layer mark;
 	public static List<String> LMList = Arrays.asList(LM);	
+	public static List<String> AlphabetList = Arrays.asList(alphabet);
 	
 	public static String GetEmpty(){
 		return "E";

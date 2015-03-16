@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import TopDown.Node;
-import TopDown.ParserConfigurator;
 import Utilities.Helper;
 
 public class TermInterface {

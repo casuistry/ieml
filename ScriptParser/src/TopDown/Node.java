@@ -57,9 +57,9 @@ public class Node {
 	}
 	
 	public boolean IsPrimitive(){
-		return (layer == 0 && (nodes == null || nodes.size() == 0));
+		return (layer == 0 && name.length() == 2 && IEMLLang.AlphabetList.contains(name.substring(0, 1)));
 	}
-	
+
 	public boolean IsOpcode(){
 		return (layer == OpcodeLayer);
 	}

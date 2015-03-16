@@ -14,10 +14,16 @@ public class TermInspector extends BaseInspector {
 	@Override
 	protected String inspect(Node node) {
     	
-		if (!node.isTerm)
+		StringBuilder builder = new StringBuilder();
+		
+		if (node.IsOpcode())
 			return null;
 		
-		StringBuilder builder = new StringBuilder(node.GetName() + "\t[" + termInterface.GetMapping(node.GetName()) + "]");
+		if (!node.isTerm)
+			builder.append(node.GetName() + "\t[#]");
+		else
+			builder.append(node.GetName() + "\t[" + termInterface.GetMapping(node.GetName()) + "]");
+		
 		return builder.toString();
 	}
 }
