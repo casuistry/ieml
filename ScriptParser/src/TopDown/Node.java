@@ -6,7 +6,6 @@ import java.util.PriorityQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import IEMLInterface.IEMLLang;
-import IEMLInterface.TermInterface;
 import Inspector.BaseInspector;
 import Structures.CompMatch;
 import Structures.Counter;
@@ -31,7 +30,7 @@ public class Node {
 	
 	//-----------------------------------------calculated values-----------------------------------
 	
-	public Boolean isEmpty = null;
+	public Boolean isEmpty = null; //null is undefined
 	public boolean isTerm = false;
 	
 	//-----------------------------------------basic methods-----------------------------------
@@ -96,6 +95,7 @@ public class Node {
 				}
 			}
 		}
+		
 		return null;
 	}
 	
@@ -136,7 +136,7 @@ public class Node {
 			return isEmpty;
 		
 		if (layer == 0){
-			if (GetName().equals("E"))
+			if (IEMLLang.IsEmpty(GetName()))
 				isEmpty = true;
 			else 
 				isEmpty = false;
@@ -156,25 +156,6 @@ public class Node {
 		}
 		
 		return isEmpty;
-	}
-	
-	public static void MarkTerms(TermInterface termMap, Node node){
-		
-    	if (termMap.IsTerm(node)){    		
-    		node.isTerm = true;
-    	}
-    	else {
-    		if (node.nodes != null) {
-    			for(Node n : node.nodes){	
-    				MarkTerms(termMap, n);
-    			}
-    		}
-    		else 
-    		{
-    			//Node may be at level 0 but not be a term (depends on the dictionary?)
-    			//throw new Exception("Node is not a term, but has no children");			
-    		}
-    	}
 	}
 	
 	//-----------------------------------------other methods----------------------------------- 

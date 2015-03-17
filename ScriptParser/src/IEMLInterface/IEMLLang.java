@@ -21,7 +21,11 @@ public class IEMLLang {
 	public static List<String> AlphabetList = Arrays.asList(alphabet);
 	
 	public static String GetEmpty(){
-		return "E";
+		return "E:";
+	}
+	
+	public static boolean IsEmpty(String s){
+		return s.equals("E:");
 	}
 	
 	public static boolean IsOpcodeValid(String opcode){

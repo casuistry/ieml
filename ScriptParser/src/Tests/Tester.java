@@ -16,12 +16,13 @@ public class Tester {
 		//RuleTester tester = new RuleTester();
 		//tester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
-		TermTester tester = new TermTester();
-		tester.RunTest(null, 5, new BaseIEMLProvider(), null, null);			
+		//TermTester tester = new TermTester();
+		//tester.RunTest(null, 5, new BaseIEMLProvider(), null, null);			
 		//ScriptExamples.StudentLearnsMathematics
 		
-		//NullTester tester = new NullTester();
-		//tester.RunTest(null, 3, new EmptyIEMLProvider(), null, null);
+		//Generate an empty sequence of specified layer
+		NullTester tester = new NullTester();
+		tester.RunTest(null, 3, new EmptyIEMLProvider(), null, null);
 		
 		//ParsingTester parsingTester = new ParsingTester();
 		//parsingTester.RunTest(null, 2, new BaseIEMLProvider(), null, null);
