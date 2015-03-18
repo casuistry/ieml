@@ -2,8 +2,6 @@ package ScriptGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import IEMLInterface.IEMLLang;
 
 public class Generator {
 
@@ -53,6 +51,7 @@ public class Generator {
 			if (layer == 0) {
 
 				result.append(provider.GetLetter());
+				result.append(provider.GetLayerMark(0));
 			}
 			else {
 				for (int j=0; j<3; j++){

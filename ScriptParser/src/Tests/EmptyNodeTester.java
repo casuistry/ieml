@@ -1,6 +1,5 @@
 package Tests;
 
-import Inspector.BaseInspector;
 import Inspector.EmptyInspector;
 
 public class EmptyNodeTester extends BaseTester {
@@ -9,8 +8,7 @@ public class EmptyNodeTester extends BaseTester {
 	{
 		System.out.println(iemlSequence);
 		
-		//rootNode.PrintNode("", new BaseInspector());
-		rootNode.IsEmpty();
+		rootNode.MarkEmpty();
 		rootNode.PrintNodes("", new EmptyInspector());
 	}
 	

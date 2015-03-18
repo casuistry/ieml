@@ -29,12 +29,12 @@ public class TopDownParser {
 		long startParsing = System.nanoTime();
 		
 		int startingDefaultLayer = IEMLLang.LMList.indexOf(detectedLayer);		
-		Node result = Node.GetNewNode(input, startingDefaultLayer);
+		Node root = Node.GetNewNode(input, startingDefaultLayer);
 		ParserConfigurator pc = new ParserConfigurator();
 		pc._Mode = Mode.Toplevel;		
-		Parser.Parse(result, startingDefaultLayer, pc);
+		Parser.Parse(root, startingDefaultLayer, pc);
 		
-		ArrayList<Node> children = result.GetNodes();
+		ArrayList<Node> children = root.GetNodes();
 		
 		if (children!=null){
 			for (Node n : children){
@@ -50,12 +50,22 @@ public class TopDownParser {
 				e.printStackTrace();
 			}
 		}
-				
-		rules.RunRules(result);
+			
+		//processing
+		
+		root.MarkEmpty();
+		
+		//end processing
+		
+		//checks
+		
+		rules.RunRules(root);
+		
+		//end checks
 		
 		parsingTime = System.nanoTime() - startParsing;
 		System.out.println(Node.TotalNodes.get() + " node(s) processed in " + parsingTime/1000000 + " ms. on " + numCores + " cores for length " + inputLength);
-		return result;	
+		return root;	
 	}
 }
 

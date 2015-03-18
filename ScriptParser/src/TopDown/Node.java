@@ -6,6 +6,7 @@ import java.util.PriorityQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import IEMLInterface.IEMLLang;
+import IEMLInterface.IEMLLang.GrammarConstruct;
 import Inspector.BaseInspector;
 import Structures.CompMatch;
 import Structures.Counter;
@@ -32,6 +33,7 @@ public class Node {
 	
 	public Boolean isEmpty = null; //null is undefined
 	public boolean isTerm = false;
+    public GrammarConstruct grammarConstruct;
 	
 	//-----------------------------------------basic methods-----------------------------------
 	
@@ -130,7 +132,7 @@ public class Node {
 	//-----------------------------------------basic semantic-----------------------------------
 	
 	//Checks if a node contains 'empty' ieml. 
-	public Boolean IsEmpty() throws Exception {
+	public Boolean MarkEmpty() {
 				
 		if (isEmpty != null)
 			return isEmpty;
@@ -141,10 +143,10 @@ public class Node {
 			else 
 				isEmpty = false;
 		}
-		else {
+		else {			
 			if (!IsOpcode()) {
 				for (Node n : nodes){		
-					Boolean b = n.IsEmpty();
+					Boolean b = n.MarkEmpty();
 					if (b != null){
 						if (isEmpty != null)
 							isEmpty &= b;	

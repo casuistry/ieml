@@ -16,12 +16,21 @@ public class IEMLLang {
 	public static String Addition = "+";
 	public static String Multiplication = "*";
 	
+	public enum GrammarConstruct {
+		Undefined,
+		E, //empty
+		Z, //term
+		R, //addition of terms
+	    w, //RxExR
+	    W, //R || w
+	}
+	
 	//convenience to find index of a particular layer mark;
 	public static List<String> LMList = Arrays.asList(LM);	
 	public static List<String> AlphabetList = Arrays.asList(alphabet);
 	
 	public static String GetEmpty(){
-		return "E:";
+		return "E";
 	}
 	
 	public static boolean IsEmpty(String s){

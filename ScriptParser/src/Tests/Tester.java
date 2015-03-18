@@ -21,14 +21,14 @@ public class Tester {
 		//ScriptExamples.StudentLearnsMathematics
 		
 		//Generate an empty sequence of specified layer
-		NullTester tester = new NullTester();
-		tester.RunTest(null, 3, new EmptyIEMLProvider(), null, null);
+		//NullTester tester = new NullTester();
+		//tester.RunTest(null, 3, new EmptyIEMLProvider(), null, null);
 		
 		//ParsingTester parsingTester = new ParsingTester();
 		//parsingTester.RunTest(null, 2, new BaseIEMLProvider(), null, null);
 		
-		//EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
-		//emptyNodeTester.RunTest(null, 6);
+		EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
+		emptyNodeTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 	}
 }
 
