@@ -14,20 +14,14 @@ import Structures.Utilities;
 
 public class Node {
 		
-	public static AtomicLong TotalNodes = new AtomicLong(0);
+	public static AtomicLong TotalNodes = new AtomicLong(0);	
+	public static int DefaultLayer = -1;
 	
-	public static int DefaultLayer = -2;
-	public static int OpcodeLayer = -1;
-	
-	//data for Node class with default values
 	private String name = "NO_NAME";	
-	//-2 is not set, -1 is opcode, 0 through n are layers
 	private int layer = DefaultLayer;	
-	
-	//children
-	private ArrayList<Node> nodes = null;	
-	//parent
-	private Node parent = null;
+	private ArrayList<Node> nodes;	
+	private Node parent;
+	private String opCode;
 	
 	//-----------------------------------------calculated values-----------------------------------
 	
@@ -37,32 +31,26 @@ public class Node {
 	
 	//-----------------------------------------basic methods-----------------------------------
 	
-	public static Node GetNewOpcodeNode(String s){
-		if (IEMLLang.IsOpcodeValid(s))
-			return new Node(s, OpcodeLayer);
-		return null;
-	}
-	
 	public static Node GetNewNode(String s, int l){
-		if (s != null && IEMLLang.IsLayerValid(l))
+		
+		if (s != null && IEMLLang.IsLayerValid(l)) {			
+			TotalNodes.getAndIncrement();
 			return new Node(s, l);
+		}
+			
 		return null;
 	}
 	
-	private Node(String n, int l) {
-		
-		TotalNodes.getAndIncrement();
-		
+	private Node(String n, int l) {						
 		name = n;
 		layer = l;
+		nodes = new ArrayList<Node>();
+		parent = null;
+		opCode = null;
 	}
 	
 	public boolean IsPrimitive(){
 		return (layer == 0 && name.length() == 2 && IEMLLang.AlphabetList.contains(name.substring(0, 1)));
-	}
-
-	public boolean IsOpcode(){
-		return (layer == OpcodeLayer);
 	}
 	
 	public ArrayList<Node> GetNodes(){
@@ -78,37 +66,23 @@ public class Node {
 	}
 	
 	public void AddNode(Node n){
-		if (nodes == null)
-			nodes = new ArrayList<Node>();
 		n.SetParent(this);		
 		nodes.add(n);
 	}
 	
-	//get the opcode affecting children of this node (can be null)
 	public String GetOpcode(){
-		
-		if (IsOpcode())
-			return GetName();
-		
-		if (nodes!=null){
-			for (Node n : nodes){
-				if (n.IsOpcode()){
-					return n.GetName();
-				}
-			}
-		}
-		
-		return null;
+		return opCode;
 	}
 	
-	//name of this node
+	public void SetOpCode(String op){
+		if (IEMLLang.IsOpcodeValid(op))
+			opCode = op;
+	}
+
 	public String GetName(){
-		if (IsOpcode())
-			return name; //opcode can be "+", we want to keep it
 		return name.startsWith("+") ? name.substring(1) : name;
 	}
 
-	//layer of this node
     public int GetLayer(){
 		return layer;
 	}
@@ -144,17 +118,15 @@ public class Node {
 				isEmpty = false;
 		}
 		else {			
-			if (!IsOpcode()) {
-				for (Node n : nodes){		
-					Boolean b = n.MarkEmpty();
-					if (b != null){
-						if (isEmpty != null)
-							isEmpty &= b;	
-						else
-							isEmpty = b;
-					}						
-				}	
-		    }
+			for (Node n : nodes){		
+				Boolean b = n.MarkEmpty();
+				if (b != null){
+					if (isEmpty != null)
+						isEmpty &= b;	
+					else
+						isEmpty = b;
+				}						
+			}
 		}
 		
 		return isEmpty;

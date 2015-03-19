@@ -87,15 +87,8 @@ public class Parser implements Runnable {
 		while (matcher.find())	
 			substrings.add(matcher.group());
 			
-		//discover the highest layer
-		//TODO: run if 'mode' says it should
 		if (substrings.size() < 1) {
-			//nothing at this layer, go down
-			//if (input.GetSize() > 0){
-				throw new Exception("==> "+ "missing layer " + IEMLLang.LM_R[index]);
-			//}
-			//input.SetLayer((index - 1));
-			//parse(input, index - 1, mode);
+		    throw new Exception("missing layer " + IEMLLang.LM_R[index]);
 		}			
 		else if (substrings.size() == 1){
 			// multiplication
@@ -113,27 +106,29 @@ public class Parser implements Runnable {
 				input.AddNode(newNode);
 				return;
 			}
-			
-			input.AddNode(Node.GetNewOpcodeNode(IEMLLang.Multiplication));
-			
-			for (String str : substrings) 
-			{	
-				Node newNode = Node.GetNewNode(str, index-1);				
-				input.AddNode(newNode);	
+			else {
+				input.SetOpCode(IEMLLang.Multiplication);
 				
-				if (mode == Mode.Full)
-					parse(newNode, index - 1);
-				else if (mode == Mode.TermOnly){
-					if (terms.IsTerm(newNode))
-						newNode.isTerm = true;
-					else
-						parse(newNode, index - 1);						
+				for (String str : substrings) 
+				{	
+					Node newNode = Node.GetNewNode(str, index-1);				
+					input.AddNode(newNode);	
+					
+					if (mode == Mode.Full)
+						parse(newNode, index - 1);
+					else if (mode == Mode.TermOnly){
+						if (terms.IsTerm(newNode))
+							newNode.isTerm = true;
+						else
+							parse(newNode, index - 1);						
+					}
 				}
 			}
 		}	
 		else {
 			// addition
-			input.AddNode(Node.GetNewOpcodeNode(IEMLLang.Addition));
+			//input.AddNode(Node.GetNewOpcodeNode(IEMLLang.Addition));
+			input.SetOpCode(IEMLLang.Addition);
 			
 			for (String str : substrings) 
 			{	

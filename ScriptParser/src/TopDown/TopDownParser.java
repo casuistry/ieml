@@ -12,11 +12,10 @@ import TopDown.Parser.Mode;
 
 public class TopDownParser {
 	
-	private static int numCores = Runtime.getRuntime().availableProcessors()/2;
-	private static long parsingTime;
-	private static ExecutorService e = Executors.newFixedThreadPool(numCores);
-	
 	public static Node Parse(String input, ParserConfigurator config) {
+		
+		int numCores = Runtime.getRuntime().availableProcessors()/2;
+		ExecutorService executor = Executors.newFixedThreadPool(numCores);
 		
 		RuleEngine rules = new RuleEngine();
 		
@@ -38,12 +37,12 @@ public class TopDownParser {
 		
 		if (children!=null){
 			for (Node n : children){
-				e.execute(new Parser(n, n.GetLayer(), config));
+				executor.execute(new Parser(n, n.GetLayer(), config));
 			}
 			
 			try {
-				e.shutdown();
-				if (!e.awaitTermination(10, TimeUnit.SECONDS)){
+				executor.shutdown();
+				if (!executor.awaitTermination(10, TimeUnit.SECONDS)){
 					System.out.println("Timed out");
 				}
 			} catch (Exception e) {
@@ -63,7 +62,7 @@ public class TopDownParser {
 		
 		//end checks
 		
-		parsingTime = System.nanoTime() - startParsing;
+		long parsingTime = System.nanoTime() - startParsing;
 		System.out.println(Node.TotalNodes.get() + " node(s) processed in " + parsingTime/1000000 + " ms. on " + numCores + " cores for length " + inputLength);
 		return root;	
 	}

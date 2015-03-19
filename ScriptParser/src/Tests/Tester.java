@@ -16,8 +16,8 @@ public class Tester {
 		//RuleTester tester = new RuleTester();
 		//tester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
-		//TermTester tester = new TermTester();
-		//tester.RunTest(null, 5, new BaseIEMLProvider(), null, null);			
+		TermTester tester = new TermTester();
+		tester.RunTest(ScriptExamples.StudentLearnsMathematics, 5, new BaseIEMLProvider(), null, null);			
 		//ScriptExamples.StudentLearnsMathematics
 		
 		//Generate an empty sequence of specified layer
@@ -28,7 +28,7 @@ public class Tester {
 		//parsingTester.RunTest(null, 2, new BaseIEMLProvider(), null, null);
 		
 		EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
-		emptyNodeTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
+		emptyNodeTester.RunTest(null, 3, new BaseIEMLProvider(), null, null);
 	}
 }
 

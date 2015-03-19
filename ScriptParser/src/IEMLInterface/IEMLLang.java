@@ -38,8 +38,7 @@ public class IEMLLang {
 	}
 	
 	public static boolean IsOpcodeValid(String opcode){
-		if (opcode != null && (
-				opcode.equals(IEMLLang.Addition) || opcode.equals(IEMLLang.Multiplication))) {
+		if (opcode != null && (opcode.equals(IEMLLang.Addition) || opcode.equals(IEMLLang.Multiplication))) {
 			return true;
 		}
 		return false;
@@ -50,5 +49,21 @@ public class IEMLLang {
 			return true;
 		}
 		return false;
+	}
+	
+	public static boolean IsParamNumberValid(int num, String op) throws Exception{
+		
+		if (num == 0 && op == null)
+			return true;
+		
+		if (!IsOpcodeValid(op))
+			throw new Exception("Unknown operation");
+		
+		if (op.equals(Addition)){
+			return num > 1;
+		}
+		else {
+			return num >= 1 && num <= 3;
+		}
 	}
 }
