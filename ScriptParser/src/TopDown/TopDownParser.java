@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import IEMLInterface.IEMLLang;
 import Rules.PostprocessorEngine;
-import Rules.RuleEngine;
 import TopDown.Parser.Mode;
 
 public class TopDownParser {
@@ -57,8 +56,8 @@ public class TopDownParser {
 		
 		//checks
 		
-		RuleEngine rules = new RuleEngine();
-		rules.RunRules(root);
+		//RuleEngine rules = new RuleEngine();
+		//rules.RunRules(root);
 		
 		//end checks
 		

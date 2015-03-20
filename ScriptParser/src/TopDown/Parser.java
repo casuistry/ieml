@@ -104,7 +104,6 @@ public class Parser implements Runnable {
 		}	
 		else {
 			// addition
-			//input.AddNode(Node.GetNewOpcodeNode(IEMLLang.Addition));
 			input.SetOpCode(IEMLLang.Addition);
 			
 			for (String str : substrings) 

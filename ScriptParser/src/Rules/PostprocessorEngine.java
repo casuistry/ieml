@@ -11,6 +11,7 @@ public class PostprocessorEngine {
 	public PostprocessorEngine(){
 		rules = new ArrayList<PostprocessorBase<String>>();
 		rules.add(new PostprocessorEmpty());
+		rules.add(new PostprocessorStructure());
 	}
 	
 	public void RunRules(Node node) {

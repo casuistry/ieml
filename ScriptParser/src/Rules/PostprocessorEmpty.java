@@ -20,4 +20,8 @@ public class PostprocessorEmpty extends PostprocessorBase<String> {
 		
 		return node.GetEmpty() ? "E" : "X";
 	}
+	
+	public String GetName(){
+		return "PostprocessorEmpty";
+	}
 }
