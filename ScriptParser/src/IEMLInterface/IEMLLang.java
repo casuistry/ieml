@@ -2,6 +2,7 @@ package IEMLInterface;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class IEMLLang {
 	
@@ -12,7 +13,28 @@ public class IEMLLang {
 	
 	//layer marks for regex
 	public static String[] LM_R = new String[]{":", "\\.", "-", "’", ",", "_", ";"};
-		
+	
+	//patterns
+	public static Pattern[] patternDetector = new Pattern[] { 
+		Pattern.compile("(\\w+)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[0]+"(\\+.+?"+IEMLLang.LM_R[0]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[1]+"(\\+.+?"+IEMLLang.LM_R[1]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[2]+"(\\+.+?"+IEMLLang.LM_R[2]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[3]+"(\\+.+?"+IEMLLang.LM_R[3]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[4]+"(\\+.+?"+IEMLLang.LM_R[4]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[5]+"(\\+.+?"+IEMLLang.LM_R[5]+")*)"),
+		Pattern.compile("(.+?"+IEMLLang.LM_R[6]+"(\\+.+?"+IEMLLang.LM_R[6]+")*)")
+	};
+	public static Pattern[] layerMarkDetectors = new Pattern[] { 
+		Pattern.compile("(\\w+"+IEMLLang.LM_R[0]+")"),
+		Pattern.compile(".+?"+IEMLLang.LM_R[1]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[2]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[3]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[4]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[5]),
+		Pattern.compile(".+?"+IEMLLang.LM_R[6])
+	};
+	
 	public static String Addition = "+";
 	public static String Multiplication = "*";
 	
@@ -34,7 +56,7 @@ public class IEMLLang {
 	}
 	
 	public static boolean IsEmpty(String s){
-		return s.equals("E:");
+		return s.equals("E:") || s.equals("EEE");
 	}
 	
 	public static boolean IsOpcodeValid(String opcode){

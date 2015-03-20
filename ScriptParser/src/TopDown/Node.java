@@ -25,7 +25,7 @@ public class Node {
 	
 	//-----------------------------------------calculated values-----------------------------------
 	
-	public Boolean isEmpty = null; //null is undefined
+	private Boolean isEmpty = null; //null is undefined
 	public boolean isTerm = false;
     public GrammarConstruct grammarConstruct;
 	
@@ -42,7 +42,7 @@ public class Node {
 	}
 	
 	private Node(String n, int l) {						
-		name = n;
+		name = n.startsWith("+") ? n.substring(1) : n;
 		layer = l;
 		nodes = new ArrayList<Node>();
 		parent = null;
@@ -51,6 +51,14 @@ public class Node {
 	
 	public boolean IsPrimitive(){
 		return (layer == 0 && name.length() == 2 && IEMLLang.AlphabetList.contains(name.substring(0, 1)));
+	}
+	
+	public void SetEmpty(boolean b){
+		isEmpty = b;
+	}
+	
+	public Boolean GetEmpty(){
+		return isEmpty;
 	}
 	
 	public ArrayList<Node> GetNodes(){
@@ -80,7 +88,7 @@ public class Node {
 	}
 
 	public String GetName(){
-		return name.startsWith("+") ? name.substring(1) : name;
+		return name;
 	}
 
     public int GetLayer(){
@@ -104,6 +112,22 @@ public class Node {
 	}
 	
 	//-----------------------------------------basic semantic-----------------------------------
+	
+	public String process(Node node) {
+		
+		if (node.GetLayer() == 0){
+			node.SetEmpty(IEMLLang.IsEmpty(node.GetName()));						
+		}
+		else {
+			StringBuilder builder = new StringBuilder();
+			for (Node n: nodes){
+				builder.append(process(n)); 
+			}
+			node.SetEmpty(IEMLLang.IsEmpty(builder.toString()));			
+		}
+		
+		return node.GetEmpty() ? "E" : "X";
+	}
 	
 	//Checks if a node contains 'empty' ieml. 
 	public Boolean MarkEmpty() {

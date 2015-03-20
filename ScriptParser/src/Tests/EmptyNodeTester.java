@@ -7,8 +7,6 @@ public class EmptyNodeTester extends BaseTester {
 	protected void run() throws Exception
 	{
 		System.out.println(iemlSequence);
-		
-		rootNode.MarkEmpty();
 		rootNode.PrintNodes("", new EmptyInspector());
 	}
 	

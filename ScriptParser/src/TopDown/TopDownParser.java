@@ -1,12 +1,12 @@
 package TopDown;
 
 import java.util.ArrayList;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import IEMLInterface.IEMLLang;
+import Rules.PostprocessorEngine;
 import Rules.RuleEngine;
 import TopDown.Parser.Mode;
 
@@ -16,8 +16,6 @@ public class TopDownParser {
 		
 		int numCores = Runtime.getRuntime().availableProcessors()/2;
 		ExecutorService executor = Executors.newFixedThreadPool(numCores);
-		
-		RuleEngine rules = new RuleEngine();
 		
 		int inputLength = input.length();
 		String detectedLayer = input.substring(inputLength-1, inputLength);
@@ -52,12 +50,14 @@ public class TopDownParser {
 			
 		//processing
 		
-		root.MarkEmpty();
+		PostprocessorEngine post = new PostprocessorEngine();
+		post.RunRules(root);
 		
 		//end processing
 		
 		//checks
 		
+		RuleEngine rules = new RuleEngine();
 		rules.RunRules(root);
 		
 		//end checks

@@ -2,32 +2,11 @@ package TopDown;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import IEMLInterface.IEMLLang;
 import IEMLInterface.TermInterface;
 
 public class Parser implements Runnable {
-
-	public static Pattern[] patternDetector = new Pattern[] { 
-		Pattern.compile("(\\w+)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[0]+"(\\+.+?"+IEMLLang.LM_R[0]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[1]+"(\\+.+?"+IEMLLang.LM_R[1]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[2]+"(\\+.+?"+IEMLLang.LM_R[2]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[3]+"(\\+.+?"+IEMLLang.LM_R[3]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[4]+"(\\+.+?"+IEMLLang.LM_R[4]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[5]+"(\\+.+?"+IEMLLang.LM_R[5]+")*)"),
-		Pattern.compile("(.+?"+IEMLLang.LM_R[6]+"(\\+.+?"+IEMLLang.LM_R[6]+")*)")
-	};
-	public static Pattern[] layerMarkDetectors = new Pattern[] { 
-		Pattern.compile("(\\w+"+IEMLLang.LM_R[0]+")"),
-		Pattern.compile(".+?"+IEMLLang.LM_R[1]),
-		Pattern.compile(".+?"+IEMLLang.LM_R[2]),
-		Pattern.compile(".+?"+IEMLLang.LM_R[3]),
-		Pattern.compile(".+?"+IEMLLang.LM_R[4]),
-		Pattern.compile(".+?"+IEMLLang.LM_R[5]),
-		Pattern.compile(".+?"+IEMLLang.LM_R[6])
-	};
 	
 	private Node startNode; // root node
 	private int startIndex; // estimate of layer
@@ -77,13 +56,13 @@ public class Parser implements Runnable {
 		if (!IEMLLang.IsLayerValid(index)) 
 			return; 
 		
-		if (index >= patternDetector.length || index >= layerMarkDetectors.length){
+		if (index >= IEMLLang.patternDetector.length || index >= IEMLLang.layerMarkDetectors.length){
 			throw new Exception("==> "+ "missing regex for index " + index);
 		}
 									
 		ArrayList<String> substrings = new ArrayList<String>();	
 		
-		Matcher matcher = layerMarkDetectors[index].matcher(input.GetName());			
+		Matcher matcher = IEMLLang.layerMarkDetectors[index].matcher(input.GetName());			
 		while (matcher.find())	
 			substrings.add(matcher.group());
 			
@@ -93,17 +72,15 @@ public class Parser implements Runnable {
 		else if (substrings.size() == 1){
 			// multiplication
 			substrings.clear();
-			matcher = patternDetector[index].matcher(input.GetName());	
+			matcher = IEMLLang.patternDetector[index].matcher(input.GetName());	
 			
 			while (matcher.find())
 				substrings.add(matcher.group());
 			
 			if (index == 0 && substrings.size() == 1) {
 				//atom
-				Node newNode = Node.GetNewNode(input.GetName(), index);
-				if (terms.IsTerm(newNode))
-					newNode.isTerm = true;				
-				input.AddNode(newNode);
+				if (terms.IsTerm(input))
+					input.isTerm = true;				
 				return;
 			}
 			else {
