@@ -80,7 +80,7 @@ public class Parser implements Runnable {
 			if (index == 0 && substrings.size() == 1) {
 				//atom
 				if (terms.IsTerm(input))
-					input.isTerm = true;				
+					input.SetTerm(true);				
 				return;
 			}
 			else {
@@ -95,7 +95,7 @@ public class Parser implements Runnable {
 						parse(newNode, index - 1);
 					else if (mode == Mode.TermOnly){
 						if (terms.IsTerm(newNode))
-							newNode.isTerm = true;
+							newNode.SetTerm(true);
 						else
 							parse(newNode, index - 1);						
 					}
@@ -115,7 +115,7 @@ public class Parser implements Runnable {
 					parse(newNode, index - 1);
 				else if (mode == Mode.TermOnly){
 					if (terms.IsTerm(newNode))
-						newNode.isTerm = true;
+						newNode.SetTerm(true);
 					else
 						parse(newNode, index - 1);	
 				}

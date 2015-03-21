@@ -3,7 +3,7 @@ package Rules;
 import IEMLInterface.IEMLLang;
 import TopDown.Node;
 
-public class PostprocessorEmpty extends PostprocessorBase<String> {
+public class PostprocessorEmpty extends PostprocessorBase {
 	
 	protected String process(Node node) {
 		
@@ -18,10 +18,10 @@ public class PostprocessorEmpty extends PostprocessorBase<String> {
 			node.SetEmpty(IEMLLang.IsEmpty(builder.toString()));			
 		}
 		
-		return node.GetEmpty() ? "E" : "X";
+		return node.IsEmpty() ? "E" : "X";
 	}
 	
 	public String GetName(){
-		return "PostprocessorEmpty";
+		return "[PostprocessorEmpty]";
 	}
 }

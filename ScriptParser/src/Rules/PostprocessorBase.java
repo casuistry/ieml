@@ -2,15 +2,18 @@ package Rules;
 
 import TopDown.Node;
 
-public class PostprocessorBase<T> {
+public class PostprocessorBase {
 	
-	public T Process(Node node){
+	protected boolean status = true;
+	protected String result = null;
+	
+	public String Process(Node node){
 			
-		T result = null;
+		String result = null;
 		
 		try {
 			result = process(node);
-			System.out.println(GetName() + " " + (GetStatus() ? "passed" : "failed"));
+			System.out.println(GetName() + " " + (GetStatus() ? "passed" : result));			
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -18,12 +21,12 @@ public class PostprocessorBase<T> {
 		return result;
 	}
 	
-	protected T process(Node node) throws Exception {
+	protected String process(Node node) throws Exception {
 		return null;
 	}
 	
 	public String GetName(){
-		return "PostprocessorBase";
+		return "[PostprocessorBase]";
 	}
 	
 	public boolean GetStatus(){

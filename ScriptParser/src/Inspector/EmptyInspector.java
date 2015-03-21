@@ -7,7 +7,7 @@ public class EmptyInspector extends BaseInspector {
 	@Override
 	protected String inspect(Node node) {
 		
-		StringBuilder builder = new StringBuilder(node.GetName() + " is empty = " + node.GetEmpty());
+		StringBuilder builder = new StringBuilder(node.GetName() + " is empty = " + node.IsEmpty());
 		return builder.toString();
 	}
 }

@@ -6,7 +6,6 @@ import java.util.PriorityQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import IEMLInterface.IEMLLang;
-import IEMLInterface.IEMLLang.GrammarConstruct;
 import Inspector.BaseInspector;
 import Structures.CompMatch;
 import Structures.Counter;
@@ -26,8 +25,8 @@ public class Node {
 	//-----------------------------------------calculated values-----------------------------------
 	
 	private Boolean isEmpty = null; //null is undefined
-	public boolean isTerm = false;
-    public GrammarConstruct grammarConstruct;
+	private boolean isTerm = false;
+	private String grammaticalConstruct = null;
 	
 	//-----------------------------------------basic methods-----------------------------------
 	
@@ -53,12 +52,33 @@ public class Node {
 		return (layer == 0 && name.length() == 2 && IEMLLang.AlphabetList.contains(name.substring(0, 1)));
 	}
 	
+	public boolean IsLeaf(){
+		return (nodes.size() == 0 && opCode == null);
+	}
+	
 	public void SetEmpty(boolean b){
 		isEmpty = b;
 	}
 	
-	public Boolean GetEmpty(){
+	public Boolean IsEmpty(){
 		return isEmpty;
+	}
+	
+	public void SetTerm(boolean b){
+		isTerm = b;
+		grammaticalConstruct = isTerm ? "Z" : null;
+	}
+	
+	public Boolean IsTerm(){
+		return isTerm;
+	}
+	
+	public String GetGConstruct(){
+		return grammaticalConstruct;
+	}
+	
+	public void SetGConstruct(String s){
+		grammaticalConstruct = s;
 	}
 	
 	public ArrayList<Node> GetNodes(){
@@ -110,52 +130,7 @@ public class Node {
 			}
 		}		
 	}
-	
-	//-----------------------------------------basic semantic-----------------------------------
-	
-	public String process(Node node) {
 		
-		if (node.GetLayer() == 0){
-			node.SetEmpty(IEMLLang.IsEmpty(node.GetName()));						
-		}
-		else {
-			StringBuilder builder = new StringBuilder();
-			for (Node n: nodes){
-				builder.append(process(n)); 
-			}
-			node.SetEmpty(IEMLLang.IsEmpty(builder.toString()));			
-		}
-		
-		return node.GetEmpty() ? "E" : "X";
-	}
-	
-	//Checks if a node contains 'empty' ieml. 
-	public Boolean MarkEmpty() {
-				
-		if (isEmpty != null)
-			return isEmpty;
-		
-		if (layer == 0){
-			if (IEMLLang.IsEmpty(GetName()))
-				isEmpty = true;
-			else 
-				isEmpty = false;
-		}
-		else {			
-			for (Node n : nodes){		
-				Boolean b = n.MarkEmpty();
-				if (b != null){
-					if (isEmpty != null)
-						isEmpty &= b;	
-					else
-						isEmpty = b;
-				}						
-			}
-		}
-		
-		return isEmpty;
-	}
-	
 	//-----------------------------------------other methods----------------------------------- 
     
 	public static Counter GetNumberOfDifferences(Node a, Node b) throws Exception{

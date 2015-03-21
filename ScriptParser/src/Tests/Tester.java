@@ -13,11 +13,8 @@ public class Tester {
 		//BaseTester baseTester = new BaseTester();
 		//baseTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
-		//RuleTester tester = new RuleTester();
-		//tester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
-		
-		//TermTester tester = new TermTester();
-		//tester.RunTest(ScriptExamples.StudentLearnsMathematics, 5, new BaseIEMLProvider(), null, null);			
+		TermTester tester = new TermTester();
+		tester.RunTest(ScriptExamples.StudentLearnsMathematics, 5, new BaseIEMLProvider(), null, null);			
 		//ScriptExamples.StudentLearnsMathematics
 		
 		//Generate an empty sequence of specified layer
@@ -25,10 +22,10 @@ public class Tester {
 		//tester.RunTest(null, 3, new EmptyIEMLProvider(), null, null);
 		
 		//ParsingTester parsingTester = new ParsingTester();
-		//parsingTester.RunTest(null, 2, new BaseIEMLProvider(), null, null);
+		//parsingTester.RunTest("*S:S:T:.(F:(S:+M:)B:.+M:U:E:.+(T:+S:+A:)(A:+O:+S:)(M:+I:+A:+B:).+(U:+O:+A:+S:)U:(F:+I:+M:).)B:M:F:.-**", 2, new BaseIEMLProvider(), null, null);
 		
-		EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
-		emptyNodeTester.RunTest("*S:B:T:.E:E:E:.S:B:T:.-**", 3, new BaseIEMLProvider(), null, null);
+		//EmptyNodeTester emptyNodeTester = new EmptyNodeTester();
+		//emptyNodeTester.RunTest("*S:B:T:.E:E:E:.S:B:T:.-**", 3, new BaseIEMLProvider(), null, null);
 	}
 }
 

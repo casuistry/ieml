@@ -16,7 +16,7 @@ public class TermInspector extends BaseInspector {
     	
 		StringBuilder builder = new StringBuilder();
 		
-		if (!node.isTerm)
+		if (!node.IsTerm())
 			builder.append(node.GetName() + "\t[#]");
 		else
 			builder.append(node.GetName() + "\t[" + termInterface.GetMapping(node.GetName()) + "]");
