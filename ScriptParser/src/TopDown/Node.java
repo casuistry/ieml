@@ -40,6 +40,15 @@ public class Node {
 		return null;
 	}
 	
+	public static Node GetEmptyNode(int l){
+		Node emptyNode = GetNewNode(IEMLLang.GetEmpty() + IEMLLang.LM[l], l);
+		if (emptyNode != null){
+			emptyNode.SetEmpty(true);
+			emptyNode.SetTerm(true);
+		}
+		return emptyNode;
+	}
+	
 	private Node(String n, int l) {						
 		name = n.startsWith("+") ? n.substring(1) : n;
 		layer = l;

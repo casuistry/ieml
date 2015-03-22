@@ -1,27 +1,25 @@
 package Rules;
 
-import java.util.regex.Pattern;
-
-import IEMLInterface.IEMLLang;
+import IEMLInterface.Detector;
 import TopDown.Node;
 
 public class PostprocessorGrammar extends PostprocessorBase {
 
     boolean morpheme = true;
 
-	protected String process(Node node) {
+	protected String process(Node node) throws Exception {
 				
 		if (node.GetGConstruct() == null){
 			
-			for (Node n: node.GetNodes()){
-				
-				String temp = process(n);				
-				morpheme &= temp.equals(IEMLLang.GetTerm()); 
+			Detector detector = new Detector();
+			
+			detector.Next(node.GetOpcode());
+			
+			for (Node n: node.GetNodes()){				
+				detector.Next(process(n)); 
 			}
 			
-			String res = morpheme ? 
-			
-			node.SetGConstruct(builder.toString());
+			node.SetGConstruct(detector.GetResult());
 		}
 			
 		System.out.println(node.GetGConstruct());

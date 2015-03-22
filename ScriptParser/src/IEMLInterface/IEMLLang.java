@@ -50,6 +50,18 @@ public class IEMLLang {
 		return "Z";
 	}
 	
+	public static String GetMorpheme(){
+		return "R";
+	}
+	
+	public static String GetWord(){
+		return "W";
+	}
+	
+	public static String GetClause1(){
+		return "C1";
+	}
+	
 	public static boolean IsEmpty(String s){
 		return s.equals("E:") || s.equals("EEE");
 	}

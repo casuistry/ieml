@@ -7,6 +7,12 @@ public class PostprocessorEmpty extends PostprocessorBase {
 	
 	protected String process(Node node) {
 		
+		if (node.GetOpcode().equals(IEMLLang.Multiplication)){
+			while (node.GetNodes().size() < 3){
+				node.AddNode(Node.GetEmptyNode(node.GetLayer()-1));
+			}
+		}
+		
 		if (node.GetLayer() == 0){
 			node.SetEmpty(IEMLLang.IsEmpty(node.GetName()));						
 		}

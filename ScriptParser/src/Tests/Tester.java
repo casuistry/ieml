@@ -13,8 +13,8 @@ public class Tester {
 		//BaseTester baseTester = new BaseTester();
 		//baseTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
-		TermTester tester = new TermTester();
-		tester.RunTest(ScriptExamples.StudentLearnsMathematics, 5, new BaseIEMLProvider(), null, null);			
+		ParsingTester tester = new ParsingTester();
+		tester.RunTest("*S.**", 5, new BaseIEMLProvider(), null, null);			
 		//ScriptExamples.StudentLearnsMathematics
 		
 		//Generate an empty sequence of specified layer
