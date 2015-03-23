@@ -7,7 +7,8 @@ public class PostprocessorEmpty extends PostprocessorBase {
 	
 	protected String process(Node node) {
 		
-		if (node.GetOpcode().equals(IEMLLang.Multiplication)){
+		//fill in missing multiplication spots, if required
+		if (IEMLLang.Multiplication.equals(node.GetOpcode())){
 			while (node.GetNodes().size() < 3){
 				node.AddNode(Node.GetEmptyNode(node.GetLayer()-1));
 			}
@@ -24,7 +25,7 @@ public class PostprocessorEmpty extends PostprocessorBase {
 			node.SetEmpty(IEMLLang.IsEmpty(builder.toString()));			
 		}
 		
-		return node.IsEmpty() ? "E" : "X";
+		return node.IsEmpty() ? IEMLLang.GetEmpty() : IEMLLang.GetInvalid();
 	}
 	
 	public String GetName(){

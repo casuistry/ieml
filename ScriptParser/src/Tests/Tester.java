@@ -1,6 +1,8 @@
 package Tests;
 
 import IEMLInterface.ScriptExamples;
+import NewParser.Parser;
+import NewParser.Parser.Node;
 import ScriptGenerator.BaseIEMLProvider;
 import ScriptGenerator.EmptyIEMLProvider;
 import ScriptGenerator.GeneratorConfigurator;
@@ -13,8 +15,12 @@ public class Tester {
 		//BaseTester baseTester = new BaseTester();
 		//baseTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
-		ParsingTester tester = new ParsingTester();
-		tester.RunTest("*S.**", 5, new BaseIEMLProvider(), null, null);			
+		String a = "*S:B:.**";
+		Parser.run(a);		
+		
+		
+		//ParsingTester tester = new ParsingTester();
+		//tester.RunTest(a, 3, new BaseIEMLProvider(), null, null);			
 		//ScriptExamples.StudentLearnsMathematics
 		
 		//Generate an empty sequence of specified layer

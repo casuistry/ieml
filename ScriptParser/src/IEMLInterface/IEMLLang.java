@@ -42,6 +42,10 @@ public class IEMLLang {
 	public static List<String> LMList = Arrays.asList(LM);	
 	public static List<String> AlphabetList = Arrays.asList(alphabet);
 	
+	public static String GetInvalid(){
+		return "X";
+	}
+	
 	public static String GetEmpty(){
 		return "E";
 	}

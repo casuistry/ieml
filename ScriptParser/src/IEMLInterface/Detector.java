@@ -27,11 +27,11 @@ public class Detector {
 	
 	protected boolean isMorpheme(){
 		
-		if (!pattern.get(0).equals(IEMLLang.Addition))
+		if (!(IEMLLang.Addition).equals(pattern.get(0)))
 			return false;
 		
 		for (int i = 1; i < pattern.size(); i++){
-			if (!pattern.get(i).equals(IEMLLang.GetTerm()))
+			if (!IEMLLang.GetTerm().equals(pattern.get(i)))
 				return false;				
 		}
 		

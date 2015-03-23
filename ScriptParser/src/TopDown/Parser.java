@@ -51,59 +51,62 @@ public class Parser implements Runnable {
 	
 	private void parse(Node input, int index) throws Exception {		
 		
-		Mode mode = config._Mode;
-		
 		if (!IEMLLang.IsLayerValid(index)) 
 			return; 
 		
-		if (index >= IEMLLang.patternDetector.length || index >= IEMLLang.layerMarkDetectors.length){
-			throw new Exception("==> "+ "missing regex for index " + index);
-		}
-									
-		ArrayList<String> substrings = new ArrayList<String>();	
+		if (index >= IEMLLang.patternDetector.length || index >= IEMLLang.layerMarkDetectors.length)
+			throw new Exception("missing regex for index " + index);
+				
+		Mode mode = config._Mode;
 		
-		Matcher matcher = IEMLLang.layerMarkDetectors[index].matcher(input.GetName());			
+		Matcher matcher = IEMLLang.layerMarkDetectors[index].matcher(input.GetName());	
+		ArrayList<String> substrings = new ArrayList<String>();
 		while (matcher.find())	
 			substrings.add(matcher.group());
 			
 		if (substrings.size() < 1) {
 		    throw new Exception("missing layer " + IEMLLang.LM_R[index]);
 		}			
-		else if (substrings.size() == 1){
-			// multiplication
-			substrings.clear();
-			matcher = IEMLLang.patternDetector[index].matcher(input.GetName());	
-			
+		
+		// multiplication (only one layer mark found)
+		if (substrings.size() == 1){
+
+			ArrayList<String> mults = new ArrayList<String>();
+			matcher = IEMLLang.patternDetector[index].matcher(input.GetName());				
 			while (matcher.find())
-				substrings.add(matcher.group());
-			
-			if (index == 0 && substrings.size() == 1) {
-				//atom
-				if (terms.IsTerm(input))
-					input.SetTerm(true);				
-				return;
-			}
-			else {
-				input.SetOpCode(IEMLLang.Multiplication);
+				mults.add(matcher.group());
 				
-				for (String str : substrings) 
-				{	
-					Node newNode = Node.GetNewNode(str, index-1);				
-					input.AddNode(newNode);	
-					
-					if (mode == Mode.Full)
-						parse(newNode, index - 1);
-					else if (mode == Mode.TermOnly){
-						if (terms.IsTerm(newNode))
-							newNode.SetTerm(true);
-						else
-							parse(newNode, index - 1);						
-					}
+			if (mults.size() < 1){
+				if (index == 1)
+					throw new Exception("small cap " + substrings.get(0));
+				else
+					throw new Exception("unrecognized " + substrings.get(0));
+			}
+			
+			if (mults.size() == 1){ 
+				if (index == 0) {//atom
+					input.SetTerm(terms.IsTerm(input));
+					return;	
 				}
+			}			
+			
+			input.SetOpCode(IEMLLang.Multiplication);
+			
+			for (String str : mults) 
+			{	
+				Node newNode = Node.GetNewNode(str, index-1);				
+				input.AddNode(newNode);	
+				
+				if (mode == Mode.Full)
+					parse(newNode, index - 1);
+				else if (mode == Mode.TermOnly)
+					newNode.SetTerm(terms.IsTerm(newNode));
+					else
+						parse(newNode, index - 1);										
 			}
 		}	
-		else {
-			// addition
+		else { // addition (multiple layer marks)
+			
 			input.SetOpCode(IEMLLang.Addition);
 			
 			for (String str : substrings) 
