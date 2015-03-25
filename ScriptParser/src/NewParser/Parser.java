@@ -5,21 +5,18 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import Inspector.BaseInspector;
-import TopDown.Node;
-
 public class Parser {
 	
 	public static List<Character> c_alphabet = Arrays.asList(new Character[]{'S','B','T','U','A','O','M','I','E','F'});
 	public static List<Character> c_smallCap = Arrays.asList(new Character[]{'y','o','e','u','a','i','j','g','s','b','t','h','c','k','m','n','p','x','d','f','l'});
 	public static List<Character> c_vowels   = Arrays.asList(new Character[]{'o','a','u','e'});
-	public static List<Character> c_ignore  = Arrays.asList(new Character[]{'(',')','*'});
+	public static List<Character> c_ignore   = Arrays.asList(new Character[]{'(',')','*',' '});
 	public static List<Character> c_wLetter  = Arrays.asList(new Character[]{'w'});
 	public static List<Character> c_addOp    = Arrays.asList(new Character[]{'+'});
 	public static List<Character> c_marks    = Arrays.asList(new Character[]{':', '.', '-', '’', ',', '_', ';'});
 	
 	public static Character multiplication = '*';
-	
+	public static int MaxMultiplications = 3;
 	public static String StateInitial = "Initial";
 	public static String StateLetter = "Letter";
 	public static String StateMark = "Mark";
@@ -27,194 +24,354 @@ public class Parser {
 	
 	static int counter;
 	
-	public static void run(String input) {
-	
-		Parser parser = new Parser();
-		counter = 0;
+	public static String run(String input) {
+		
+		String result = null;
 		
 		try {
-			Node n = parser.Parse(input);
-			n.PrintNodes("");
+			counter = 0;
+			Parser parser = new Parser();			
+			Node n = parser.parse(input);
+			//n.PrintNodes("");
+			//result = n.Output();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			System.out.println(input);
+			StringBuilder builder = new StringBuilder();
 			for (int i = 0 ; i < counter; i++)
-				System.out.print(" ");
-			System.out.print("^");
+				builder.append(" ");
+			builder.append("^");
+			result = builder.toString();
 		}
+		
+		return result;
 	}
 	
-	public Node Parse(String input) throws Exception{
-		 
-		State state = new State();
-		Node current = null;
-
+	enum States {
+		state_i,		//initial
+		state_sc,		//small cap 
+		state_ws,		//start small cap wo, wa, wu and we
+		state_a,		//primitives
+		state_finish,	//node completed
+		state_add,		//addition operation
+	}
+	
+	Node currentNode;
+	States currentState;
+	Character previousChar;
+	int lmCounter;
+	Character previousLM;
+	
+	public Node parse(String input) throws Exception {
+		
+		currentNode = null;
+		currentState = States.state_i;
+		previousChar = null;
+		lmCounter = 0;
+		previousLM = null;
+		
+		//state variables
+		Node root = null;
+		
 		for (counter = 0; counter < input.length(); counter++){
 			
 			Character charIn = new Character(input.charAt(counter));
 			
-			if (charIn.equals(' ')) 
-				continue;
-			
-			if (charIn.equals(c_wLetter)) {
-				
-			}
-			
 			if (c_ignore.contains(charIn))
 				continue;
-						
-			if (c_smallCap.contains(charIn)){
-				
-			}
 			
-			if (c_alphabet.contains(charIn)){ //1
-								
-				if (state.GetState().equals(StateInitial)){
-					
-					//starting node
-					current = new Node();
-					current.name = charIn.toString();	
-					
-					//create parent of current
-					Node parent = new Node();
-					parent.nodes.add(current);
-					current.parent = parent;
-				}
-								
-				else if (state.GetState().equals(StateMark)){ //2
-					
-					//we should have a parent at this point
-					if (current.parent == null)
-						throw new Exception("parent of root not defined");
-					
-					//cannot have more than three nodes in this relation
-					if (current.parent.nodes.size() > 2)
-						throw new Exception("too many nodes in multiplication relation");
-					
-					//set parent opcode as multiplication
-					current.parent.opCode = multiplication;
-					
-					//sibling node
-					Node sibling = new Node();
-					sibling.name = charIn.toString();
-					sibling.layer = current.layer;
-					sibling.parent = current.parent;
-					
-					//add sibling
-					current.parent.nodes.add(sibling);
-					
-					//re-point current node to sibling
-					current = sibling;
-				}
-				
-				else {
-					throw new Exception("do not know how to handle this " + charIn + " in state " + state.GetState());
-				}
-				
-				state.Transition(c_alphabet, charIn);
-			}
+			stateDispatcher(charIn);
 			
-			if (c_marks.contains(charIn)){
-								
-				if (state.GetState().equals(StateLetter)){ //3
-					
-					//we should have a parent at this point
-					if (current.parent == null)
-						throw new Exception("parent of root not defined");
-					
-					//finalize current node
-					//parent can be at this layer or the next, we still do not know
-					current.layer = c_marks.indexOf(charIn); 									
-				}		
-								
-				else if (state.GetState().equals(StateMark)){ //4
-					
-					//we should have a parent at this point
-					if (current.parent == null)
-						throw new Exception("parent of root not defined");
-					
-					//can only be the next layer mark from
-					//current, anything else is an error					
-					if (current.layer + 1 != c_marks.indexOf(charIn))
-						throw new Exception("Layer mark: " + charIn + " cannot follow " + c_marks.get(current.layer));
-					
-					//set parent's layer
-					current.parent.layer = current.layer + 1;
-					
-					//if the parent of the root is a multiplication relation, 
-					//verify if three children exist and fill as required					
-					if (multiplication.equals(current.parent.opCode)){
-						while (current.parent.nodes.size() < 3){							
-							Node emptyNode = new Node();
-							emptyNode.name = "E";
-							emptyNode.layer = current.layer;
-							current.parent.nodes.add(emptyNode);
-						}
-					}
-				}
-				
-				else {
-					throw new Exception("do not know how to handle this " + charIn + " in state " + state.GetState());
-				}
-				
-				state.Transition(c_marks, charIn);
-			}
+			previousChar = charIn;
 		}
 		
-		current.parent.name = input;
-		return current.parent;
+		if (currentState != States.state_finish)
+			throw new Exception("bad final state");
+		
+		//currentNode.parent.name = input;
+		return root != null ? root.parent : null;
 	}
 	
-	class State {
+	private void stateDispatcher(char c) throws Exception {
+				
+		if (c_addOp.contains(c)){
+			switch (currentState) {
+				case state_i:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_a:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_add:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_finish:
+					action_op(c);
+					break;
+				case state_sc:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_ws:
+					throw new Exception(c + " cannot follow " + previousChar);
+				default:
+					throw new Exception("unrecognized state " + currentState);			
+			}
+			
+			currentState = States.state_add;
+		}
+		else if (c_wLetter.contains(c)){
+			switch (currentState) {
+				case state_i:
+					action_ci(c);
+					break;
+				case state_a:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_add:
+					action_ca(c);
+					break;
+				case state_finish:
+					action_cf(c);
+					break;
+				case state_sc:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_ws:
+					throw new Exception(c + " cannot follow " + previousChar);
+				default:
+					throw new Exception("unrecognized state " + currentState);			
+			}
+			
+			currentState = States.state_ws;
+		}		
+		else if (c_marks.contains(c)){
+			switch (currentState) {
+				case state_i:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_a:
+					if (c != c_marks.get(0))
+						throw new Exception("layer mark must be '" + c_marks.get(0) + "'");
+					action_fn(c);
+					break;
+				case state_add:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_finish:
+					action_fnn(c);
+					break;
+				case state_sc:
+					if (c != c_marks.get(1))
+						throw new Exception("layer mark must be '" + c_marks.get(1) + "'");
+					action_fn(c);
+					break;
+				case state_ws:
+					throw new Exception(c + " cannot follow " + previousChar);
+				default:
+					throw new Exception("unrecognized state " + currentState);			
+			}
+			
+			currentState = States.state_finish;
+		}		
+		else if (c_smallCap.contains(c)){
+			switch (currentState) {
+				case state_i:
+					action_ci(c);
+					break;
+				case state_a:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_add:
+					action_ca(c);
+					break;
+				case state_finish:
+					action_cf(c);
+					break;
+				case state_sc:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_ws:
+					if (c_vowels.contains(c))
+						action_cw(c);
+					else 
+						throw new Exception(c + " cannot follow " + previousChar);
+				default:
+					throw new Exception("unrecognized state " + currentState);			
+			}
+			
+			currentState = States.state_sc;
+		}
+		else if (c_alphabet.contains(c)){
+			switch (currentState) {
+				case state_i:
+					action_ci(c);
+					break;
+				case state_a:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_add:
+					action_ca(c);
+					break;
+				case state_finish:
+					action_cf(c);
+					break;
+				case state_sc:
+					throw new Exception(c + " cannot follow " + previousChar);
+				case state_ws:
+					throw new Exception(c + " cannot follow " + previousChar);
+				default:
+					throw new Exception("unrecognized state " + currentState);			
+			}
+		
+			currentState = States.state_a;
+		}
+		else {
+			throw new Exception("unrecognized input " + c);
+		}
+	}	
+	
+	//create first node and its parent
+	private void action_ci(char c){
+		
+	}
+	
+	//new node in additive relation
+	private void action_ca(char c){
+		
+	}
+	
+	//get ready for additive relation
+	private void action_op(char c){
+		
+		lmCounter = 0;
+	}
+	
+	//new node in multiplication relation
+	private void action_cf(char c){
+
+	}
+	
+	//recognized wo, we, wu , wa
+	private void action_cw(char c){
+		
+	}
+	
+	//finalize node
+	private void action_fn(char c) throws Exception{
+		
+		if (lmCounter >= MaxMultiplications)
+			throw new Exception("too many nodes in multiplication relation");
+		else
+			lmCounter++;		
+		
+		previousLM = c;
+	}
+	
+	//finalize next node
+	private void action_fnn(char c) throws Exception{
+		
+		lmCounter = 0;
+		
+		if (c_marks.indexOf(previousLM) + 1 != c_marks.indexOf(c))
+			throw new Exception(c + " cannot follow " + previousLM);
+		else
+			previousLM = c;
+	}
+		
+	public class State {
 		
 		String current;
-		int currentLayer = -1;
-		HashMap<String, HashMap<List<Character>, String>> transitions;
+		HashMap<String, HashMap<List<Character>, String>> Tx;
+		
+		Character currentLayer;
+		String stateMark;
+		HashMap<String, HashMap<String, String>> markTx;
+		String _same = "_same";
+		String _greaterByOne = "_greaterByOne";
+		String _reset = "_reset";
+		String _first = "_first";
+		String _second = "_second";
+		String _third = "_third";
+		String _higher = "_higher";		
 				
-		public State(){
+		public State(){			
+			_init_state();
+			_init_layer();			
+		}
+		
+		private void _init_state(){
 			
 			current = StateInitial;
-			transitions = new HashMap<String, HashMap<List<Character>, String>>();
-					
+			Tx = new HashMap<String, HashMap<List<Character>, String>>();
+			
 			//from Initial
 			HashMap<List<Character>, String> fromInitial = new HashMap<List<Character>, String>();
 			fromInitial.put(c_alphabet, StateLetter);			
-			transitions.put(StateInitial, fromInitial);	
+			Tx.put(StateInitial, fromInitial);	
 			
 			//from Letter
 			HashMap<List<Character>, String> fromLetter = new HashMap<List<Character>, String>();
 			fromLetter.put(c_marks, StateMark);			
-			transitions.put(StateLetter, fromLetter);	
+			Tx.put(StateLetter, fromLetter);	
 			
 			//from Mark
 			HashMap<List<Character>, String> fromMark = new HashMap<List<Character>, String>();
 			fromMark.put(c_alphabet, StateLetter);		
 			fromMark.put(c_addOp, StateAddition);
 			fromMark.put(c_marks, StateMark);
-			transitions.put(StateMark, fromMark);
+			Tx.put(StateMark, fromMark);
 			
 			//from Addition
 			HashMap<List<Character>, String> fromAddition = new HashMap<List<Character>, String>();
 			fromAddition.put(c_alphabet, StateLetter);		
-			transitions.put(StateAddition, fromAddition);			
+			Tx.put(StateAddition, fromAddition);
+		}
+		
+		private void _init_layer(){
+			
+			currentLayer = null;
+			stateMark = StateInitial;
+			markTx = new HashMap<String, HashMap<String, String>>();
+			
+			HashMap<String, String> fromInitial = new HashMap<String, String>();
+			fromInitial.put(_same, "A");	
+			HashMap<String, String> fromA = new HashMap<String, String>();
+			fromA.put(_same, "B");
+			fromA.put(_greaterByOne, "D");
+			HashMap<String, String> fromB =  new HashMap<String, String>();
+			fromB.put(_same, "C");
+			fromB.put(_greaterByOne, "D");
+			HashMap<String, String> fromC = new HashMap<String, String>();
+			fromC.put(_same, "D");
+			HashMap<String, String> fromD = new HashMap<String, String>();
+			fromD.put(_reset, "A");
+			fromD.put(_greaterByOne, "D");
+			
+			markTx.put(StateInitial, fromInitial);
+			markTx.put(StateInitial, fromA);
+			markTx.put(StateInitial, fromB);
+			markTx.put(StateInitial, fromC);
+			markTx.put(StateInitial, fromD);
 		}
 		
 		public String Transition(List<Character> cl, Character c) throws Exception{
 			
-			if (!transitions.containsKey(current))
+			if (!Tx.containsKey(current))
 				throw new Exception("cannot transition from state " + current);
 			
-			HashMap<List<Character>, String> h = transitions.get(current);
+			HashMap<List<Character>, String> h = Tx.get(current);
 			
 			if (!h.containsKey(cl))
 				throw new Exception("cannot transition from state " + current + " for input " + c);
 			
-			//keep track of layers
+			//keep count of layer marks
 			if (c_marks.contains(c)){
+				
 				int newLayer = c_marks.indexOf(c);
+				
+				if (currentLayer == null) {					
+					if (newLayer != 0) 
+						//TODO: there will be an exception to this with small caps
+						throw new Exception("cannot start from layer mark " + c);									
+					currentLayer = c;
+					stateMark = _first;
+				}
+				else {
+					
+				}
+				
 				if (newLayer != currentLayer + 1 && newLayer != currentLayer)
 					throw new Exception("bad layer numbering progression: current layer is " + currentLayer);
-				currentLayer = newLayer;
+				
 			}
 			
 			current = h.get(cl);
@@ -255,6 +412,20 @@ public class Parser {
 					node.PrintNodes(prepend+"\t");
 				}
 			}	
+		}
+		
+		public String Output(){
+			
+			StringBuilder builder = new StringBuilder("[" + name);			
+			if (layer >= 0)
+				builder.append("|" + layer);
+			builder.append("]");			
+			
+			for(Node node : nodes){
+				builder.append(node.Output());
+			}
+			
+			return builder.toString();
 		}
 	}
 }
