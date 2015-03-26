@@ -15,8 +15,8 @@ public class Tester {
 		//BaseTester baseTester = new BaseTester();
 		//baseTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
-		String a = "*S:B:**";
-		System.out.println(Parser.run(ScriptExamples.StudentLearnsMathematics));	
+		String a = "*Z:B:B:**";
+		System.out.println(Parser.run(a));	
 		
 		//ParsingTester tester = new ParsingTester();
 		//tester.RunTest(a, 3, new BaseIEMLProvider(), null, null);			
