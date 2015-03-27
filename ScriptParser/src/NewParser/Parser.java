@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import TopDown.Node;
+
 public class Parser {
 	
 	public static List<Character> c_alphabet = Arrays.asList(new Character[]{'S','B','T','U','A','O','M','I','E','F'});
@@ -100,6 +102,7 @@ public class Parser {
 	}
 	
 	public static Character multiplication = '*';
+	public static Character addition = '+';
 	public static int MaxMultiplications = 3;
 	public static String StateInitial = "Initial";
 	public static String StateLetter = "Letter";
@@ -131,6 +134,7 @@ public class Parser {
 		return result;
 	}
 	
+	Node rootNode;
 	Node currentNode;
 	States currentState;
 	Character previousChar;
@@ -139,6 +143,7 @@ public class Parser {
 	
 	public Node parse(String input) throws Exception {
 		
+		rootNode = null;
 		currentNode = null;
 		currentState = States.state_i;
 		previousChar = null;
@@ -171,78 +176,136 @@ public class Parser {
 		else if (m_addOp.containsKey(c)){			
 			if (currentState == States.state_f)
 				return StateChangeActions(States.state_d, c);
+			throw new Exception("cannot process " + c + " in state " + currentState.getFieldDescription());
 		}
 		else if (m_wLetter.containsKey(c)){
 			if (currentState == States.state_i || currentState == States.state_d || currentState == States.state_f) 
 				return StateChangeActions(States.state_ws, c);	
+			throw new Exception("cannot process " + c + " in state " + currentState.getFieldDescription());
 		}		
 		else if (m_marks.containsKey(c)){
 			if (currentState == States.state_a || currentState == States.state_f || currentState == States.state_sc) 
 				return StateChangeActions(States.state_f, c);
+			throw new Exception("cannot process " + c + " in state " + currentState.getFieldDescription());
 		}		
 		else if (m_smallCap.containsKey(c)){
 			if (currentState == States.state_i || currentState == States.state_d || currentState == States.state_f || currentState == States.state_ws) 
 				return StateChangeActions(States.state_sc, c);
+			throw new Exception("cannot process " + c + " in state " + currentState.getFieldDescription());
 		}
 		else if (m_alphabet.containsKey(c)){
 			if (currentState == States.state_i || currentState == States.state_d || currentState == States.state_f) 
 				return StateChangeActions(States.state_a, c);
+			throw new Exception("cannot process " + c + " in state " + currentState.getFieldDescription());
 		}
 
-		throw new Exception("cannot process " + c + " following " + previousChar + " in state " + currentState.getFieldDescription());
+		throw new Exception("unrecognized " + c);
 	}	
-	
+		
+	//==================================================create first node and its parent
+	private void a_i_ws(Character c) throws Exception{
+		createRoot(c);
+	}	
 	//create first node and its parent
-	private void a_i_ws(char c){
-		
+	private void a_i_sc(Character c) throws Exception{
+		createRoot(c);
+	}
+	//create first node and its parent
+	private void a_i_a(Character c) throws Exception{
+		createRoot(c);
+	}
+	private void createRoot(Character c) throws Exception{
+		currentNode = new Node(c);
+		rootNode = new Node(c);		
+		rootNode.AddNode(currentNode);
 	}
 	
-	//new node in additive relation
-	private void a_d_ws(char c){
-		
+	//================================================new node in multiplication relation
+	private void a_f_ws(Character c) throws Exception{
+		multNode(c);
 	}
+	private void a_f_sc(Character c) throws Exception{
+		multNode(c);
+	}
+	private void a_f_a(Character c) throws Exception{
+		multNode(c);
+	}
+	private void multNode(Character c) throws Exception{
+		Node newNode = new Node(c);
+		currentNode.parent.opCode = multiplication;
+		currentNode.parent.AddNode(newNode);
+		currentNode = newNode; 
+	}
+	
+	//======================================================new node in addition relation
+	
+	private void a_d_ws(Character c) throws Exception{
+		additiveNode(c);
+	}
+	private void a_d_sc(Character c) throws Exception{
+		additiveNode(c);
+	}
+	private void a_d_a(Character c) throws Exception{
+		additiveNode(c);
+	}
+	private void additiveNode(Character c) throws Exception{
+		Node newNode = new Node(c);
+		currentNode.parent.opCode = addition;
+		currentNode.parent.AddNode(newNode);
+		currentNode = newNode; 
+	}
+	
+	//==================================================finalize node====================
+	private void a_a_f(Character c) throws Exception{			
+		if (m_marks.get(c) != 0)
+			throw new Exception("layer mark must be '" + c_marks.get(0) + "'");
+		finalizeNode(c);
+	}
+	//finalize node
+	private void a_sc_f(Character c) throws Exception {
+		if (m_marks.get(c) != 1)
+			throw new Exception("layer mark must be '" + c_marks.get(1) + "'");
+		finalizeNode(c);
+	}
+	//recognized wo, we, wu , wa
+	private void a_ws_sc(Character c) throws Exception{
+		if (!m_vowels.containsKey(c)) 
+			throw new Exception(c + " cannot follow " + previousChar);		
+		currentNode.AppendToName(c);
+	}
+	private void finalizeNode(Character c) throws Exception{
+		lmCounter.Increment();			
+		lmTracker.Set(c);		
+		currentNode.AppendToName(c);
+		currentNode.CompleteNode(true);
+	}
+	
+	//==================================================finalize node.parent==============
+	
+	//finalize next layer node
+	private void a_f_f(Character c) throws Exception{		
+		
+		if (rootNode.opCode.equals(multiplication))
+			if (rootNode.nodes.size() != 3)
+				throw new Exception("layer is not complete (need more info here)");
+		
+		lmCounter.Reset();
+		lmTracker.CheckAndSet(c);
+	}
+	
+	
+	
 	
 	//get ready for additive relation
 	private void a_f_d(char c){		
 		lmCounter.Reset();
 	}
-	
-	//new node in multiplication relation
-	private void a_f_ws(char c){
 
-	}
+
 	
-	//recognized wo, we, wu , wa
-	private void a_ws_sc(char c){
-		
-	}
+
 	
-	//finalize node
-	private void a_a_f(char c) throws Exception{		
-		lmCounter.Increment();			
-		lmTracker.Set(c);
-	}
-	
-	//finalize next layer node
-	private void a_f_f(char c) throws Exception{		
-		lmCounter.Reset();
-		lmTracker.CheckAndSet(c);
-	}
-		
-	private void a_a_f_exit(char c) throws Exception {
-		if (m_marks.get(c) != 0)
-			throw new Exception("layer mark must be '" + c_marks.get(0) + "'");
-	}
-	
-	private void a_sc_f_exit(char c) throws Exception {
-		if (m_marks.get(c) != 1)
-			throw new Exception("layer mark must be '" + c_marks.get(1) + "'");
-	}
-	
-	private void a_ws_sc_exit(char c) throws Exception {
-		if (!m_vowels.containsKey(c)) 
-			throw new Exception(c + " cannot follow " + previousChar);
-	}
+
 	
 	private class LayerMarkTracker {
 	
@@ -275,51 +338,55 @@ public class Parser {
 		}		
 	}
 	
-	private States StateChangeActions(States next, char c) throws Exception {
+	private States StateChangeActions(States next, Character c) throws Exception {
 		
 		String transitionKey = States.GetKey(currentState, next);		
 		if (!transitionMap.containsKey(transitionKey))
 			throw new Exception("missing transition from "+currentState+" to "+next);
 		
 		switch (transitionMap.get(transitionKey)){
-			case t_a_f:
-				a_a_f_exit(c);
+		
+			case t_a_f:				//complete node, start multiplication counter
 				a_a_f(c);
 				break;
-			case t_d_a:
+			case t_sc_f:			//complete node, start multiplication counter
+				a_sc_f(c);
+				break;				
+			case t_d_a:				//new node in addition relation
+				a_d_a(c);
 				break;
-			case t_d_sc:
+			case t_d_sc:			//new node in addition relation
+				a_d_sc(c);
 				break;
-			case t_d_ws:
+			case t_d_ws:			//new node in addition relation
 				a_d_ws(c);
 				break;
-			case t_f_a:
+			case t_f_a:				//new node in multiplication relation
+				a_f_a(c);			
+				break;
+			case t_f_sc:			//new node in multiplication relation
+				a_f_sc(c);
+				break;
+			case t_f_ws:			//new node in multiplication relation				
+				a_f_ws(c);
+				break;
+			case t_i_a:				//initial node
+				a_i_a(c);
+				break;
+			case t_i_sc:			//initial node
+				a_i_sc(c);
+				break;
+			case t_i_ws:			//initial node
+				a_i_ws(c);
 				break;
 			case t_f_d:
 				a_f_d(c);
 				break;
-			case t_f_f:
+			case t_f_f:				//finalize node.parent
 				a_f_f(c);
-				break;
-			case t_f_sc:
-				break;
-			case t_f_ws:
-				a_f_ws(c);
-				break;
-			case t_i_a:
-				break;
-			case t_i_sc:
-				break;
-			case t_i_ws:
-				a_i_ws(c);
-				break;
-			case t_sc_f:
-				a_sc_f_exit(c);
-				a_a_f(c);
-				break;
+				break;				
 			case t_ws_sc:
-				a_ws_sc_exit(c);
-				a_ws_sc(c);
+				a_ws_sc(c);			//update node's name			
 				break;
 			default:
 				throw new Exception("undefined transition from "+currentState+" to "+next);		
@@ -331,17 +398,65 @@ public class Parser {
 		return prev;
 	}
 	
-	public class Node{
-		private String name = null;	
+	public class Node {
+		
+		private boolean completed = false;
+		private StringBuilder name = null;	
 		private int layer = -1;
-		public ArrayList<Node> nodes = new ArrayList<Node>();	
+		public ArrayList<Node> nodes = null;	
 		public Node parent = null;
-		public Character opCode = multiplication;
+		public Character opCode = null;
+		
+		public Node(Character c){
+			name = c != null ? new StringBuilder(c) : new StringBuilder();
+			nodes = new ArrayList<Node>();
+		}
+		
+		//=============================================
+		
+		public void AddNode(Node n) throws Exception{
+			
+			if (completed)
+				throw new Exception("already completed, cannot modify me");
+			
+			n.SetParent(this);		
+			nodes.add(n);
+		}
+		
+		public void SetParent(Node n) throws Exception{
+			
+			if (completed)
+				throw new Exception("already completed, cannot modify me");
+			
+			parent = n;
+		}
+		
+		public void AppendToName(Character c) throws Exception{
+			
+			if (completed)
+				throw new Exception("already completed, cannot modify me");
+			
+			name.append(c);
+		}
+		
+		public void CompleteNode(boolean completed){
+			this.completed = completed;
+		}
+		
+		//=============================================
+		
+		public Node GetParent(){
+			return parent;
+		}
+		
+		public boolean IsCompleted(){
+			return completed;
+		}
 		
 		//Readable representation of a node and its children in a list-form
 		public void PrintNodes(String prepend){
 			
-			StringBuilder builder = new StringBuilder("[" + name);
+			StringBuilder builder = new StringBuilder("[" + name.toString());
 			
 			if (layer >= 0)
 				builder.append("|" + layer);
@@ -364,7 +479,7 @@ public class Parser {
 		
 		public String Output(){
 			
-			StringBuilder builder = new StringBuilder("[" + name);			
+			StringBuilder builder = new StringBuilder("[" + name.toString());			
 			if (layer >= 0)
 				builder.append("|" + layer);
 			builder.append("]");			

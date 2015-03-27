@@ -15,7 +15,7 @@ public class Tester {
 		//BaseTester baseTester = new BaseTester();
 		//baseTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
-		String a = "*Z:B:B:**";
+		String a = "*A:B:B:**";
 		System.out.println(Parser.run(a));	
 		
 		//ParsingTester tester = new ParsingTester();
