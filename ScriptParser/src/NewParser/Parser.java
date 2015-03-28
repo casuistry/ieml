@@ -134,25 +134,19 @@ public class Parser {
 		return result;
 	}
 	
-	Node rootNode;
 	Node currentNode;
 	States currentState;
 	Character previousChar;
-	LayerMarkCounter lmCounter; //Used to avoid a situation like: S:S:S:S:
 	LayerMarkTracker lmTracker; //Used to avoid situations where the next layer mark is of layer inferior to the current layer
 	
 	public Node parse(String input) throws Exception {
 		
-		rootNode = null;
 		currentNode = null;
+		
 		currentState = States.state_i;
 		previousChar = null;
-		lmCounter = new LayerMarkCounter();
 		lmTracker = new LayerMarkTracker();	
-		
-		//state variables
-		Node root = null;
-		
+				
 		for (counter = 0; counter < input.length(); counter++){
 			
 			Character charIn = new Character(input.charAt(counter));
@@ -165,8 +159,8 @@ public class Parser {
 		if (currentState != States.state_f)
 			throw new Exception("bad final state");
 		
-		//currentNode.parent.name = input;
-		return root != null ? root.parent : null;
+		
+		return currentNode.parent != null ? currentNode.parent : currentNode;
 	}
 	
 	private States stateDispatcher(char c) throws Exception {					
@@ -202,22 +196,57 @@ public class Parser {
 		throw new Exception("unrecognized " + c);
 	}	
 		
-	//==================================================create first node and its parent
+	//==================================================create first node ===============
+	//just one node as it may be the only thing to parse
+	//root may be null
+	
 	private void a_i_ws(Character c) throws Exception{
-		createRoot(c);
+		currentNode = new Node(c);
 	}	
 	//create first node and its parent
 	private void a_i_sc(Character c) throws Exception{
-		createRoot(c);
+		currentNode = new Node(c);
 	}
 	//create first node and its parent
 	private void a_i_a(Character c) throws Exception{
-		createRoot(c);
-	}
-	private void createRoot(Character c) throws Exception{
 		currentNode = new Node(c);
-		rootNode = new Node(c);		
-		rootNode.AddNode(currentNode);
+	}
+	
+	//==================================================finalize node====================
+	private void a_a_f(Character c) throws Exception{			
+		if (m_marks.get(c) != 0)
+			throw new Exception("layer mark must be '" + c_marks.get(0) + "'");
+		finalizeNode(c);
+	}
+	private void a_sc_f(Character c) throws Exception {
+		if (m_marks.get(c) != 1)
+			throw new Exception("layer mark must be '" + c_marks.get(1) + "'");
+		
+		//get name for parent
+		String parentName = currentNode.GetName();
+		
+		//currentNode
+		finalizeNode(c);
+		
+		//fast-forward
+		multNode(new Character('E'));
+		finalizeNode(new Character(':'));
+		multNode(new Character('E'));
+		finalizeNode(new Character(':'));
+		
+
+		finalizeNode(c);
+	}
+	//recognized wo, we, wu , wa
+	private void a_ws_sc(Character c) throws Exception{
+		if (!m_vowels.containsKey(c)) 
+			throw new Exception(c + " cannot follow " + previousChar);		
+		currentNode.AppendToName(c);
+	}
+	private void finalizeNode(Character c) throws Exception{		
+		lmTracker.Set(c);	
+		currentNode.AppendToName(c);
+		currentNode.CompleteNode(true);
 	}
 	
 	//================================================new node in multiplication relation
@@ -231,10 +260,21 @@ public class Parser {
 		multNode(c);
 	}
 	private void multNode(Character c) throws Exception{
-		Node newNode = new Node(c);
-		currentNode.parent.opCode = multiplication;
-		currentNode.parent.AddNode(newNode);
-		currentNode = newNode; 
+		
+		if (currentNode.parent == null) {
+			Node newRoot = new Node(null);
+			newRoot.AddNode(currentNode);
+			newRoot.opCode = multiplication;
+		}
+
+		if (currentNode.parent.nodes.size() < 3) {
+			Node newNode = new Node(c);
+			currentNode.parent.AddNode(newNode);			
+			currentNode = newNode;
+		}
+		else {
+			throw new Exception("number of parameters in a multiplication relation exceeds maximum");
+		}
 	}
 	
 	//======================================================new node in addition relation
@@ -255,54 +295,20 @@ public class Parser {
 		currentNode = newNode; 
 	}
 	
-	//==================================================finalize node====================
-	private void a_a_f(Character c) throws Exception{			
-		if (m_marks.get(c) != 0)
-			throw new Exception("layer mark must be '" + c_marks.get(0) + "'");
-		finalizeNode(c);
-	}
-	//finalize node
-	private void a_sc_f(Character c) throws Exception {
-		if (m_marks.get(c) != 1)
-			throw new Exception("layer mark must be '" + c_marks.get(1) + "'");
-		finalizeNode(c);
-	}
-	//recognized wo, we, wu , wa
-	private void a_ws_sc(Character c) throws Exception{
-		if (!m_vowels.containsKey(c)) 
-			throw new Exception(c + " cannot follow " + previousChar);		
-		currentNode.AppendToName(c);
-	}
-	private void finalizeNode(Character c) throws Exception{
-		lmCounter.Increment();			
-		lmTracker.Set(c);		
-		currentNode.AppendToName(c);
-		currentNode.CompleteNode(true);
-	}
-	
 	//==================================================finalize node.parent==============
 	
 	//finalize next layer node
-	private void a_f_f(Character c) throws Exception{		
-		
-		if (rootNode.opCode.equals(multiplication))
-			if (rootNode.nodes.size() != 3)
-				throw new Exception("layer is not complete (need more info here)");
-		
-		lmCounter.Reset();
+	private void a_f_f(Character c) throws Exception{				
 		lmTracker.CheckAndSet(c);
 	}
 	
-	
-	
-	
 	//get ready for additive relation
 	private void a_f_d(char c){		
-		lmCounter.Reset();
+
 	}
 
 
-	
+	//====================================================================================
 
 	
 
@@ -320,22 +326,6 @@ public class Parser {
 				throw new Exception(c + " cannot follow " + ch);			
 			Set(c);
 		}
-	}
-	
-	private class LayerMarkCounter{
-		
-		private byte counter = 0;
-		
-		public void Increment() throws Exception{
-			if (counter >= MaxMultiplications)
-				throw new Exception("too many nodes in multiplication relation");
-			else
-				counter++;	
-		}
-		
-		public void Reset(){
-			counter = 0;
-		}		
 	}
 	
 	private States StateChangeActions(States next, Character c) throws Exception {
@@ -379,14 +369,14 @@ public class Parser {
 			case t_i_ws:			//initial node
 				a_i_ws(c);
 				break;
-			case t_f_d:
+			case t_f_d:				//get ready for additive relation
 				a_f_d(c);
 				break;
 			case t_f_f:				//finalize node.parent
 				a_f_f(c);
 				break;				
-			case t_ws_sc:
-				a_ws_sc(c);			//update node's name			
+			case t_ws_sc:			//update node's name
+				a_ws_sc(c);						
 				break;
 			default:
 				throw new Exception("undefined transition from "+currentState+" to "+next);		
@@ -403,13 +393,12 @@ public class Parser {
 		private boolean completed = false;
 		private StringBuilder name = null;	
 		private int layer = -1;
-		public ArrayList<Node> nodes = null;	
+		public ArrayList<Node> nodes = new ArrayList<Node>();	
 		public Node parent = null;
 		public Character opCode = null;
 		
 		public Node(Character c){
 			name = c != null ? new StringBuilder(c) : new StringBuilder();
-			nodes = new ArrayList<Node>();
 		}
 		
 		//=============================================
@@ -439,11 +428,23 @@ public class Parser {
 			name.append(c);
 		}
 		
+		public void AppendToName(String s) throws Exception{
+			
+			if (completed)
+				throw new Exception("already completed, cannot modify me");
+			
+			name.append(s);
+		}
+		
 		public void CompleteNode(boolean completed){
 			this.completed = completed;
 		}
 		
 		//=============================================
+		
+		public String GetName(){
+			return name.toString();
+		}
 		
 		public Node GetParent(){
 			return parent;
