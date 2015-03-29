@@ -47,9 +47,9 @@ public class Parser {
 	}
 	
 	public enum Transitions {
-		t_p_i,    //pre to initial
-		t_f_p,	  //final to post
-		t_p_p,    //post to post
+		t_p_i,    
+		t_f_p,	  
+		t_p_p,    
 		t_i_sc,
 		t_i_ws,
 		t_i_a,
@@ -59,9 +59,9 @@ public class Parser {
 		t_d_sc,
 		t_d_ws,
 		t_d_a,
-		t_a_f,    //alphabet to final
-		t_ws_sc,  //w to wa
-		t_sc_f,   //sc to final
+		t_a_f,    
+		t_ws_sc,  
+		t_sc_f,   
 		t_f_d,
 		t_f_f
 	}
@@ -116,13 +116,7 @@ public class Parser {
 	}
 	
 	public static Character multiplication = '*';
-	public static Character addition = '+';
-	public static int MaxMultiplications = 3;
-	public static String StateInitial = "Initial";
-	public static String StateLetter = "Letter";
-	public static String StateMark = "Mark";
-	public static String StateAddition = "Addition";
-	
+	public static Character addition = '+';	
 	static int counter;
 	
 	public static String run(String input) {
@@ -148,29 +142,21 @@ public class Parser {
 		return result;
 	}
 	
-	Node currentNode;
 	States currentState;
 	Character previousChar;
-	boolean lookForEndAddition = false;
-	
-	Stack<Node> stack = new Stack<Node>();
+	Stack<Node> stack;
 	
 	public Node parse(String input) throws Exception {
 		
-		currentNode = null;
-		
 		currentState = States.state_pre;
 		previousChar = null;
-				
-		for (counter = 0; counter < input.length(); counter++){
-			
-			Character charIn = new Character(input.charAt(counter));
-						
+		stack = new Stack<Node>();
+		
+		for (counter = 0; counter < input.length(); counter++){			
+			Character charIn = new Character(input.charAt(counter));						
 			if (m_ignore.containsKey(charIn)) 
-				continue;
-			
-			stateDispatcher(charIn);
-			
+				continue;			
+			stateDispatcher(charIn);			
 			previousChar = charIn;
 		}
 		
@@ -179,13 +165,7 @@ public class Parser {
 			throw new Exception("bad final state, missing *");
 		}
 		
-		Node ret = null;
-		while (!stack.isEmpty()){
-			ret = stack.pop();
-			if (ret != null)
-				System.out.println(ret.GetName());
-		}
-		return ret;
+		return stack.pop();
 	}
 	
 	private States stateDispatcher(char c) throws Exception {					
@@ -369,7 +349,7 @@ public class Parser {
 		Node temp = stack.peek();
 		//TODO:test case
 		if (temp.layer != m_marks.get(c)-1)
-			throw new Exception("bad layer mark");
+			throw new Exception("bad layer mark, expecting " + c_marks.get(temp.layer+1));
 		stackMultiply(c);
 	}
 	
