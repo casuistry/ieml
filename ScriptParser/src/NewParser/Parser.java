@@ -146,12 +146,14 @@ public class Parser {
 	Character previousChar;
 	Stack<Node> stack;
 	
-	public Node parse(String input) throws Exception {
-		
+	public Parser() {
 		currentState = States.state_pre;
 		previousChar = null;
 		stack = new Stack<Node>();
-		
+	}
+	
+	public Node parse(String input) throws Exception {
+
 		for (counter = 0; counter < input.length(); counter++){			
 			Character charIn = new Character(input.charAt(counter));						
 			if (m_ignore.containsKey(charIn)) 
@@ -166,6 +168,30 @@ public class Parser {
 		}
 		
 		return stack.pop();
+	}
+	
+	public void nextChar(Character charIn) throws Exception {
+		
+		if (m_ignore.containsKey(charIn)) 
+			return;
+	
+		stateDispatcher(charIn);			
+		previousChar = charIn;
+	}
+	
+	public States GetCurrentState() {
+		return currentState;
+	}
+	
+	public Integer getPreviousLM() {
+		if (stack.isEmpty())
+			return null;		
+		Node temp = stack.peek();
+		return temp.layer;
+	}
+	
+	public boolean canMovePost(){
+		return stack.size() == 1;
 	}
 	
 	private States stateDispatcher(char c) throws Exception {					

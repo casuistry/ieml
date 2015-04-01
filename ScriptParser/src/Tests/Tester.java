@@ -15,13 +15,14 @@ public class Tester {
 		//BaseTester baseTester = new BaseTester();
 		//baseTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
-		String a = "*S:B:T:.S:.-S:B:T:.S:.-+**";
-		System.out.println(Parser.run(ScriptExamples.JeSaurai));	
+		String a = "*S:B:T:T:.S:.-S:B:T:.S:.-+**";
+		System.out.println(Parser.run(a));	
 		
 		//ParsingTester tester = new ParsingTester();
 		//tester.RunTest(a, 3, new BaseIEMLProvider(), null, null);			
 		//ScriptExamples.StudentLearnsMathematics
 		//ScriptExamples.CesJeux
+		//ScriptExamples.JeSaurai
 		
 		//Generate an empty sequence of specified layer
 		//NullTester tester = new NullTester();
