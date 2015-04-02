@@ -15,14 +15,17 @@ public class Tester {
 		//BaseTester baseTester = new BaseTester();
 		//baseTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
-		String a = "*S:B:T:T:.S:.-S:B:T:.S:.-+**";
-		System.out.println(Parser.run(a));	
-		
-		//ParsingTester tester = new ParsingTester();
-		//tester.RunTest(a, 3, new BaseIEMLProvider(), null, null);			
+		String a = "*T:+i.**"; //error is too general
+		String b = "*S:B:i.**";//error is too general
+		System.out.println(Parser.run(b));	
+
 		//ScriptExamples.StudentLearnsMathematics
 		//ScriptExamples.CesJeux
 		//ScriptExamples.JeSaurai
+		
+		
+		//ParsingTester tester = new ParsingTester();
+		//tester.RunTest(a, 3, new BaseIEMLProvider(), null, null);			
 		
 		//Generate an empty sequence of specified layer
 		//NullTester tester = new NullTester();

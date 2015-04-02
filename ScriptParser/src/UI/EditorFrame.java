@@ -102,6 +102,8 @@ public class EditorFrame extends JFrame {
 		list.addAll(Parser.c_alphabet);		
 		list.addAll(Parser.c_smallCap);
 		list.addAll(Parser.c_marks);
+		list.addAll(Parser.c_ignore);
+		
 
 		for (int i = 0; i < list.size(); i++) {
 			
@@ -146,14 +148,25 @@ public class EditorFrame extends JFrame {
 			l.addAll(Parser.c_wLetter);		
 			l.addAll(Parser.c_alphabet);		
 			l.addAll(Parser.c_smallCap);
+			l.addAll(Parser.c_ignore);
 			break;
 		case state_done:
 			break; //nothing to add
 		case state_f:
-			l.addAll(Parser.c_wLetter);		
-			l.addAll(Parser.c_alphabet);		
-			l.addAll(Parser.c_smallCap);
+			
 			Integer prev = parser.getPreviousLM();
+			
+			l.addAll(Parser.c_addOp);	
+			l.addAll(Parser.c_ignore);
+			
+			if (parser.canMultiplyNode()){
+				if (parser.canAddLayer(0))
+					l.addAll(Parser.c_alphabet);
+				if (parser.canAddLayer(1)) {
+					l.addAll(Parser.c_wLetter);							
+					l.addAll(Parser.c_smallCap);
+				}
+			}			
 			if (prev != null && prev == Parser.c_marks.size()-1) {
 				next(Parser.c_star.get(0));
 				return;
@@ -167,6 +180,7 @@ public class EditorFrame extends JFrame {
 			l.addAll(Parser.c_wLetter);		
 			l.addAll(Parser.c_alphabet);		
 			l.addAll(Parser.c_smallCap);
+			l.addAll(Parser.c_ignore);
 			break;
 		case state_post:
 			next(Parser.c_star.get(0));

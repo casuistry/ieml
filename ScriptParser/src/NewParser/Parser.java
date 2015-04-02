@@ -190,8 +190,50 @@ public class Parser {
 		return temp.layer;
 	}
 	
+	public boolean canAddLayer(int l){
+		if (stack.isEmpty())
+			return true;		
+		Node temp = stack.peek();
+		if (temp.opCode != null)
+			return true;	
+		return temp.layer == l;
+	}
+	
 	public boolean canMovePost(){
 		return stack.size() == 1;
+	}
+	
+	//prevents a sequence of 4 or more nodes in multiplication relation
+	public boolean canMultiplyNode() {
+		
+		boolean result = true;
+		
+		if (stack.isEmpty())
+			return true;
+		
+		if (stack.peek() == null)
+			return true;
+		
+		Stack<Node> temp = new Stack<Node>();
+		
+		for (int i = 0; i< 3; i++){						
+			
+			temp.push(stack.pop());
+			
+			if (stack.isEmpty() || stack.peek() == null)
+				break;
+			
+			if (stack.peek().layer != temp.peek().layer) 
+				break;
+		}
+		
+		if (temp.size() == 3)
+			result = false;
+		
+		while (!temp.isEmpty())
+			stack.push(temp.pop());
+		
+		return result;			
 	}
 	
 	private States stateDispatcher(char c) throws Exception {					
@@ -249,7 +291,7 @@ public class Parser {
 		stackAdd(n);
 	}
 	
-	private void stackMultiply(Character c) throws Exception{
+	private void stackMakeMultRelation(Character c) throws Exception{
 		Stack<Node> multStack = new Stack<Node>();		
 		for (int i = 0; i < 3; i++) {
 			if (stack.isEmpty())
@@ -273,11 +315,15 @@ public class Parser {
 	
 	private void stackAdd(Node n) throws Exception{
 		
-		if (n != null){			
+		if (n != null){		
+			
+			if (!canMultiplyNode())
+				throw new Exception("too many parameters in multiplication relation");
+			
 			if (n.layer < 0) {
 				stack.push(n);
 			}
-			else {
+			else {				
 				if (!stack.isEmpty() && stack.peek() == null) {
 					stack.pop(); //eat
 					Node prev = stack.pop();
@@ -376,7 +422,7 @@ public class Parser {
 		//TODO:test case
 		if (temp.layer != m_marks.get(c)-1)
 			throw new Exception("bad layer mark, expecting " + c_marks.get(temp.layer+1));
-		stackMultiply(c);
+		stackMakeMultRelation(c);
 	}
 	
 	//==================================================================================
