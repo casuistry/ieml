@@ -358,7 +358,7 @@ public class Parser {
 		//TODO:test case
 		if (temp.layer != m_marks.get(c)-1)
 			throw new Exception("bad layer mark, expecting " + c_marks.get(temp.layer+1));
-		stackMakeMultRelation(c);
+		makeMultRelation(c);
 	}
 	private void a_f_p(Character c) throws Exception{
 		//TODO:test case
@@ -423,28 +423,55 @@ public class Parser {
 		
 		return result;			
 	}
-	private void stackMakeMultRelation(Character c) throws Exception{
-		Stack<Node> multStack = new Stack<Node>();		
+	
+	private void makeMultRelation(Character c) throws Exception{
+		
+		Stack<Node> tempStack = new Stack<Node>();
+		
 		for (int i = 0; i < 3; i++) {
+			
 			if (stack.isEmpty())
 				break;
-			Node temp = stack.peek();
-			if (temp == null || temp.layer != m_marks.get(c)-1)
+			
+			Node tempNode = stack.peek();
+			
+			if (tempNode == null)
 				break;			
-			multStack.push(stack.pop());
+			
+			if (tempNode.opCode != null)
+				break;
+						
+			if (tempNode.layer != m_marks.get(c)-1)
+				break;
+			
+			tempStack.push(stack.pop());
+		}
+		
+		if (tempStack.isEmpty())
+			throw new Exception("could not find nodes in multiplication relation");
+		
+		if (tempStack.size() < 3){
+			//need empty nodes
 		}
 		
 		Node newNode = new Node(null);
 		newNode.opCode = multiplication;
-		while (!multStack.isEmpty()){
-			Node popedNode = multStack.pop();
-			newNode.AppendToName(popedNode.GetName());
-			newNode.AddNode(popedNode);
+		newNode.layer = m_marks.get(c);
+		
+		while (!tempStack.isEmpty()){
+			Node pop = tempStack.pop();
+			newNode.AppendToName(pop.GetName());
+			newNode.AddNode(pop);
 		}
 		newNode.AppendToName(c);
-		newNode.layer = m_marks.get(c);
+		
 		addNodeToStack(newNode);
 	}
+	
+	private void makeAddRelation(Character c) throws Exception{
+		
+	}
+	
 	
 	private void addNodeToStack(Node n) throws Exception{
 		

@@ -17,7 +17,7 @@ public class Tester {
 		
 		String a = "*T:+i.**"; //error is too general
 		String b = "*S:B:i.**";//error is too general
-		String c = "*h.i.S:B:T:.**";
+		String c = "*h.i.g.d.S:B:T:.**";
 		System.out.println(c);	
 
 		//ScriptExamples.StudentLearnsMathematics
