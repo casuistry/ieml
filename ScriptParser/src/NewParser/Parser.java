@@ -117,14 +117,14 @@ public class Parser {
 	
 	public static Character multiplication = '*';
 	public static Character addition = '+';	
+	
 	static int counter;
 	
 	public static String run(String input) {
 		
 		String result = null;
 		
-		try {
-			counter = 0;
+		try {			
 			Parser parser = new Parser();			
 			Node n = parser.parse(input);
 			n.PrintNodes("");
@@ -147,6 +147,7 @@ public class Parser {
 	Stack<Node> stack;
 	
 	public Parser() {
+		counter = 0;
 		currentState = States.state_pre;
 		previousChar = null;
 		stack = new Stack<Node>();
@@ -156,10 +157,7 @@ public class Parser {
 
 		for (counter = 0; counter < input.length(); counter++){			
 			Character charIn = new Character(input.charAt(counter));						
-			if (m_ignore.containsKey(charIn)) 
-				continue;			
-			stateDispatcher(charIn);			
-			previousChar = charIn;
+			nextChar(charIn);
 		}
 		
 		//TODO: test case
@@ -178,64 +176,7 @@ public class Parser {
 		stateDispatcher(charIn);			
 		previousChar = charIn;
 	}
-	
-	public States GetCurrentState() {
-		return currentState;
-	}
-	
-	public Integer getPreviousLM() {
-		if (stack.isEmpty())
-			return null;		
-		Node temp = stack.peek();
-		return temp.layer;
-	}
-	
-	public boolean canAddLayer(int l){
-		if (stack.isEmpty())
-			return true;		
-		Node temp = stack.peek();
-		if (temp.opCode != null)
-			return true;	
-		return temp.layer == l;
-	}
-	
-	public boolean canMovePost(){
-		return stack.size() == 1;
-	}
-	
-	//prevents a sequence of 4 or more nodes in multiplication relation
-	public boolean canMultiplyNode() {
 		
-		boolean result = true;
-		
-		if (stack.isEmpty())
-			return true;
-		
-		if (stack.peek() == null)
-			return true;
-		
-		Stack<Node> temp = new Stack<Node>();
-		
-		for (int i = 0; i< 3; i++){						
-			
-			temp.push(stack.pop());
-			
-			if (stack.isEmpty() || stack.peek() == null)
-				break;
-			
-			if (stack.peek().layer != temp.peek().layer) 
-				break;
-		}
-		
-		if (temp.size() == 3)
-			result = false;
-		
-		while (!temp.isEmpty())
-			stack.push(temp.pop());
-		
-		return result;			
-	}
-	
 	private States stateDispatcher(char c) throws Exception {					
 		
 		if (m_star.containsKey(c)){			
@@ -275,166 +216,7 @@ public class Parser {
 
 		throw new Exception("unrecognized " + c);
 	}	
-		
-	//==================================================================================
-	
-	private void stackAppendLayer(Character c) throws Exception{
-		Node n = stack.pop();	
-		n.AppendToName(c);
-		n.layer = m_marks.get(c);
-		stackAdd(n);
-	}
-	
-	private void stackAppend(Character c) throws Exception{
-		Node n = stack.pop();	
-		n.AppendToName(c);
-		stackAdd(n);
-	}
-	
-	private void stackMakeMultRelation(Character c) throws Exception{
-		Stack<Node> multStack = new Stack<Node>();		
-		for (int i = 0; i < 3; i++) {
-			if (stack.isEmpty())
-				break;
-			Node temp = stack.peek();
-			if (temp == null || temp.layer != m_marks.get(c)-1)
-				break;			
-			multStack.push(stack.pop());
-		}
-		
-		Node newNode = new Node(null);
-		newNode.opCode = multiplication;
-		while (!multStack.isEmpty()){
-			Node popedNode = multStack.pop();
-			newNode.AppendToName(popedNode.GetName());
-			newNode.AddNode(popedNode);
-		}
-		stackAdd(newNode);
-		stackAppendLayer(c);
-	}
-	
-	private void stackAdd(Node n) throws Exception{
-		
-		if (n != null){		
 			
-			if (!canMultiplyNode())
-				throw new Exception("too many parameters in multiplication relation");
-			
-			if (n.layer < 0) {
-				stack.push(n);
-			}
-			else {				
-				if (!stack.isEmpty() && stack.peek() == null) {
-					stack.pop(); //eat
-					Node prev = stack.pop();
-					if (n.layer == prev.layer){
-						Node addNode;
-						if (prev.opCode == addition){
-							addNode = prev;
-						}
-						else {
-							addNode = new Node(null);
-							addNode.layer = n.layer;
-							addNode.opCode = addition;
-							addNode.AppendToName(prev.GetName());
-							addNode.AddNode(prev);
-						}
-						
-						addNode.AppendToName(addition);
-						addNode.AppendToName(n.GetName());
-						addNode.AddNode(n);
-						stackAdd(addNode);
-					}
-					else {
-						stack.push(prev);
-						stack.push(null);
-						stack.push(n);
-					}
-				}
-				else {
-					stack.push(n);
-				}
-			}
-		}
-		else {
-			stack.push(null);
-		}
-	}
-	
-	//==================================================================================
-	
-	private void a_i_ws(Character c) throws Exception{
-		stackAdd(new Node(c));
-	}	
-	private void a_i_sc(Character c) throws Exception{
-		stackAdd(new Node(c));
-	}
-	private void a_i_a(Character c) throws Exception{
-		stackAdd(new Node(c));
-	}	
-	private void a_f_ws(Character c) throws Exception{
-		stackAdd(new Node(c));
-	}
-	private void a_f_sc(Character c) throws Exception{
-		stackAdd(new Node(c));
-	}
-	private void a_f_a(Character c) throws Exception{
-		stackAdd(new Node(c));
-	}
-	private void a_d_ws(Character c) throws Exception{
-		stackAdd(new Node(c));
-	}
-	private void a_d_sc(Character c) throws Exception{
-		stackAdd(new Node(c));
-	}
-	private void a_d_a(Character c) throws Exception{
-		stackAdd(new Node(c));
-	}
-	private void a_f_d(char c) throws Exception{		
-		stackAdd(null);
-	}
-	
-	//==================================================================================
-	
-	private void a_a_f(Character c) throws Exception{		
-		//TODO:test case
-		if (m_marks.get(c) != 0)
-			throw new Exception("layer mark must be '" + c_marks.get(0) + "'");		
-		stackAppendLayer(c);
-	}
-	private void a_sc_f(Character c) throws Exception {
-		//TODO:test case
-		if (m_marks.get(c) != 1)
-			throw new Exception("layer mark must be '" + c_marks.get(1) + "'");
-		stackAppendLayer(c);
-	}
-	private void a_ws_sc(Character c) throws Exception{
-		//TODO:test case
-		if (!m_vowels.containsKey(c)) 
-			throw new Exception(c + " cannot follow " + previousChar);		
-		stackAppend(c);
-	}
-
-	//==================================================================================
-	
-	private void a_f_f(Character c) throws Exception{	
-		Node temp = stack.peek();
-		//TODO:test case
-		if (temp.layer != m_marks.get(c)-1)
-			throw new Exception("bad layer mark, expecting " + c_marks.get(temp.layer+1));
-		stackMakeMultRelation(c);
-	}
-	
-	//==================================================================================
-	
-	private void a_f_p(Character c) throws Exception{	
-		//TODO:test case
-		if (stack.size() > 1)
-			throw new Exception("missing layer mark");
-	}
-	
-	//==================================================================================
-		
 	private States StateChangeActions(States next, Character c) throws Exception {
 		
 		String transitionKey = States.GetKey(currentState, next);		
@@ -500,6 +282,216 @@ public class Parser {
 		currentState = next;
 		
 		return prev;
+	}
+	
+	//==================================================================================
+	
+	private void a_i_ws(Character c) throws Exception{ //ok
+		addNodeToStack(new Node(c));
+	}	
+	private void a_i_sc(Character c) throws Exception{ //ok
+		addNodeToStack(new Node(c));
+	}
+	private void a_i_a(Character c) throws Exception{ //ok
+		addNodeToStack(new Node(c));
+	}	
+	private void a_f_ws(Character c) throws Exception{ //ok
+		addNodeToStack(new Node(c));
+	}
+	private void a_f_sc(Character c) throws Exception{ //ok
+		addNodeToStack(new Node(c));
+	}
+	private void a_f_a(Character c) throws Exception{ //ok
+		addNodeToStack(new Node(c));
+	}
+	private void a_d_ws(Character c) throws Exception{ //ok
+		addNodeToStack(new Node(c));
+	}
+	private void a_d_sc(Character c) throws Exception{ //ok
+		addNodeToStack(new Node(c));
+	}
+	private void a_d_a(Character c) throws Exception{ //ok
+		addNodeToStack(new Node(c));
+	}
+	private void a_f_d(Character c) throws Exception{ //ok
+		addNodeToStack(null);
+	}
+	private void a_a_f(Character c) throws Exception{ //ok
+		
+		//TODO:test case
+		if (m_marks.get(c) != 0)
+			throw new Exception("layer mark must be '" + c_marks.get(0) + "'");		
+		
+		//This is a node of layer 0.		
+		Node pop = stack.pop();	
+		pop.AppendToName(c);
+		pop.layer = m_marks.get(c);
+		addNodeToStack(pop);
+	}
+	private void a_sc_f(Character c) throws Exception{ //ok
+		
+		//TODO:test case
+		if (m_marks.get(c) != 1)
+			throw new Exception("layer mark must be '" + c_marks.get(1) + "'");
+		
+		//This is a node of layer one. Its opCode is *. It has three children nodes in 
+		//multiplication relation. These children nodes can be had by doing a lookup.		
+		Node pop = stack.pop();	
+		pop.AppendToName(c);
+		pop.layer = m_marks.get(c);
+		pop.opCode = multiplication;
+		addNodeToStack(pop);
+	}
+	private void a_ws_sc(Character c) throws Exception{ //ok
+		
+		//TODO:test case
+		if (!m_vowels.containsKey(c)) 
+			throw new Exception(c + " cannot follow " + previousChar);		
+		
+		//This is a composite small cap node
+		Node pop = stack.pop();	
+		pop.AppendToName(c);
+		addNodeToStack(pop);
+	}
+	private void a_f_f(Character c) throws Exception{
+		Node temp = stack.peek();
+		//TODO:test case
+		if (temp.layer != m_marks.get(c)-1)
+			throw new Exception("bad layer mark, expecting " + c_marks.get(temp.layer+1));
+		stackMakeMultRelation(c);
+	}
+	private void a_f_p(Character c) throws Exception{
+		//TODO:test case
+		if (stack.size() > 1)
+			throw new Exception("missing layer mark");
+	}
+	
+	//==================================================================================
+	
+	public States GetCurrentState() {
+		return currentState;
+	}
+	
+	public Integer getPreviousLM() {
+		if (stack.isEmpty())
+			return null;		
+		Node temp = stack.peek();
+		return temp.layer;
+	}
+	
+	public boolean canAddLayer(int l){
+		if (stack.isEmpty())
+			return true;		
+		Node temp = stack.peek();
+		if (temp.opCode != null)
+			return true;	
+		return temp.layer == l;
+	}
+	
+	public boolean canMovePost(){
+		return stack.size() == 1;
+	}
+	
+	public boolean canMultiplyNode() {
+		
+		boolean result = true;
+		
+		if (stack.isEmpty())
+			return true;
+		
+		if (stack.peek() == null)
+			return true;
+		
+		Stack<Node> temp = new Stack<Node>();
+		
+		for (int i = 0; i< 3; i++){						
+			
+			temp.push(stack.pop());
+			
+			if (stack.isEmpty() || stack.peek() == null)
+				break;
+			
+			if (stack.peek().layer != temp.peek().layer) 
+				break;
+		}
+		
+		if (temp.size() == 3)
+			result = false;
+		
+		while (!temp.isEmpty())
+			stack.push(temp.pop());
+		
+		return result;			
+	}
+	private void stackMakeMultRelation(Character c) throws Exception{
+		Stack<Node> multStack = new Stack<Node>();		
+		for (int i = 0; i < 3; i++) {
+			if (stack.isEmpty())
+				break;
+			Node temp = stack.peek();
+			if (temp == null || temp.layer != m_marks.get(c)-1)
+				break;			
+			multStack.push(stack.pop());
+		}
+		
+		Node newNode = new Node(null);
+		newNode.opCode = multiplication;
+		while (!multStack.isEmpty()){
+			Node popedNode = multStack.pop();
+			newNode.AppendToName(popedNode.GetName());
+			newNode.AddNode(popedNode);
+		}
+		newNode.AppendToName(c);
+		newNode.layer = m_marks.get(c);
+		addNodeToStack(newNode);
+	}
+	
+	private void addNodeToStack(Node n) throws Exception{
+		
+		if (n != null){		
+			
+			if (!canMultiplyNode())
+				throw new Exception("too many parameters in multiplication relation");
+			
+			if (n.layer < 0) {
+				stack.push(n);
+			}
+			else {				
+				if (!stack.isEmpty() && stack.peek() == null) {
+					stack.pop(); //eat
+					Node prev = stack.pop();
+					if (n.layer == prev.layer){
+						Node addNode;
+						if (prev.opCode == addition){
+							addNode = prev;
+						}
+						else {
+							addNode = new Node(null);
+							addNode.layer = n.layer;
+							addNode.opCode = addition;
+							addNode.AppendToName(prev.GetName());
+							addNode.AddNode(prev);
+						}
+						
+						addNode.AppendToName(addition);
+						addNode.AppendToName(n.GetName());
+						addNode.AddNode(n);
+						addNodeToStack(addNode);
+					}
+					else {
+						stack.push(prev);
+						stack.push(null);
+						stack.push(n);
+					}
+				}
+				else {
+					stack.push(n);
+				}
+			}
+		}
+		else {
+			stack.push(null);
+		}
 	}
 	
 	private String getEmptySequence(int l) {
