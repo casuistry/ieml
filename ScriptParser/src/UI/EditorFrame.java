@@ -140,7 +140,7 @@ public class EditorFrame extends JFrame {
 
 		ArrayList<Character> l = new ArrayList<Character>();
 		
-		switch (parser.GetCurrentState()) {
+		switch (/*parser.GetCurrentState()*/States.state_a) {
 		case state_a:
 			next(Parser.c_marks.get(0));
 			return;
@@ -154,27 +154,27 @@ public class EditorFrame extends JFrame {
 			break; //nothing to add
 		case state_f:
 			
-			Integer prev = parser.getPreviousLM();
+			Integer prev = null; //parser.getPreviousLM();
 			
 			l.addAll(Parser.c_addOp);	
 			l.addAll(Parser.c_ignore);
 			
-			if (parser.canMultiplyNode()){
+			/*if (parser.canMultiplyNode()){
 				if (parser.canAddLayer(0))
 					l.addAll(Parser.c_alphabet);
 				if (parser.canAddLayer(1)) {
 					l.addAll(Parser.c_wLetter);							
 					l.addAll(Parser.c_smallCap);
 				}
-			}			
+			}	*/		
 			if (prev != null && prev == Parser.c_marks.size()-1) {
 				next(Parser.c_star.get(0));
 				return;
 			}
 			if (prev != null && prev < Parser.c_marks.size()-1) 
 				l.add(Parser.c_marks.get(prev+1));
-			if (parser.canMovePost())
-				l.addAll(Parser.c_star);
+			/*if (parser.canMovePost())
+				l.addAll(Parser.c_star);*/
 			break;
 		case state_i:
 			l.addAll(Parser.c_wLetter);		
@@ -195,7 +195,7 @@ public class EditorFrame extends JFrame {
 			l.addAll(Parser.c_vowels);
 			break;
 		default:
-			throw new Exception("undefined state " + parser.GetCurrentState().getFieldDescription());
+			throw new Exception("undefined state " /*+ parser.GetCurrentState().getFieldDescription()*/);
 		}
 		
 		enableButtons(l);

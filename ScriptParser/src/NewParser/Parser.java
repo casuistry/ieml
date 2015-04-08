@@ -21,6 +21,7 @@ public class Parser {
 	
 	public enum States {
 		
+		state_none("invalid state"),
 		state_pre("not started parsing yet"),
 		state_i("initial"),		
 		state_sc("small cap"),		
@@ -127,8 +128,9 @@ public class Parser {
 		try {			
 			Parser parser = new Parser();			
 			Node n = parser.parse(input);
-			n.PrintNodes("");
-			result = n.Output();
+			//n.PrintNodes("");
+			//result = n.Output();
+			result = n.GetName();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			System.out.println(input);
@@ -143,13 +145,11 @@ public class Parser {
 	}
 	
 	States currentState;
-	Character previousChar;
 	Stack<Node> stack;
 	
 	public Parser() {
 		counter = 0;
 		currentState = States.state_pre;
-		previousChar = null;
 		stack = new Stack<Node>();
 	}
 	
@@ -168,13 +168,10 @@ public class Parser {
 		return stack.pop();
 	}
 	
-	public void nextChar(Character charIn) throws Exception {
-		
+	public void nextChar(Character charIn) throws Exception {		
 		if (m_ignore.containsKey(charIn)) 
 			return;
-	
 		stateDispatcher(charIn);			
-		previousChar = charIn;
 	}
 		
 	private States stateDispatcher(char c) throws Exception {					
@@ -287,37 +284,36 @@ public class Parser {
 	//==================================================================================
 	
 	private void a_i_ws(Character c) throws Exception{ //ok
-		addNodeToStack(new Node(c));
+		pushNode(new Node(c));
 	}	
 	private void a_i_sc(Character c) throws Exception{ //ok
-		addNodeToStack(new Node(c));
+		pushNode(new Node(c));
 	}
 	private void a_i_a(Character c) throws Exception{ //ok
-		addNodeToStack(new Node(c));
+		pushNode(new Node(c));
 	}	
-	private void a_f_ws(Character c) throws Exception{ //ok
-		addNodeToStack(new Node(c));
+	private void a_f_ws(Character c) throws Exception{ 
+		pushNodeFromFinal(c);
 	}
-	private void a_f_sc(Character c) throws Exception{ //ok
-		addNodeToStack(new Node(c));
+	private void a_f_sc(Character c) throws Exception{ 
+		pushNodeFromFinal(c);
 	}
-	private void a_f_a(Character c) throws Exception{ //ok
-		addNodeToStack(new Node(c));
+	private void a_f_a(Character c) throws Exception{ 
+		pushNodeFromFinal(c);
 	}
-	private void a_d_ws(Character c) throws Exception{ //ok
-		addNodeToStack(new Node(c));
+	private void a_d_ws(Character c) throws Exception{ 
+		pushNodeFromAdd(c);
 	}
-	private void a_d_sc(Character c) throws Exception{ //ok
-		addNodeToStack(new Node(c));
+	private void a_d_sc(Character c) throws Exception{ 
+		pushNodeFromAdd(c);
 	}
-	private void a_d_a(Character c) throws Exception{ //ok
-		addNodeToStack(new Node(c));
+	private void a_d_a(Character c) throws Exception{ 
+		pushNodeFromAdd(c);
 	}
 	private void a_f_d(Character c) throws Exception{ //ok
-		addNodeToStack(null);
+		pushNode(null);
 	}
 	private void a_a_f(Character c) throws Exception{ //ok
-		
 		//TODO:test case
 		if (m_marks.get(c) != 0)
 			throw new Exception("layer mark must be '" + c_marks.get(0) + "'");		
@@ -326,32 +322,27 @@ public class Parser {
 		Node pop = stack.pop();	
 		pop.AppendToName(c);
 		pop.layer = m_marks.get(c);
-		addNodeToStack(pop);
+		pushNode(pop);
 	}
 	private void a_sc_f(Character c) throws Exception{ //ok
-		
 		//TODO:test case
 		if (m_marks.get(c) != 1)
 			throw new Exception("layer mark must be '" + c_marks.get(1) + "'");
-		
-		//This is a node of layer one. Its opCode is *. It has three children nodes in 
-		//multiplication relation. These children nodes can be had by doing a lookup.		
+				
 		Node pop = stack.pop();	
 		pop.AppendToName(c);
 		pop.layer = m_marks.get(c);
 		pop.opCode = multiplication;
-		addNodeToStack(pop);
+		pushNode(pop);
 	}
 	private void a_ws_sc(Character c) throws Exception{ //ok
-		
 		//TODO:test case
 		if (!m_vowels.containsKey(c)) 
-			throw new Exception(c + " cannot follow " + previousChar);		
+			throw new Exception("must use vowel");		
 		
-		//This is a composite small cap node
 		Node pop = stack.pop();	
 		pop.AppendToName(c);
-		addNodeToStack(pop);
+		pushNode(pop);
 	}
 	private void a_f_f(Character c) throws Exception{
 		Node temp = stack.peek();
@@ -363,66 +354,10 @@ public class Parser {
 	private void a_f_p(Character c) throws Exception{
 		//TODO:test case
 		if (stack.size() > 1)
-			throw new Exception("missing layer mark");
+			throw new Exception("missing layer mark?");
 	}
 	
 	//==================================================================================
-	
-	public States GetCurrentState() {
-		return currentState;
-	}
-	
-	public Integer getPreviousLM() {
-		if (stack.isEmpty())
-			return null;		
-		Node temp = stack.peek();
-		return temp.layer;
-	}
-	
-	public boolean canAddLayer(int l){
-		if (stack.isEmpty())
-			return true;		
-		Node temp = stack.peek();
-		if (temp.opCode != null)
-			return true;	
-		return temp.layer == l;
-	}
-	
-	public boolean canMovePost(){
-		return stack.size() == 1;
-	}
-	
-	public boolean canMultiplyNode() {
-		
-		boolean result = true;
-		
-		if (stack.isEmpty())
-			return true;
-		
-		if (stack.peek() == null)
-			return true;
-		
-		Stack<Node> temp = new Stack<Node>();
-		
-		for (int i = 0; i< 3; i++){						
-			
-			temp.push(stack.pop());
-			
-			if (stack.isEmpty() || stack.peek() == null)
-				break;
-			
-			if (stack.peek().layer != temp.peek().layer) 
-				break;
-		}
-		
-		if (temp.size() == 3)
-			result = false;
-		
-		while (!temp.isEmpty())
-			stack.push(temp.pop());
-		
-		return result;			
-	}
 	
 	private void makeMultRelation(Character c) throws Exception{
 		
@@ -437,9 +372,6 @@ public class Parser {
 			
 			if (tempNode == null)
 				break;			
-			
-			if (tempNode.opCode != null)
-				break;
 						
 			if (tempNode.layer != m_marks.get(c)-1)
 				break;
@@ -465,59 +397,102 @@ public class Parser {
 		}
 		newNode.AppendToName(c);
 		
-		addNodeToStack(newNode);
+		pushNode(newNode);
 	}
 	
-	private void makeAddRelation(Character c) throws Exception{
-		
+	private void pushNodeFromAdd(Character c) throws Exception{
+		if (stack.isEmpty()) 
+			throw new Exception("pushNodeFromAdd cannot be used");
+		if  (stack.peek() != null)
+			throw new Exception("pushNodeFromAdd internal error");
+		stack.pop(); //eat
+		Node tempNode = stack.peek();
+		if (tempNode.layer == 0 && !m_alphabet.containsKey(c))
+			throw new Exception("small cap cannot be used here");
+		stack.push(null);
+		stack.push(new Node(c));
 	}
 	
-	
-	private void addNodeToStack(Node n) throws Exception{
+	private void pushNodeFromFinal(Character c) throws Exception{	
 		
-		if (n != null){		
+		if (stack.isEmpty() || stack.peek() == null) 
+			throw new Exception("addNodeFromFinal cannot be used");
+		
+		Stack<Node> tempStack = new Stack<Node>();
+		
+		for (int i = 0; i< 3; i++){						
 			
-			if (!canMultiplyNode())
-				throw new Exception("too many parameters in multiplication relation");
+			tempStack.push(stack.pop());
 			
-			if (n.layer < 0) {
-				stack.push(n);
-			}
-			else {				
-				if (!stack.isEmpty() && stack.peek() == null) {
-					stack.pop(); //eat
-					Node prev = stack.pop();
-					if (n.layer == prev.layer){
-						Node addNode;
-						if (prev.opCode == addition){
-							addNode = prev;
-						}
-						else {
-							addNode = new Node(null);
-							addNode.layer = n.layer;
-							addNode.opCode = addition;
-							addNode.AppendToName(prev.GetName());
-							addNode.AddNode(prev);
-						}
-						
-						addNode.AppendToName(addition);
-						addNode.AppendToName(n.GetName());
-						addNode.AddNode(n);
-						addNodeToStack(addNode);
-					}
-					else {
-						stack.push(prev);
-						stack.push(null);
-						stack.push(n);
-					}
+			if (stack.isEmpty() || stack.peek() == null)
+				break;
+			
+			if (stack.peek().layer != tempStack.peek().layer) 
+				break;
+			
+			if (tempStack.peek().layer == 0 && !m_alphabet.containsKey(c))
+				throw new Exception("small cap cannot be used here");
+		}
+		
+		if (tempStack.size() == 3)
+			throw new Exception("missing layer mark");
+		
+		while (!tempStack.isEmpty())
+			stack.push(tempStack.pop());
+		
+		stack.push(new Node(c));	
+	}
+	
+	private void pushNode(Node n) throws Exception{
+		
+		if (stack.isEmpty() && n == null) 
+			throw new Exception("addNode cannot be used");
+
+		if (stack.isEmpty()) {
+			stack.push(n);
+			return;
+		}
+			
+		if (n == null) {
+			stack.push(null);
+			return;
+		}
+		
+		if (n.layer < 0) {
+			stack.push(n);
+			return;
+		}
+
+		if (stack.peek() == null) {
+			stack.pop(); //eat
+			Node prev = stack.pop();
+			
+			if (n.layer == prev.layer){
+				Node newNode;
+				if (prev.opCode == addition){
+					newNode = prev;
 				}
 				else {
-					stack.push(n);
+					newNode = new Node(null);
+					newNode.layer = n.layer;
+					newNode.opCode = addition;
+					newNode.AppendToName(prev.GetName());
+					newNode.AddNode(prev);
 				}
+				
+				newNode.AppendToName(addition);
+				newNode.AppendToName(n.GetName());
+				newNode.AddNode(n);
+				stack.push(newNode);
+			}
+			else {
+				stack.push(prev);
+				stack.push(null);
+				stack.push(n);
 			}
 		}
 		else {
-			stack.push(null);
+			stack.push(n);
 		}
 	}
 	

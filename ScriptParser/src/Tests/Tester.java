@@ -1,6 +1,10 @@
 package Tests;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import IEMLInterface.ScriptExamples;
+import IEMLInterface.TermInterface;
 import NewParser.Parser;
 import NewParser.Parser.Node;
 import ScriptGenerator.BaseIEMLProvider;
@@ -15,10 +19,27 @@ public class Tester {
 		//BaseTester baseTester = new BaseTester();
 		//baseTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
-		String a = "*T:+i.**"; //error is too general
-		String b = "*S:B:i.**";//error is too general
-		String c = "*h.i.g.d.S:B:T:.**";
-		System.out.println(c);	
+		ArrayList<String> list = new ArrayList<String>(Arrays.asList(
+				"*T:+i.**", 					//too general
+				"*S:B:i.**", 					//has to fail - ok
+				"*h.i.g.d.S:B:T:.**",			//has to fail - ok
+				"*h.S:B:T:.h.-**"				//has to pass - ok
+				
+				));
+		
+		list.add(ScriptExamples.StudentLearnsMathematics);
+		list.add(ScriptExamples.CesJeux);
+		list.add(ScriptExamples.JeSaurai);
+			
+		for (String s:TermInterface.LoadDictionary(null).keySet()){
+			list.add("*"+s+"**");
+		}
+		
+		for (String s:list){
+			System.out.println(Parser.run(s));
+		}
+
+		//System.out.println(c);	
 
 		//ScriptExamples.StudentLearnsMathematics
 		//ScriptExamples.CesJeux
