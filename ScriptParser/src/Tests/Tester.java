@@ -36,7 +36,8 @@ public class Tester {
 		}
 		
 		for (String s:list){
-			System.out.println(Parser.run(s));
+			String r = Parser.run(s);
+			//System.out.println(r);
 		}
 
 		//System.out.println(c);	

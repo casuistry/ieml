@@ -10,7 +10,7 @@ import TopDown.Node;
 
 public class Parser {
 	
-	public static List<Character> c_alphabet = Arrays.asList(new Character[]{'S','B','T','U','A','O','M','I','E','F'});
+	public static List<Character> c_alphabet = Arrays.asList(new Character[]{'E','U','A','O','S','B','T','M','F','I'});
 	public static List<Character> c_smallCap = Arrays.asList(new Character[]{'y','o','e','u','a','i','j','g','s','b','t','h','c','k','m','n','p','x','d','f','l'});
 	public static List<Character> c_vowels   = Arrays.asList(new Character[]{'o','a','u','e'});
 	public static List<Character> c_ignore   = Arrays.asList(new Character[]{'(',')',' '});
@@ -18,6 +18,8 @@ public class Parser {
 	public static List<Character> c_addOp    = Arrays.asList(new Character[]{'+'});
 	public static List<Character> c_marks    = Arrays.asList(new Character[]{':', '.', '-', '’', ',', '_', ';'});
 	public static List<Character> c_star     = Arrays.asList(new Character[]{'*'});
+	
+	public static List<String> c_smallCapOrdered = Arrays.asList(new String[]{"wo", "wa","y","o","e","wu","we","u","a","i","j","g","s","b","t","h","c","k","m","n","p","x","d","f","l"});
 	
 	public enum States {
 		
@@ -138,7 +140,7 @@ public class Parser {
 			for (int i = 0 ; i < counter; i++)
 				builder.append(" ");
 			builder.append("^");
-			result = builder.toString();
+			System.out.println(builder.toString());
 		}
 		
 		return result;
@@ -513,7 +515,6 @@ public class Parser {
 	
 	public class Node {
 		
-		private boolean completed = false;
 		private StringBuilder name = null;	
 		private int layer = -1;
 		public ArrayList<Node> nodes = new ArrayList<Node>();	
@@ -528,42 +529,21 @@ public class Parser {
 		
 		//=============================================
 		
-		public void AddNode(Node n) throws Exception{
-			
-			if (completed)
-				throw new Exception("already completed, cannot modify me");
-			
+		public void AddNode(Node n) throws Exception{		
 			n.SetParent(this);		
 			nodes.add(n);
 		}
 		
-		public void SetParent(Node n) throws Exception{
-			
-			//this node can be finalized but then we find out it is in a * relation, hence the check for parent != null
-			if (completed && parent != null) 
-				throw new Exception("already completed, cannot modify me");
-			
+		public void SetParent(Node n) throws Exception{	
 			parent = n;
 		}
 		
 		public void AppendToName(Character c) throws Exception{
-			
-			if (completed)
-				throw new Exception("already completed, cannot modify me");
-			
 			name.append(c);
 		}
 		
 		public void AppendToName(String s) throws Exception{
-			
-			if (completed)
-				throw new Exception("already completed, cannot modify me");
-			
 			name.append(s);
-		}
-		
-		public void CompleteNode(boolean completed){
-			this.completed = completed;
 		}
 		
 		//=============================================
@@ -574,10 +554,6 @@ public class Parser {
 		
 		public Node GetParent(){
 			return parent;
-		}
-		
-		public boolean IsCompleted(){
-			return completed;
 		}
 		
 		//Readable representation of a node and its children in a list-form
