@@ -19,7 +19,10 @@ public class Tester {
 		//BaseTester baseTester = new BaseTester();
 		//baseTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
-		ArrayList<String> list = new ArrayList<String>(Arrays.asList(
+		ArrayList<String> list = new ArrayList<String>();
+		
+		list.addAll(Arrays.asList(
+				"*O:+B:**",
 				"*T:+i.**", 					//too general
 				"*S:B:i.**", 					//has to fail - ok
 				"*h.i.g.d.S:B:T:.**",			//has to fail - ok
@@ -30,7 +33,7 @@ public class Tester {
 		list.add(ScriptExamples.StudentLearnsMathematics);
 		list.add(ScriptExamples.CesJeux);
 		list.add(ScriptExamples.JeSaurai);
-			
+		
 		for (String s:TermInterface.LoadDictionary(null).keySet()){
 			list.add("*"+s+"**");
 		}

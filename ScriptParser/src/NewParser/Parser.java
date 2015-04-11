@@ -118,6 +118,39 @@ public class Parser {
 			m_star.put(c, c_star.indexOf(c));
 	}
 	
+	public static HashMap<String, Node> scLookup = new HashMap<String, Node>();
+	static {
+		try {
+		scLookup.put("wo.", new Parser().parse("*U:U:E:.**"));
+		scLookup.put("wa.", new Parser().parse("*U:A:E:.**"));
+		scLookup.put("wu.", new Parser().parse("*A:U:E:.**"));
+		scLookup.put("we.", new Parser().parse("*A:A:E:.**"));
+		scLookup.put("y.", new Parser().parse("*U:S:E:.**"));
+		scLookup.put("o.", new Parser().parse("*U:B:E:.**"));
+		scLookup.put("e.", new Parser().parse("*U:T:E:.**"));
+		scLookup.put("u.", new Parser().parse("*A:S:E:.**"));
+		scLookup.put("a.", new Parser().parse("*A:B:E:.**"));
+		scLookup.put("i.", new Parser().parse("*A:T:E:.**"));
+		scLookup.put("j.", new Parser().parse("*S:U:E:.**"));
+		scLookup.put("g.", new Parser().parse("*S:A:E:.**"));
+		scLookup.put("s.", new Parser().parse("*S:S:E:.**"));
+		scLookup.put("b.", new Parser().parse("*S:B:E:.**"));
+		scLookup.put("t.", new Parser().parse("*S:T:E:.**"));
+		scLookup.put("h.", new Parser().parse("*B:U:E:.**"));
+		scLookup.put("c.", new Parser().parse("*B:A:E:.**"));
+		scLookup.put("k.", new Parser().parse("*B:S:E:.**"));
+		scLookup.put("m.", new Parser().parse("*B:B:E:.**"));
+		scLookup.put("n.", new Parser().parse("*B:T:E:.**"));
+		scLookup.put("p.", new Parser().parse("*T:U:E:.**"));
+		scLookup.put("x.", new Parser().parse("*T:A:E:.**"));
+		scLookup.put("d.", new Parser().parse("*T:S:E:.**"));
+		scLookup.put("f.", new Parser().parse("*T:B:E:.**"));
+		scLookup.put("l.", new Parser().parse("*T:T:E:.**"));
+		}catch (Exception e) {
+			System.out.println("mapping failed: " + e.getMessage());
+		}
+	}
+	
 	public static Character multiplication = '*';
 	public static Character addition = '+';	
 	
@@ -335,6 +368,7 @@ public class Parser {
 		pop.AppendToName(c);
 		pop.layer = m_marks.get(c);
 		pop.opCode = multiplication;
+		pop.AddNode(scLookup.get(pop.GetName()));
 		pushNode(pop);
 	}
 	private void a_ws_sc(Character c) throws Exception{ 
@@ -397,11 +431,11 @@ public class Parser {
 		newNode.AppendToName(c);
 		
 		//fill with empty nodes
-		need to have the empty nodes as well
+		//need to have the empty nodes as well
 		while (newNode.nodes.size() < 3) {
-			//Node eNode = new Node('E');
-			//eNode.layer = newNode.layer-1;
-			//newNode.AddNode(eNode);
+			Node eNode = new Node('E');
+			eNode.layer = newNode.layer-1;
+			newNode.AddNode(eNode);
 			//newNode.AddNode(new Parser().parse("*"+getEmptySequence(newNode.layer-1)+"**"));
 		}
 		
@@ -576,7 +610,6 @@ public class Parser {
 		//=============================================
 		
 		//recursively get all nodes of layer 0
-		does not work for small caps
 		public ArrayList<Node> GetComponents() {
 			ArrayList<Node> result = new ArrayList<Node>();
 			if (layer == 0)
