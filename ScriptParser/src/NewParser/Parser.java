@@ -285,13 +285,13 @@ public class Parser {
 	
 	//==================================================================================
 	
-	private void a_i_ws(Character c) throws Exception{ //ok
+	private void a_i_ws(Character c) throws Exception{ 
 		pushNode(new Node(c));
 	}	
-	private void a_i_sc(Character c) throws Exception{ //ok
+	private void a_i_sc(Character c) throws Exception{ 
 		pushNode(new Node(c));
 	}
-	private void a_i_a(Character c) throws Exception{ //ok
+	private void a_i_a(Character c) throws Exception{ 
 		pushNode(new Node(c));
 	}	
 	private void a_f_ws(Character c) throws Exception{ 
@@ -312,10 +312,10 @@ public class Parser {
 	private void a_d_a(Character c) throws Exception{ 
 		pushNodeFromAdd(c);
 	}
-	private void a_f_d(Character c) throws Exception{ //ok
+	private void a_f_d(Character c) throws Exception{ 
 		pushNode(null);
 	}
-	private void a_a_f(Character c) throws Exception{ //ok
+	private void a_a_f(Character c) throws Exception{ 
 		//TODO:test case
 		if (m_marks.get(c) != 0)
 			throw new Exception("layer mark must be '" + c_marks.get(0) + "'");		
@@ -326,7 +326,7 @@ public class Parser {
 		pop.layer = m_marks.get(c);
 		pushNode(pop);
 	}
-	private void a_sc_f(Character c) throws Exception{ //ok
+	private void a_sc_f(Character c) throws Exception{ 
 		//TODO:test case
 		if (m_marks.get(c) != 1)
 			throw new Exception("layer mark must be '" + c_marks.get(1) + "'");
@@ -337,13 +337,14 @@ public class Parser {
 		pop.opCode = multiplication;
 		pushNode(pop);
 	}
-	private void a_ws_sc(Character c) throws Exception{ //ok
+	private void a_ws_sc(Character c) throws Exception{ 
 		//TODO:test case
 		if (!m_vowels.containsKey(c)) 
 			throw new Exception("must use vowel");		
 		
 		Node pop = stack.pop();	
 		pop.AppendToName(c);
+		pop.UpdateOrdre(c);
 		pushNode(pop);
 	}
 	private void a_f_f(Character c) throws Exception{
@@ -384,10 +385,6 @@ public class Parser {
 		if (tempStack.isEmpty())
 			throw new Exception("could not find nodes in multiplication relation");
 		
-		if (tempStack.size() < 3){
-			//need empty nodes
-		}
-		
 		Node newNode = new Node(null);
 		newNode.opCode = multiplication;
 		newNode.layer = m_marks.get(c);
@@ -399,22 +396,35 @@ public class Parser {
 		}
 		newNode.AppendToName(c);
 		
+		//fill with empty nodes
+		need to have the empty nodes as well
+		while (newNode.nodes.size() < 3) {
+			//Node eNode = new Node('E');
+			//eNode.layer = newNode.layer-1;
+			//newNode.AddNode(eNode);
+			//newNode.AddNode(new Parser().parse("*"+getEmptySequence(newNode.layer-1)+"**"));
+		}
+		
 		pushNode(newNode);
 	}
 	
 	private void pushNodeFromAdd(Character c) throws Exception{
 		if (stack.isEmpty()) 
-			throw new Exception("pushNodeFromAdd cannot be used");
+			throw new Exception("pushNodeFromAdd cannot be used here, stack empty");
 		if  (stack.peek() != null)
-			throw new Exception("pushNodeFromAdd internal error");
+			throw new Exception("pushNodeFromAdd cannot be used here, no addition");
 		stack.pop(); //eat
 		Node tempNode = stack.peek();
 		if (tempNode.layer == 0 && !m_alphabet.containsKey(c))
 			throw new Exception("small cap cannot be used here");
+		
+		Node newNode = new Node(c);
 		stack.push(null);
-		stack.push(new Node(c));
+		stack.push(newNode);
 	}
 	
+	//checks that at most three nodes are in a multiplicative relation
+	//
 	private void pushNodeFromFinal(Character c) throws Exception{	
 		
 		if (stack.isEmpty() || stack.peek() == null) 
@@ -445,6 +455,8 @@ public class Parser {
 		stack.push(new Node(c));	
 	}
 	
+	//add a node to stack, creates additive relation if needed
+	//
 	private void pushNode(Node n) throws Exception{
 		
 		if (stack.isEmpty() && n == null) 
@@ -484,6 +496,21 @@ public class Parser {
 				
 				newNode.AppendToName(addition);
 				newNode.AppendToName(n.GetName());
+				
+				//check if order is respected
+				ArrayList<Node> children = newNode.nodes;
+				Node lastChild = children.get(children.size()-1);	
+				
+				//TODO:testcase
+				if (!lastChild.IsLessThan(n))
+					throw new Exception("standard order is not respected");
+				
+				//TODO:testcase
+				for (Node child : children){
+					if (child.GetName().equals(n.GetName()))
+						throw new Exception("duplicate in additive relation");
+				}
+
 				newNode.AddNode(n);
 				stack.push(newNode);
 			}
@@ -515,8 +542,11 @@ public class Parser {
 	
 	public class Node {
 		
-		private StringBuilder name = null;	
 		private int layer = -1;
+		private int taille = -1;
+		private int ordre = -1;
+		
+		private StringBuilder name = null;			
 		public ArrayList<Node> nodes = new ArrayList<Node>();	
 		public Node parent = null;
 		public Character opCode = null;
@@ -525,9 +555,91 @@ public class Parser {
 			name = new StringBuilder();
 			if (c != null)
 				name.append(c);
+			
+			if (m_alphabet.containsKey(c)){
+				if (c.equals('O'))
+					taille = 2;
+				if (c.equals('M'))
+					taille = 3;
+				if (c.equals('F'))
+					taille = 5;
+				if (c.equals('I'))
+					taille = 6;
+				
+				ordre = m_alphabet.get(c);
+			}
+			
+			if (m_smallCap.containsKey(c)) 
+				ordre = c_smallCapOrdered.indexOf(c);
 		}
 		
 		//=============================================
+		
+		//recursively get all nodes of layer 0
+		does not work for small caps
+		public ArrayList<Node> GetComponents() {
+			ArrayList<Node> result = new ArrayList<Node>();
+			if (layer == 0)
+				result.add(this);
+			else {
+				for (Node n : nodes){
+					result.addAll(n.GetComponents());
+				}
+			}
+			return result;	
+		}
+		
+		//=============================================
+		
+		public boolean IsLessThan(Node n) throws Exception{
+			
+			if (this.layer < 0 || n.layer < 0)
+				throw new Exception("negative layer values");
+			
+			ArrayList<Node> thisNode = this.GetComponents();
+			ArrayList<Node> otherNode = n.GetComponents();
+			
+			if (thisNode.size() != otherNode.size())
+				throw new Exception("cannot compute order for this");
+			
+			for (int i = 0; i < thisNode.size(); i++)
+				if (thisNode.get(i).lessThan(otherNode.get(i)))
+					return true;
+			return false;
+		}
+		
+		private boolean lessThan(Node n){
+			if (this.layer < n.layer)
+				return true;
+			else if (this.layer > n.layer)
+				return false;
+			else {
+				if (this.taille < n.taille)
+					return true;
+				else if (this.taille > n.taille)
+					return false;
+				else {
+					if (this.ordre > n.ordre)
+						return false;
+					return true;					
+				}
+			}
+		}
+		
+		public void UpdateOrdre(Character c) throws Exception {
+			if (m_vowels.containsKey(c)){
+				if (c.equals('o'))
+					ordre = c_smallCapOrdered.indexOf("wo");
+				if (c.equals('a'))
+					ordre = c_smallCapOrdered.indexOf("wa");
+				if (c.equals('u'))
+					ordre = c_smallCapOrdered.indexOf("wu");
+				if (c.equals('e'))
+					ordre = c_smallCapOrdered.indexOf("we");
+			}
+			else 
+				throw new Exception("cannot call UpdateOrdre here");
+		}
 		
 		public void AddNode(Node n) throws Exception{		
 			n.SetParent(this);		
@@ -555,7 +667,7 @@ public class Parser {
 		public Node GetParent(){
 			return parent;
 		}
-		
+				
 		//Readable representation of a node and its children in a list-form
 		public void PrintNodes(String prepend){
 			

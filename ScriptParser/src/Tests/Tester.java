@@ -23,8 +23,8 @@ public class Tester {
 				"*T:+i.**", 					//too general
 				"*S:B:i.**", 					//has to fail - ok
 				"*h.i.g.d.S:B:T:.**",			//has to fail - ok
-				"*h.S:B:T:.h.-**"				//has to pass - ok
-				
+				"*h.S:B:T:.h.-**",				//has to pass - ok
+				"*wo.+wa.+we.+we.**"
 				));
 		
 		list.add(ScriptExamples.StudentLearnsMathematics);
