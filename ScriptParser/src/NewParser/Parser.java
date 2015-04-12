@@ -154,14 +154,12 @@ public class Parser {
 	public static Character multiplication = '*';
 	public static Character addition = '+';	
 	
-	static int counter;
-	
 	public static String run(String input) {
 		
 		String result = null;
+		Parser parser = new Parser();
 		
-		try {			
-			Parser parser = new Parser();			
+		try {				
 			Node n = parser.parse(input);
 			//n.PrintNodes("");
 			//result = n.Output();
@@ -170,7 +168,7 @@ public class Parser {
 			System.out.println(e.getMessage());
 			System.out.println(input);
 			StringBuilder builder = new StringBuilder();
-			for (int i = 0 ; i < counter; i++)
+			for (int i = 0 ; i < parser.counter; i++)
 				builder.append(" ");
 			builder.append("^");
 			System.out.println(builder.toString());
@@ -181,6 +179,7 @@ public class Parser {
 	
 	States currentState;
 	Stack<Node> stack;
+	int counter;
 	
 	public Parser() {
 		counter = 0;
@@ -432,11 +431,11 @@ public class Parser {
 		
 		//fill with empty nodes
 		//need to have the empty nodes as well
-		while (newNode.nodes.size() < 3) {
-			Node eNode = new Node('E');
-			eNode.layer = newNode.layer-1;
-			newNode.AddNode(eNode);
-			//newNode.AddNode(new Parser().parse("*"+getEmptySequence(newNode.layer-1)+"**"));
+		while (newNode.nodes.size() < 3) {			
+			Parser p = new Parser();
+			Node filler = p.parse("*"+getEmptySequence(newNode.layer-1)+"**");
+			newNode.AddNode(filler);			
+			//System.out.println("Appending " + filler.GetName() + " to " + newNode.GetName());
 		}
 		
 		pushNode(newNode);
@@ -635,13 +634,18 @@ public class Parser {
 			if (thisNode.size() != otherNode.size())
 				throw new Exception("cannot compute order for this");
 			
-			for (int i = 0; i < thisNode.size(); i++)
-				if (thisNode.get(i).lessThan(otherNode.get(i)))
+			for (int i = 0; i < thisNode.size(); i++) {
+				Boolean result = thisNode.get(i).lessThan(otherNode.get(i));
+				if (result == null)
+					continue;
+				if (result)
 					return true;
+			}
+
 			return false;
 		}
 		
-		private boolean lessThan(Node n){
+		private Boolean lessThan(Node n){
 			if (this.layer < n.layer)
 				return true;
 			else if (this.layer > n.layer)
@@ -654,7 +658,9 @@ public class Parser {
 				else {
 					if (this.ordre > n.ordre)
 						return false;
-					return true;					
+					if (this.ordre < n.ordre)
+						return true;
+					return null;					
 				}
 			}
 		}
