@@ -30,18 +30,18 @@ public class Tester {
 				"*wo.+wa.+we.+we.**"
 				));
 */
-		list.add(ScriptExamples.StudentLearnsMathematics);
-		list.add(ScriptExamples.CesJeux);
-		list.add(ScriptExamples.JeSaurai);
-		list.add(ScriptExamples.NeSaurontPas);
-		list.add(ScriptExamples.UnCoteurraconteUneHistoire);
+		//list.add(ScriptExamples.StudentLearnsMathematics);
+		//list.add(ScriptExamples.CesJeux);
+		//list.add(ScriptExamples.JeSaurai);
+		//list.add(ScriptExamples.NeSaurontPas);
+		//list.add(ScriptExamples.UnCoteurraconteUneHistoire);
 		list.add(ScriptExamples.EnfantDeMaVoisine);
-		list.add(ScriptExamples.EnfantDeMaVoisin1);
+		//list.add(ScriptExamples.EnfantDeMaVoisin1);
 		
 		
 		
 		for (String s:TermInterface.LoadDictionary(null).keySet()){
-			list.add("*"+s+"**");
+			//list.add("*"+s+"**");
 		}
 		
 		for (String s:list){

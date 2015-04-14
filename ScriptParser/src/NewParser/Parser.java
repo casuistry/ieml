@@ -623,6 +623,51 @@ public class Parser {
 		
 		//=============================================
 		
+		public Boolean LessThanOrder(Node n) throws Exception{		
+			
+			if (this.layer < 0)
+				throw new Exception("cannot compare: negative layer value in this node");
+			if (n.layer < 0)
+				throw new Exception("cannot compare: negative layer value in other node");
+			if (this.layer != n.layer)
+				throw new Exception("cannot compare: layer mismatch");
+			
+			boolean pThis = this.layer == 0 && this.nodes.size() == 0;
+			boolean pOther = n.layer == 0 && n.nodes.size() == 0;			
+			if (pThis && !pOther || !pThis && pOther)
+				throw new Exception("cannot compare: primitive layer mismatch");
+			
+			if (pThis && pOther) 
+				return this.lessThan(n);
+			else {
+				
+				if (this.opCode == null)
+					throw new Exception("cannot compare: null opcode in this node");
+				if (n.opCode == null)
+					throw new Exception("cannot compare: null opcode in other node");
+								
+				boolean opcodeThis = this.opCode == multiplication;
+				boolean opcodeOther = n.opCode == multiplication;
+				
+				Boolean childResult = null;
+				
+				if (opcodeThis && opcodeOther) {				
+					for (int i = 0; i < this.nodes.size(); i++){
+						childResult &= this.nodes.get(i).LessThanOrder(n.nodes.get(i));
+					}
+					
+				}
+				else if (opcodeThis && !opcodeOther || !opcodeThis && opcodeOther) {
+					
+				}
+				else { //both are in addition
+					
+				}
+				
+				return childResult;
+			}
+		}
+		
 		public boolean IsLessThan(Node n) throws Exception{
 			
 			if (this.layer < 0 || n.layer < 0)
@@ -630,6 +675,15 @@ public class Parser {
 			
 			ArrayList<Node> thisNode = this.GetComponents();
 			ArrayList<Node> otherNode = n.GetComponents();
+			
+			System.out.println("this: " + this.GetName());
+			for (Node child : thisNode)
+				System.out.print(child.GetName() + " ");
+			System.out.println();
+			System.out.println("other:" + n.GetName());
+			for (Node child : otherNode)
+				System.out.print(child.GetName() + " ");
+			System.out.println();
 			
 			if (thisNode.size() != otherNode.size())
 				throw new Exception("cannot compute order for this");
@@ -664,6 +718,8 @@ public class Parser {
 				}
 			}
 		}
+		
+		//=============================================
 		
 		public void UpdateOrdre(Character c) throws Exception {
 			if (m_vowels.containsKey(c)){
