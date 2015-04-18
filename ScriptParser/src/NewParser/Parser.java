@@ -121,35 +121,46 @@ public class Parser {
 	public static HashMap<String, Node> scLookup = new HashMap<String, Node>();
 	static {
 		try {
-		scLookup.put("wo.", new Parser().parse("*U:U:E:.**"));
-		scLookup.put("wa.", new Parser().parse("*U:A:E:.**"));
-		scLookup.put("wu.", new Parser().parse("*A:U:E:.**"));
-		scLookup.put("we.", new Parser().parse("*A:A:E:.**"));
-		scLookup.put("y.", new Parser().parse("*U:S:E:.**"));
-		scLookup.put("o.", new Parser().parse("*U:B:E:.**"));
-		scLookup.put("e.", new Parser().parse("*U:T:E:.**"));
-		scLookup.put("u.", new Parser().parse("*A:S:E:.**"));
-		scLookup.put("a.", new Parser().parse("*A:B:E:.**"));
-		scLookup.put("i.", new Parser().parse("*A:T:E:.**"));
-		scLookup.put("j.", new Parser().parse("*S:U:E:.**"));
-		scLookup.put("g.", new Parser().parse("*S:A:E:.**"));
-		scLookup.put("s.", new Parser().parse("*S:S:E:.**"));
-		scLookup.put("b.", new Parser().parse("*S:B:E:.**"));
-		scLookup.put("t.", new Parser().parse("*S:T:E:.**"));
-		scLookup.put("h.", new Parser().parse("*B:U:E:.**"));
-		scLookup.put("c.", new Parser().parse("*B:A:E:.**"));
-		scLookup.put("k.", new Parser().parse("*B:S:E:.**"));
-		scLookup.put("m.", new Parser().parse("*B:B:E:.**"));
-		scLookup.put("n.", new Parser().parse("*B:T:E:.**"));
-		scLookup.put("p.", new Parser().parse("*T:U:E:.**"));
-		scLookup.put("x.", new Parser().parse("*T:A:E:.**"));
-		scLookup.put("d.", new Parser().parse("*T:S:E:.**"));
-		scLookup.put("f.", new Parser().parse("*T:B:E:.**"));
-		scLookup.put("l.", new Parser().parse("*T:T:E:.**"));
+			scLookup.put("wo.", new Parser().parse("*U:U:E:.**"));
+			scLookup.put("wa.", new Parser().parse("*U:A:E:.**"));
+			scLookup.put("wu.", new Parser().parse("*A:U:E:.**"));
+			scLookup.put("we.", new Parser().parse("*A:A:E:.**"));
+			scLookup.put("y.", new Parser().parse("*U:S:E:.**"));
+			scLookup.put("o.", new Parser().parse("*U:B:E:.**"));
+			scLookup.put("e.", new Parser().parse("*U:T:E:.**"));
+			scLookup.put("u.", new Parser().parse("*A:S:E:.**"));
+			scLookup.put("a.", new Parser().parse("*A:B:E:.**"));
+			scLookup.put("i.", new Parser().parse("*A:T:E:.**"));
+			scLookup.put("j.", new Parser().parse("*S:U:E:.**"));
+			scLookup.put("g.", new Parser().parse("*S:A:E:.**"));
+			scLookup.put("s.", new Parser().parse("*S:S:E:.**"));
+			scLookup.put("b.", new Parser().parse("*S:B:E:.**"));
+			scLookup.put("t.", new Parser().parse("*S:T:E:.**"));
+			scLookup.put("h.", new Parser().parse("*B:U:E:.**"));
+			scLookup.put("c.", new Parser().parse("*B:A:E:.**"));
+			scLookup.put("k.", new Parser().parse("*B:S:E:.**"));
+			scLookup.put("m.", new Parser().parse("*B:B:E:.**"));
+			scLookup.put("n.", new Parser().parse("*B:T:E:.**"));
+			scLookup.put("p.", new Parser().parse("*T:U:E:.**"));
+			scLookup.put("x.", new Parser().parse("*T:A:E:.**"));
+			scLookup.put("d.", new Parser().parse("*T:S:E:.**"));
+			scLookup.put("f.", new Parser().parse("*T:B:E:.**"));
+			scLookup.put("l.", new Parser().parse("*T:T:E:.**"));
 		}catch (Exception e) {
 			System.out.println("mapping failed: " + e.getMessage());
 		}
 	}
+	
+	public static HashMap<Integer, Node> emptyLookup = new HashMap<Integer, Node>();
+	static {
+		try {
+			for (int i = 0; i < 7; i++)
+				emptyLookup.put(i, new Parser().parse(getEmptySequence(i)));
+		}catch (Exception e) {
+			System.out.println("mapping failed: " + e.getMessage());
+		}
+	}
+	
 	
 	public static Character multiplication = '*';
 	public static Character addition = '+';	
@@ -182,9 +193,9 @@ public class Parser {
 	int counter;
 	
 	public Parser() {
-		counter = 0;
 		currentState = States.state_pre;
 		stack = new Stack<Node>();
+		counter = 0;
 	}
 	
 	public Node parse(String input) throws Exception {
@@ -380,13 +391,52 @@ public class Parser {
 		pop.UpdateOrdre(c);
 		pushNode(pop);
 	}
+	
+	//checks if layer mark is ok
+	//finds up to 3 nodes in multiplication relation (siblings)
+	//creates a new parent multiplication node and ads children
+	//fills with Empty as needed
+	//triggers more processing if required
 	private void a_f_f(Character c) throws Exception{
-		Node temp = stack.peek();
+		
+		Node tempNode = stack.peek();
+		
 		//TODO:test case
-		if (temp.layer != m_marks.get(c)-1)
-			throw new Exception("bad layer mark, expecting " + c_marks.get(temp.layer+1));
-		makeMultRelation(c);
+		if (tempNode.layer != m_marks.get(c)-1)
+			throw new Exception("bad layer mark, expecting " + c_marks.get(tempNode.layer+1));
+		
+		Stack<Node> tempStack = new Stack<Node>();		
+		for (int i = 0; i < 3; i++) {			
+			if (stack.isEmpty())
+				break;			
+			tempNode = stack.peek();			
+			if (tempNode == null)
+				break;									
+			if (tempNode.layer != m_marks.get(c)-1)
+				break;			
+			tempStack.push(stack.pop());
+		}
+		
+		//sanity
+		if (tempStack.isEmpty())
+			throw new Exception("could not find nodes in multiplication relation");
+				
+		Node newNode = new Node(null, multiplication, m_marks.get(c));	
+		while (!tempStack.isEmpty()){
+			Node pop = tempStack.pop();
+			newNode.AppendToName(pop.GetName());
+			newNode.AddNode(pop);
+		}
+		
+		//empties not added to his name
+		while (newNode.nodes.size() < 3)	
+			newNode.AddNode(emptyLookup.get(newNode.layer-1));			
+
+		newNode.AppendToName(c);
+		
+		pushNode(newNode);
 	}
+	
 	private void a_f_p(Character c) throws Exception{
 		//TODO:test case
 		if (stack.size() > 1)
@@ -395,90 +445,51 @@ public class Parser {
 	
 	//==================================================================================
 	
-	private void makeMultRelation(Character c) throws Exception{
-		
-		Stack<Node> tempStack = new Stack<Node>();
-		
-		for (int i = 0; i < 3; i++) {
-			
-			if (stack.isEmpty())
-				break;
-			
-			Node tempNode = stack.peek();
-			
-			if (tempNode == null)
-				break;			
-						
-			if (tempNode.layer != m_marks.get(c)-1)
-				break;
-			
-			tempStack.push(stack.pop());
-		}
-		
-		if (tempStack.isEmpty())
-			throw new Exception("could not find nodes in multiplication relation");
-		
-		Node newNode = new Node(null);
-		newNode.opCode = multiplication;
-		newNode.layer = m_marks.get(c);
-		
-		while (!tempStack.isEmpty()){
-			Node pop = tempStack.pop();
-			newNode.AppendToName(pop.GetName());
-			newNode.AddNode(pop);
-		}
-		newNode.AppendToName(c);
-		
-		//fill with empty nodes
-		//need to have the empty nodes as well
-		while (newNode.nodes.size() < 3) {			
-			Parser p = new Parser();
-			Node filler = p.parse("*"+getEmptySequence(newNode.layer-1)+"**");
-			newNode.AddNode(filler);			
-			//System.out.println("Appending " + filler.GetName() + " to " + newNode.GetName());
-		}
-		
-		pushNode(newNode);
-	}
-	
+	//node will be in additive relation
+	//check if layers match
+	//no further processing, need layer mark
 	private void pushNodeFromAdd(Character c) throws Exception{
+		//sanity
 		if (stack.isEmpty()) 
 			throw new Exception("pushNodeFromAdd cannot be used here, stack empty");
+		//sanity
 		if  (stack.peek() != null)
-			throw new Exception("pushNodeFromAdd cannot be used here, no addition");
+			throw new Exception("pushNodeFromAdd cannot be used here, not an addition");
 		stack.pop(); //eat
 		Node tempNode = stack.peek();
+		
+		//TODO: test case
 		if (tempNode.layer == 0 && !m_alphabet.containsKey(c))
 			throw new Exception("small cap cannot be used here");
 		
-		Node newNode = new Node(c);
 		stack.push(null);
-		stack.push(newNode);
+		stack.push(new Node(c));
 	}
 	
-	//checks that at most three nodes are in a multiplicative relation
-	//
+	//node will be in multiplicative relation
+	//check if layers match
+	//check if not too many nodes in relation already
+	//no further processing, need layer mark
 	private void pushNodeFromFinal(Character c) throws Exception{	
 		
+		//sanity
 		if (stack.isEmpty() || stack.peek() == null) 
 			throw new Exception("addNodeFromFinal cannot be used");
 		
-		Stack<Node> tempStack = new Stack<Node>();
-		
-		for (int i = 0; i< 3; i++){						
-			
-			tempStack.push(stack.pop());
-			
+		Stack<Node> tempStack = new Stack<Node>();		
+		for (int i = 0; i< 3; i++){									
+			tempStack.push(stack.pop());			
 			if (stack.isEmpty() || stack.peek() == null)
-				break;
-			
+				break;			
 			if (stack.peek().layer != tempStack.peek().layer) 
-				break;
+				break;			
 			
+			//TODO: test case
 			if (tempStack.peek().layer == 0 && !m_alphabet.containsKey(c))
 				throw new Exception("small cap cannot be used here");
 		}
 		
+		//TODO: test case
 		if (tempStack.size() == 3)
 			throw new Exception("missing layer mark");
 		
@@ -488,10 +499,9 @@ public class Parser {
 		stack.push(new Node(c));	
 	}
 	
-	//add a node to stack, creates additive relation if needed
-	//
 	private void pushNode(Node n) throws Exception{
 		
+		//sanity
 		if (stack.isEmpty() && n == null) 
 			throw new Exception("addNode cannot be used");
 
@@ -558,8 +568,16 @@ public class Parser {
 		}
 	}
 	
-	private String getEmptySequence(int l) {
+	public static String getEmptySequence(int l) {
 		
+		StringBuilder builder = new StringBuilder();
+		builder.append("*E");
+		for (int i = 0; i <= l; i++)
+			builder.append(c_marks.get(i));
+		builder.append("**");
+		return builder.toString();
+			
+		/*
 		if (l == 0)
 			return "E" + c_marks.get(0);
 		else 
@@ -570,14 +588,15 @@ public class Parser {
 			builder.append(getEmptySequence(l-1));
 			builder.append(c_marks.get(l));
 			return builder.toString();
-		}				
+		}	
+		*/			
 	}
 	
 	public class Node {
 		
 		private int layer = -1;
 		private int taille = -1;
-		private int ordre = -1;
+		private int alphanum = -1;
 		
 		private StringBuilder name = null;			
 		public ArrayList<Node> nodes = new ArrayList<Node>();	
@@ -586,8 +605,7 @@ public class Parser {
 		
 		public Node(Character c){
 			name = new StringBuilder();
-			if (c != null)
-				name.append(c);
+			name.append(c);
 			
 			if (m_alphabet.containsKey(c)){
 				if (c.equals('O'))
@@ -599,13 +617,43 @@ public class Parser {
 				if (c.equals('I'))
 					taille = 6;
 				
-				ordre = m_alphabet.get(c);
+				alphanum = m_alphabet.get(c);
 			}
 			
 			if (m_smallCap.containsKey(c)) 
-				ordre = c_smallCapOrdered.indexOf(c);
+				alphanum = c_smallCapOrdered.indexOf(c);
 		}
 		
+		public Node(Character c, Character operator, int l){
+			this(c);
+			opCode = operator;
+			layer = l;
+		}
+		
+		public void UpdateOrdre(Character c) throws Exception {
+			if (m_vowels.containsKey(c)){
+				if (c.equals('o'))
+					alphanum = c_smallCapOrdered.indexOf("wo");
+				if (c.equals('a'))
+					alphanum = c_smallCapOrdered.indexOf("wa");
+				if (c.equals('u'))
+					alphanum = c_smallCapOrdered.indexOf("wu");
+				if (c.equals('e'))
+					alphanum = c_smallCapOrdered.indexOf("we");
+			}
+			else 
+				throw new Exception("cannot call UpdateOrdre here");
+		}
+		
+		public void ComputeStandardOrder() {
+			
+			if (nodes.isEmpty()) {
+				
+			}
+			else {
+				
+			}
+		}
 		//=============================================
 		
 		//recursively get all nodes of layer 0
@@ -676,6 +724,7 @@ public class Parser {
 			ArrayList<Node> thisNode = this.GetComponents();
 			ArrayList<Node> otherNode = n.GetComponents();
 			
+/*
 			System.out.println("this: " + this.GetName());
 			for (Node child : thisNode)
 				System.out.print(child.GetName() + " ");
@@ -684,9 +733,10 @@ public class Parser {
 			for (Node child : otherNode)
 				System.out.print(child.GetName() + " ");
 			System.out.println();
+*/
 			
-			if (thisNode.size() != otherNode.size())
-				throw new Exception("cannot compute order for this");
+			//if (thisNode.size() != otherNode.size())
+			//	throw new Exception("cannot compute order for this");
 			
 			for (int i = 0; i < thisNode.size(); i++) {
 				Boolean result = thisNode.get(i).lessThan(otherNode.get(i));
@@ -710,32 +760,17 @@ public class Parser {
 				else if (this.taille > n.taille)
 					return false;
 				else {
-					if (this.ordre > n.ordre)
-						return false;
-					if (this.ordre < n.ordre)
+					if (this.alphanum < n.alphanum)
 						return true;
+					if (this.alphanum > n.alphanum)
+						return false;
 					return null;					
 				}
 			}
 		}
 		
 		//=============================================
-		
-		public void UpdateOrdre(Character c) throws Exception {
-			if (m_vowels.containsKey(c)){
-				if (c.equals('o'))
-					ordre = c_smallCapOrdered.indexOf("wo");
-				if (c.equals('a'))
-					ordre = c_smallCapOrdered.indexOf("wa");
-				if (c.equals('u'))
-					ordre = c_smallCapOrdered.indexOf("wu");
-				if (c.equals('e'))
-					ordre = c_smallCapOrdered.indexOf("we");
-			}
-			else 
-				throw new Exception("cannot call UpdateOrdre here");
-		}
-		
+				
 		public void AddNode(Node n) throws Exception{		
 			n.SetParent(this);		
 			nodes.add(n);
