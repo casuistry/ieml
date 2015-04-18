@@ -329,13 +329,13 @@ public class Parser {
 	//==================================================================================
 	
 	private void a_i_ws(Character c) throws Exception{ 
-		pushNode(new Node(c));
+		stack.push(new Node(c));
 	}	
 	private void a_i_sc(Character c) throws Exception{ 
-		pushNode(new Node(c));
+		stack.push(new Node(c));
 	}
 	private void a_i_a(Character c) throws Exception{ 
-		pushNode(new Node(c));
+		stack.push(new Node(c));
 	}	
 	private void a_f_ws(Character c) throws Exception{ 
 		pushNodeFromFinal(c);
@@ -356,7 +356,7 @@ public class Parser {
 		pushNodeFromAdd(c);
 	}
 	private void a_f_d(Character c) throws Exception{ 
-		pushNode(null);
+		stack.push(null);
 	}
 	private void a_a_f(Character c) throws Exception{ 
 		//TODO:test case
@@ -367,6 +367,7 @@ public class Parser {
 		Node pop = stack.pop();	
 		pop.AppendToName(c);
 		pop.layer = m_marks.get(c);
+		pop.ComputeOrder();
 		pushNode(pop);
 	}
 	private void a_sc_f(Character c) throws Exception{ 
@@ -379,17 +380,14 @@ public class Parser {
 		pop.layer = m_marks.get(c);
 		pop.opCode = multiplication;
 		pop.AddNode(scLookup.get(pop.GetName()));
+		pop.ComputeOrder();
 		pushNode(pop);
 	}
-	private void a_ws_sc(Character c) throws Exception{ 
+	private void a_ws_sc(Character c) throws Exception{ 		
 		//TODO:test case
 		if (!m_vowels.containsKey(c)) 
-			throw new Exception("must use vowel");		
-		
-		Node pop = stack.pop();	
-		pop.AppendToName(c);
-		pop.UpdateOrdre(c);
-		pushNode(pop);
+			throw new Exception("must use vowel");				
+		stack.peek().AppendToName(c);
 	}
 	
 	//checks if layer mark is ok
@@ -432,8 +430,8 @@ public class Parser {
 		while (newNode.nodes.size() < 3)	
 			newNode.AddNode(emptyLookup.get(newNode.layer-1));			
 
-		newNode.AppendToName(c);
-		
+		newNode.AppendToName(c);		
+		newNode.ComputeOrder();		
 		pushNode(newNode);
 	}
 	
@@ -499,27 +497,61 @@ public class Parser {
 		stack.push(new Node(c));	
 	}
 	
+	//check if we can addition
 	private void pushNode(Node n) throws Exception{
+
+		//sanity
+		if (n == null)
+			throw new Exception("null node");		
+		//sanity
+		if (n.layer < 0) 
+			throw new Exception("negative node");
+		
+		if (stack.isEmpty() || stack.peek() != null) {
+			stack.push(n);
+			return;
+		}
+
+		stack.pop();
+		Node popped = stack.pop();
 		
 		//sanity
-		if (stack.isEmpty() && n == null) 
-			throw new Exception("addNode cannot be used");
-
-		if (stack.isEmpty()) {
-			stack.push(n);
-			return;
-		}
+		if (popped.layer < 0) 
+			throw new Exception("negative previous node");
 			
-		if (n == null) {
+		if (n.layer != popped.layer) {
+			stack.push(popped);
 			stack.push(null);
+			stack.push(n);
 			return;
 		}
 		
-		if (n.layer < 0) {
-			stack.push(n);
-			return;
+		Node newNode;
+		if (popped.opCode == addition){
+			newNode = popped;
 		}
+		else {
+			newNode = new Node(null, addition, popped.layer);
+			newNode.AppendToName(popped.GetName());
+			newNode.AddNode(popped);
+		}
+		
+		newNode.AppendToName(addition);
+		newNode.AppendToName(n.GetName());
+		
+		//check if order is respected
+		ArrayList<Node> children = newNode.nodes;
+		Node lastChild = children.get(children.size()-1);	
+		
+		//TODO:testcase
+		if (!lastChild.IsLessThan(n))
+			throw new Exception("standard order is not respected");
+		
+		newNode.AddNode(n);
+		stack.push(newNode);
 
+		
+		/*
 		if (stack.peek() == null) {
 			stack.pop(); //eat
 			Node prev = stack.pop();
@@ -530,9 +562,7 @@ public class Parser {
 					newNode = prev;
 				}
 				else {
-					newNode = new Node(null);
-					newNode.layer = n.layer;
-					newNode.opCode = addition;
+					newNode = new Node(null, addition, n.layer);
 					newNode.AppendToName(prev.GetName());
 					newNode.AddNode(prev);
 				}
@@ -566,6 +596,7 @@ public class Parser {
 		else {
 			stack.push(n);
 		}
+		*/
 	}
 	
 	public static String getEmptySequence(int l) {
@@ -597,6 +628,7 @@ public class Parser {
 		private int layer = -1;
 		private int taille = -1;
 		private int alphanum = -1;
+		private boolean isOrdered = false;
 		
 		private StringBuilder name = null;			
 		public ArrayList<Node> nodes = new ArrayList<Node>();	
@@ -606,8 +638,28 @@ public class Parser {
 		public Node(Character c){
 			name = new StringBuilder();
 			name.append(c);
+		}
+		
+		public Node(Character c, Character operator, int l){
+			this(c);
+			opCode = operator;
+			layer = l;
+		}
+		
+		public void ComputeOrder() throws Exception {
 			
-			if (m_alphabet.containsKey(c)){
+			if (isOrdered)
+				return;
+			
+			if (nodes.isEmpty()){
+				Character c = GetName().charAt(0);
+				
+				//sanity
+				if (!m_alphabet.containsKey(c))
+					throw new Exception("cannot compute ordre standard");
+				
+				alphanum = m_alphabet.get(c);
+				taille = 1;				
 				if (c.equals('O'))
 					taille = 2;
 				if (c.equals('M'))
@@ -616,18 +668,12 @@ public class Parser {
 					taille = 5;
 				if (c.equals('I'))
 					taille = 6;
+			}
+			else{
 				
-				alphanum = m_alphabet.get(c);
 			}
 			
-			if (m_smallCap.containsKey(c)) 
-				alphanum = c_smallCapOrdered.indexOf(c);
-		}
-		
-		public Node(Character c, Character operator, int l){
-			this(c);
-			opCode = operator;
-			layer = l;
+			isOrdered = true;
 		}
 		
 		public void UpdateOrdre(Character c) throws Exception {
