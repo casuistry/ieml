@@ -10,6 +10,11 @@ import TopDown.Node;
 
 public class Parser {
 	
+	private static boolean initialised = false;
+	
+	public static Character multiplication = '*';
+	public static Character addition = '+';	
+	
 	public static List<Character> c_alphabet = Arrays.asList(new Character[]{'E','U','A','O','S','B','T','M','F','I'});
 	public static List<Character> c_smallCap = Arrays.asList(new Character[]{'y','o','e','u','a','i','j','g','s','b','t','h','c','k','m','n','p','x','d','f','l'});
 	public static List<Character> c_vowels   = Arrays.asList(new Character[]{'o','a','u','e'});
@@ -146,10 +151,18 @@ public class Parser {
 			scLookup.put("d.", new Parser().parse("*T:S:E:.**"));
 			scLookup.put("f.", new Parser().parse("*T:B:E:.**"));
 			scLookup.put("l.", new Parser().parse("*T:T:E:.**"));
-			scLookup.put("O:", new Parser().parse("*U:+A:**"));
-			scLookup.put("M:", new Parser().parse("*S:+B:+T:**"));
-			scLookup.put("F:", new Parser().parse("*U:+A:+S:+B:+T:**"));
-			scLookup.put("I:", new Parser().parse("*E:+U:+A:+S:+B:+T:**"));	
+		}catch (Exception e) {
+			System.out.println("mapping failed: " + e.getMessage());
+		}
+	}
+	
+	public static HashMap<String, Node> aLookup = new HashMap<String, Node>();
+	static {
+		try {		
+			aLookup.put("O:", new Parser().parse("*U:+A:**"));
+			aLookup.put("M:", new Parser().parse("*S:+B:+T:**"));
+			aLookup.put("F:", new Parser().parse("*U:+A:+S:+B:+T:**"));
+			aLookup.put("I:", new Parser().parse("*E:+U:+A:+S:+B:+T:**"));	
 		}catch (Exception e) {
 			System.out.println("mapping failed: " + e.getMessage());
 		}
@@ -163,11 +176,9 @@ public class Parser {
 		}catch (Exception e) {
 			System.out.println("mapping failed: " + e.getMessage());
 		}
+		
+		initialised = true;
 	}
-	
-	
-	public static Character multiplication = '*';
-	public static Character addition = '+';	
 	
 	public static String run(String input) {
 		
@@ -372,11 +383,9 @@ public class Parser {
 		pop.AppendToName(c);
 		pop.layer = m_marks.get(c);
 		
-		String name = pop.GetName();
-		
-		if (scLookup.containsKey(name)) {
+		if (initialised && aLookup.containsKey(pop.GetName())) {
 			pop.opCode = addition;
-			pop.AddNodes(scLookup.get(pop.GetName()).nodes);
+			pop.AddNodes(aLookup.get(pop.GetName()).nodes);
 		}
 		
 		pop.ComputeTaille();
@@ -605,17 +614,8 @@ public class Parser {
 					
 					//sanity
 					if (!m_alphabet.containsKey(c))
-						throw new Exception("cannot compute ordre standard");
-					
+						throw new Exception("cannot compute ordre standard");					
 					taille = 1;				
-					if (c.equals('O'))
-						taille = 2;
-					if (c.equals('M'))
-						taille = 3;
-					if (c.equals('F'))
-						taille = 5;
-					if (c.equals('I'))
-						taille = 6;
 				}
 				else if (opCode == addition) {					
 					for (Node child : nodes) {
