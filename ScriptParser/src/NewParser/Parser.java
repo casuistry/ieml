@@ -120,7 +120,7 @@ public class Parser {
 	
 	public static HashMap<String, Node> scLookup = new HashMap<String, Node>();
 	static {
-		try {
+		try {		
 			scLookup.put("wo.", new Parser().parse("*U:U:E:.**"));
 			scLookup.put("wa.", new Parser().parse("*U:A:E:.**"));
 			scLookup.put("wu.", new Parser().parse("*A:U:E:.**"));
@@ -146,6 +146,10 @@ public class Parser {
 			scLookup.put("d.", new Parser().parse("*T:S:E:.**"));
 			scLookup.put("f.", new Parser().parse("*T:B:E:.**"));
 			scLookup.put("l.", new Parser().parse("*T:T:E:.**"));
+			scLookup.put("O:", new Parser().parse("*U:+A:**"));
+			scLookup.put("M:", new Parser().parse("*S:+B:+T:**"));
+			scLookup.put("F:", new Parser().parse("*U:+A:+S:+B:+T:**"));
+			scLookup.put("I:", new Parser().parse("*E:+U:+A:+S:+B:+T:**"));	
 		}catch (Exception e) {
 			System.out.println("mapping failed: " + e.getMessage());
 		}
@@ -367,6 +371,14 @@ public class Parser {
 		Node pop = stack.pop();	
 		pop.AppendToName(c);
 		pop.layer = m_marks.get(c);
+		
+		String name = pop.GetName();
+		
+		if (scLookup.containsKey(name)) {
+			pop.opCode = addition;
+			pop.AddNodes(scLookup.get(pop.GetName()).nodes);
+		}
+		
 		pop.ComputeTaille();
 		pushNode(pop);
 	}
@@ -379,7 +391,7 @@ public class Parser {
 		pop.AppendToName(c);
 		pop.layer = m_marks.get(c);
 		pop.opCode = multiplication;
-		pop.AddNode(scLookup.get(pop.GetName()));
+		pop.AddNodes(scLookup.get(pop.GetName()).nodes);
 		pop.ComputeTaille();
 		pushNode(pop);
 	}
@@ -605,13 +617,21 @@ public class Parser {
 					if (c.equals('I'))
 						taille = 6;
 				}
-				else if (opCode == addition) {
-					for (Node child : nodes)
-						taille += child.ComputeTaille();
+				else if (opCode == addition) {					
+					for (Node child : nodes) {
+						if (taille == -1)
+							taille = child.ComputeTaille();
+						else
+							taille += child.ComputeTaille();
+					}						
 				}
 				else if (opCode == multiplication) {
-					for (Node child : nodes)
-						taille *= child.ComputeTaille();
+					for (Node child : nodes) {
+						if (taille == -1)
+							taille = child.ComputeTaille();
+						else
+						    taille *= child.ComputeTaille();
+					}						
 				}
 				//sanity
 				else 
@@ -625,8 +645,16 @@ public class Parser {
 		
 		//=============================================
 			
-		public boolean IsLessThan(Node n) throws Exception{
+		public boolean IsLessThan(Node n) throws Exception {
+			Boolean res = isLessThan(n);
+			if (res == null)
+				throw new Exception("duplicate found " + GetName() + " and " + n.GetName());
+			return res;
+		}
+		
+		public Boolean isLessThan(Node n) throws Exception{
 			
+			//sanity
 			if (this.layer < 0 || n.layer < 0)
 				throw new Exception("negative layer values");
 			
@@ -639,42 +667,74 @@ public class Parser {
 			if (this.taille > n.taille)
 				throw new Exception("taille mismatch between " + GetName() + " and " + n.GetName());
 			
-			if (this.opCode == null) {
-				if (n.opCode == null) {
-					int a = m_alphabet.get(GetName().charAt(0));
-					int b = m_alphabet.get(n.GetName().charAt(0));
-					if (a == b)
-						throw new Exception("equality in IsLessThan");
-					if (a < b)
-						return true;
-					throw new Exception("alphanumeric mismatch between " + GetName() + " and " + n.GetName());
-				}
-				//sanity
-				throw new Exception("bad opCode in isLessThan"); 
-			}
-			else if (this.opCode.equals(multiplication) && n.opCode.equals(multiplication)) {
+			if (this.opCode == null && n.opCode == null) {
+				int a = m_alphabet.get(GetName().charAt(0));
+				int b = m_alphabet.get(n.GetName().charAt(0));
+				if (a == b)
+					return null;
+				if (a < b)
+					return true;
 				
-				return true;
+				//TODO: test case
+				throw new Exception("alphanumeric mismatch between " + GetName() + " and " + n.GetName());
+			}
+			else if (this.opCode == null && n.opCode != null) {
+				if (n.layer != 0)
+					//sanity
+					throw new Exception("layer mismatch");
+				
+				throw new Exception("not implemented yet null not null");
+			}
+			else if (this.opCode != null && n.opCode == null) {
+				if (this.layer != 0)
+					//sanity
+					throw new Exception("layer mismatch");
+				
+				throw new Exception("not implemented yet not null null");
+			}
+			else if (this.opCode.equals(multiplication) && n.opCode.equals(multiplication)) {				
+				for (int i = 0; i < 3; i++ ){
+					Boolean res = this.nodes.get(i).isLessThan(n.nodes.get(i));
+					if (res != null)
+						return res;
+				}
+				return null;
 			}
 			else if (this.opCode.equals(multiplication) && n.opCode.equals(addition)) {
 				
-				return true;
+				throw new Exception("not implemented yet m a");
 			}
 			else if (this.opCode.equals(addition) && n.opCode.equals(multiplication)) {
 				
-				return true;
+				throw new Exception("not implemented yet a m");
 			}
 			else if (this.opCode.equals(addition) && n.opCode.equals(addition)) {
 				
-				return true;
+				if (this.nodes.size() != n.nodes.size())
+					//TODO: test case
+					throw new Exception("not implemented yet size mismatch");
+				
+				for (int i = 0; i < nodes.size(); i++ ){
+					Boolean res = this.nodes.get(i).isLessThan(n.nodes.get(i));
+					if (res != null)
+						return res;
+				}				
+				return null;
 			}
 			
+			//sanity
 			throw new Exception("not implemented yet");
 		}
 		
 	
 		//=============================================
-				
+			
+		public void AddNodes(ArrayList<Node> list) throws Exception {
+			for (Node n : list){
+				AddNode(n);
+			}
+		}
+		
 		public void AddNode(Node n) throws Exception{		
 			n.SetParent(this);		
 			nodes.add(n);
