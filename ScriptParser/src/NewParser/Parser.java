@@ -710,16 +710,17 @@ public class Parser {
 			}
 			else if (this.opCode.equals(addition) && n.opCode.equals(addition)) {
 				
-				if (this.nodes.size() != n.nodes.size())
-					//TODO: test case
-					throw new Exception("not implemented yet size mismatch");
-				
-				for (int i = 0; i < nodes.size(); i++ ){
+				int min = this.nodes.size() < n.nodes.size() ? this.nodes.size() : n.nodes.size();
+
+				for (int i = 0; i < min; i++ ){
 					Boolean res = this.nodes.get(i).isLessThan(n.nodes.get(i));
 					if (res != null)
 						return res;
-				}				
-				return null;
+				}
+				
+				if (this.nodes.size() == n.nodes.size()) 
+					return null;
+				return (this.nodes.size() < n.nodes.size());
 			}
 			
 			//sanity

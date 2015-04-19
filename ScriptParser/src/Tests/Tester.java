@@ -22,19 +22,19 @@ public class Tester {
 		ArrayList<String> list = new ArrayList<String>();
 
 		list.addAll(Arrays.asList(
-				"*(E:+S:+B:)(S:+B:+T:)E:.+M:M:E:.**", 						//ok
-				"*(S:+B:+T:)(S:+B:+T:)E:.+(S:+O:)(S:+B:+T:)E:.**", 		//has to fail, ?
-				"*(S:+B:+T:)(S:+B:+T:)E:.+(S:+B:+T:)(S:+B:+T:)E:.**", 		//has to fail, ok
-				"*O:+B:**",													//has to fail, ok
-				"*T:+i.**", 												//has to fail, ok
-				"*S:B:i.**", 												//has to fail - ok
-				"*h.i.g.d.S:B:T:.**",										//has to fail - ok
-				"*h.S:B:T:.h.-**",											//has to pass - ok
-				"*S:+S:**",													//has to fail - ok
-				"*we.+we.**",												//has to fail - ok
-				"*O:B:(S:+A:)B:S:**"										//has to fail - ok
+				//"*(E:+S:+B:)(S:+B:+T:)E:.+M:M:E:.**", 						//ok
+				//"*(S:+B:+T:)(S:+B:+T:)E:.+(S:+O:)(S:+B:+T:)E:.**", 		    //has to fail, ?
+				//"*(S:+B:+T:)(S:+B:+T:)E:.+(S:+B:+T:)(S:+B:+T:)E:.**", 		//has to fail, ok
+				"*O:+B:**"													//has to fail, ok
+				//"*T:+i.**", 												//has to fail, ok
+				//"*S:B:i.**", 												//has to fail - ok
+				//"*h.i.g.d.S:B:T:.**",										//has to fail - ok
+				//"*h.S:B:T:.h.-**",											//has to pass - ok
+				//"*S:+S:**",													//has to fail - ok
+				//"*we.+we.**",												//has to fail - ok
+				//"*O:B:(S:+A:)B:S:**"										//has to fail - ok
 				));
-
+/*
 		list.add(ScriptExamples.StudentLearnsMathematics);
 		list.add(ScriptExamples.CesJeux);
 		list.add(ScriptExamples.JeSaurai);
@@ -47,7 +47,7 @@ public class Tester {
 		for (String s:TermInterface.LoadDictionary(null).keySet()){
 			list.add("*"+s+"**");
 		}
-
+*/
 	
 		for (String s:list){
 			String r = Parser.run(s);
