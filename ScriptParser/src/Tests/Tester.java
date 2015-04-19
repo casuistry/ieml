@@ -27,8 +27,9 @@ public class Tester {
 				"*S:B:i.**", 					//has to fail - ok
 				"*h.i.g.d.S:B:T:.**",			//has to fail - ok
 				"*h.S:B:T:.h.-**",				//has to pass - ok
+				"*S:+S:**",						//has to fail - ok
 				"*wo.+wa.+we.+we.**",			//has to fail - ok
-				"*O:B:S:+A:B:S:**"				//has to fail - ok
+				"*O:B:(S:+A:)B:S:**"			//has to fail - ok
 				));
 
 		list.add(ScriptExamples.StudentLearnsMathematics);

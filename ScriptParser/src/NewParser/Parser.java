@@ -367,7 +367,7 @@ public class Parser {
 		Node pop = stack.pop();	
 		pop.AppendToName(c);
 		pop.layer = m_marks.get(c);
-		pop.ComputeOrder();
+		pop.ComputeTaille();
 		pushNode(pop);
 	}
 	private void a_sc_f(Character c) throws Exception{ 
@@ -380,7 +380,7 @@ public class Parser {
 		pop.layer = m_marks.get(c);
 		pop.opCode = multiplication;
 		pop.AddNode(scLookup.get(pop.GetName()));
-		pop.ComputeOrder();
+		pop.ComputeTaille();
 		pushNode(pop);
 	}
 	private void a_ws_sc(Character c) throws Exception{ 		
@@ -431,7 +431,7 @@ public class Parser {
 			newNode.AddNode(emptyLookup.get(newNode.layer-1));			
 
 		newNode.AppendToName(c);		
-		newNode.ComputeOrder();		
+		newNode.ComputeTaille();		
 		pushNode(newNode);
 	}
 	
@@ -549,54 +549,6 @@ public class Parser {
 		
 		newNode.AddNode(n);
 		stack.push(newNode);
-
-		
-		/*
-		if (stack.peek() == null) {
-			stack.pop(); //eat
-			Node prev = stack.pop();
-			
-			if (n.layer == prev.layer){
-				Node newNode;
-				if (prev.opCode == addition){
-					newNode = prev;
-				}
-				else {
-					newNode = new Node(null, addition, n.layer);
-					newNode.AppendToName(prev.GetName());
-					newNode.AddNode(prev);
-				}
-				
-				newNode.AppendToName(addition);
-				newNode.AppendToName(n.GetName());
-				
-				//check if order is respected
-				ArrayList<Node> children = newNode.nodes;
-				Node lastChild = children.get(children.size()-1);	
-				
-				//TODO:testcase
-				if (!lastChild.IsLessThan(n))
-					throw new Exception("standard order is not respected");
-				
-				//TODO:testcase
-				for (Node child : children){
-					if (child.GetName().equals(n.GetName()))
-						throw new Exception("duplicate in additive relation");
-				}
-
-				newNode.AddNode(n);
-				stack.push(newNode);
-			}
-			else {
-				stack.push(prev);
-				stack.push(null);
-				stack.push(n);
-			}
-		}
-		else {
-			stack.push(n);
-		}
-		*/
 	}
 	
 	public static String getEmptySequence(int l) {
@@ -606,29 +558,14 @@ public class Parser {
 		for (int i = 0; i <= l; i++)
 			builder.append(c_marks.get(i));
 		builder.append("**");
-		return builder.toString();
-			
-		/*
-		if (l == 0)
-			return "E" + c_marks.get(0);
-		else 
-		{
-			StringBuilder builder = new StringBuilder();
-			builder.append(getEmptySequence(l-1));
-			builder.append(getEmptySequence(l-1));
-			builder.append(getEmptySequence(l-1));
-			builder.append(c_marks.get(l));
-			return builder.toString();
-		}	
-		*/			
+		return builder.toString();		
 	}
 	
 	public class Node {
 		
 		private int layer = -1;
 		private int taille = -1;
-		private int alphanum = -1;
-		private boolean isOrdered = false;
+		private boolean isTailleComputed = false;
 		
 		private StringBuilder name = null;			
 		public ArrayList<Node> nodes = new ArrayList<Node>();	
@@ -637,7 +574,8 @@ public class Parser {
 		
 		public Node(Character c){
 			name = new StringBuilder();
-			name.append(c);
+			if (c != null)
+				name.append(c);
 		}
 		
 		public Node(Character c, Character operator, int l){
@@ -646,175 +584,95 @@ public class Parser {
 			layer = l;
 		}
 		
-		public void ComputeOrder() throws Exception {
+		public int ComputeTaille() throws Exception {
 			
-			if (isOrdered)
-				return;
-			
-			if (nodes.isEmpty()){
-				Character c = GetName().charAt(0);
+			if (!isTailleComputed) {
 				
+				if (nodes.isEmpty()){
+					Character c = GetName().charAt(0);
+					
+					//sanity
+					if (!m_alphabet.containsKey(c))
+						throw new Exception("cannot compute ordre standard");
+					
+					taille = 1;				
+					if (c.equals('O'))
+						taille = 2;
+					if (c.equals('M'))
+						taille = 3;
+					if (c.equals('F'))
+						taille = 5;
+					if (c.equals('I'))
+						taille = 6;
+				}
+				else if (opCode == addition) {
+					for (Node child : nodes)
+						taille += child.ComputeTaille();
+				}
+				else if (opCode == multiplication) {
+					for (Node child : nodes)
+						taille *= child.ComputeTaille();
+				}
 				//sanity
-				if (!m_alphabet.containsKey(c))
-					throw new Exception("cannot compute ordre standard");
+				else 
+					throw new Exception("undefined opCode");
 				
-				alphanum = m_alphabet.get(c);
-				taille = 1;				
-				if (c.equals('O'))
-					taille = 2;
-				if (c.equals('M'))
-					taille = 3;
-				if (c.equals('F'))
-					taille = 5;
-				if (c.equals('I'))
-					taille = 6;
-			}
-			else{
-				
+				isTailleComputed = true;
 			}
 			
-			isOrdered = true;
-		}
-		
-		public void UpdateOrdre(Character c) throws Exception {
-			if (m_vowels.containsKey(c)){
-				if (c.equals('o'))
-					alphanum = c_smallCapOrdered.indexOf("wo");
-				if (c.equals('a'))
-					alphanum = c_smallCapOrdered.indexOf("wa");
-				if (c.equals('u'))
-					alphanum = c_smallCapOrdered.indexOf("wu");
-				if (c.equals('e'))
-					alphanum = c_smallCapOrdered.indexOf("we");
-			}
-			else 
-				throw new Exception("cannot call UpdateOrdre here");
-		}
-		
-		public void ComputeStandardOrder() {
-			
-			if (nodes.isEmpty()) {
-				
-			}
-			else {
-				
-			}
-		}
-		//=============================================
-		
-		//recursively get all nodes of layer 0
-		public ArrayList<Node> GetComponents() {
-			ArrayList<Node> result = new ArrayList<Node>();
-			if (layer == 0)
-				result.add(this);
-			else {
-				for (Node n : nodes){
-					result.addAll(n.GetComponents());
-				}
-			}
-			return result;	
+			return taille;
 		}
 		
 		//=============================================
-		
-		public Boolean LessThanOrder(Node n) throws Exception{		
 			
-			if (this.layer < 0)
-				throw new Exception("cannot compare: negative layer value in this node");
-			if (n.layer < 0)
-				throw new Exception("cannot compare: negative layer value in other node");
-			if (this.layer != n.layer)
-				throw new Exception("cannot compare: layer mismatch");
-			
-			boolean pThis = this.layer == 0 && this.nodes.size() == 0;
-			boolean pOther = n.layer == 0 && n.nodes.size() == 0;			
-			if (pThis && !pOther || !pThis && pOther)
-				throw new Exception("cannot compare: primitive layer mismatch");
-			
-			if (pThis && pOther) 
-				return this.lessThan(n);
-			else {
-				
-				if (this.opCode == null)
-					throw new Exception("cannot compare: null opcode in this node");
-				if (n.opCode == null)
-					throw new Exception("cannot compare: null opcode in other node");
-								
-				boolean opcodeThis = this.opCode == multiplication;
-				boolean opcodeOther = n.opCode == multiplication;
-				
-				Boolean childResult = null;
-				
-				if (opcodeThis && opcodeOther) {				
-					for (int i = 0; i < this.nodes.size(); i++){
-						childResult &= this.nodes.get(i).LessThanOrder(n.nodes.get(i));
-					}
-					
-				}
-				else if (opcodeThis && !opcodeOther || !opcodeThis && opcodeOther) {
-					
-				}
-				else { //both are in addition
-					
-				}
-				
-				return childResult;
-			}
-		}
-		
 		public boolean IsLessThan(Node n) throws Exception{
 			
 			if (this.layer < 0 || n.layer < 0)
 				throw new Exception("negative layer values");
 			
-			ArrayList<Node> thisNode = this.GetComponents();
-			ArrayList<Node> otherNode = n.GetComponents();
-			
-/*
-			System.out.println("this: " + this.GetName());
-			for (Node child : thisNode)
-				System.out.print(child.GetName() + " ");
-			System.out.println();
-			System.out.println("other:" + n.GetName());
-			for (Node child : otherNode)
-				System.out.print(child.GetName() + " ");
-			System.out.println();
-*/
-			
-			//if (thisNode.size() != otherNode.size())
-			//	throw new Exception("cannot compute order for this");
-			
-			for (int i = 0; i < thisNode.size(); i++) {
-				Boolean result = thisNode.get(i).lessThan(otherNode.get(i));
-				if (result == null)
-					continue;
-				if (result)
-					return true;
-			}
-
-			return false;
-		}
-		
-		private Boolean lessThan(Node n){
 			if (this.layer < n.layer)
 				return true;
-			else if (this.layer > n.layer)
-				return false;
-			else {
-				if (this.taille < n.taille)
-					return true;
-				else if (this.taille > n.taille)
-					return false;
-				else {
-					if (this.alphanum < n.alphanum)
+			if (this.layer > n.layer)
+				throw new Exception("layer mismatch between " + GetName() + " and " + n.GetName());
+			if (this.taille < n.taille)
+				return true;
+			if (this.taille > n.taille)
+				throw new Exception("taille mismatch between " + GetName() + " and " + n.GetName());
+			
+			if (this.opCode == null) {
+				if (n.opCode == null) {
+					int a = m_alphabet.get(GetName().charAt(0));
+					int b = m_alphabet.get(n.GetName().charAt(0));
+					if (a == b)
+						throw new Exception("equality in IsLessThan");
+					if (a < b)
 						return true;
-					if (this.alphanum > n.alphanum)
-						return false;
-					return null;					
+					throw new Exception("alphanumeric mismatch between " + GetName() + " and " + n.GetName());
 				}
+				//sanity
+				throw new Exception("bad opCode in isLessThan"); 
 			}
+			else if (this.opCode.equals(multiplication) && n.opCode.equals(multiplication)) {
+				
+				return true;
+			}
+			else if (this.opCode.equals(multiplication) && n.opCode.equals(addition)) {
+				
+				return true;
+			}
+			else if (this.opCode.equals(addition) && n.opCode.equals(multiplication)) {
+				
+				return true;
+			}
+			else if (this.opCode.equals(addition) && n.opCode.equals(addition)) {
+				
+				return true;
+			}
+			
+			throw new Exception("not implemented yet");
 		}
 		
+	
 		//=============================================
 				
 		public void AddNode(Node n) throws Exception{		
