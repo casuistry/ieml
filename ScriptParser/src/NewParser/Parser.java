@@ -10,8 +10,6 @@ import TopDown.Node;
 
 public class Parser {
 	
-	private static boolean initialised = false;
-	
 	public static Character multiplication = '*';
 	public static Character addition = '+';	
 	
@@ -156,6 +154,9 @@ public class Parser {
 		}
 	}
 	
+	/*
+	 * do not expand these, see emails with Pierre
+	 * 
 	public static HashMap<String, Node> aLookup = new HashMap<String, Node>();
 	static {
 		try {		
@@ -167,6 +168,7 @@ public class Parser {
 			System.out.println("mapping failed: " + e.getMessage());
 		}
 	}
+	*/
 	
 	public static HashMap<Integer, Node> emptyLookup = new HashMap<Integer, Node>();
 	static {
@@ -176,8 +178,6 @@ public class Parser {
 		}catch (Exception e) {
 			System.out.println("mapping failed: " + e.getMessage());
 		}
-		
-		initialised = true;
 	}
 	
 	public static String run(String input) {
@@ -381,13 +381,7 @@ public class Parser {
 		//This is a node of layer 0.		
 		Node pop = stack.pop();	
 		pop.AppendToName(c);
-		pop.layer = m_marks.get(c);
-		
-		if (initialised && aLookup.containsKey(pop.GetName())) {
-			pop.opCode = addition;
-			pop.AddNodes(aLookup.get(pop.GetName()).nodes);
-		}
-		
+		pop.layer = m_marks.get(c);	
 		pop.ComputeTaille();
 		pushNode(pop);
 	}
@@ -673,8 +667,7 @@ public class Parser {
 				if (a == b)
 					return null;
 				if (a < b)
-					return true;
-				
+					return true;				
 				//TODO: test case
 				throw new Exception("alphanumeric mismatch between " + GetName() + " and " + n.GetName());
 			}
@@ -709,7 +702,7 @@ public class Parser {
 				throw new Exception("not implemented yet a m");
 			}
 			else if (this.opCode.equals(addition) && n.opCode.equals(addition)) {
-				
+				/*
 				int min = this.nodes.size() < n.nodes.size() ? this.nodes.size() : n.nodes.size();
 
 				for (int i = 0; i < min; i++ ){
@@ -721,6 +714,9 @@ public class Parser {
 				if (this.nodes.size() == n.nodes.size()) 
 					return null;
 				return (this.nodes.size() < n.nodes.size());
+				*/
+				throw new Exception("not implemented yet addition");
+				
 			}
 			
 			//sanity
