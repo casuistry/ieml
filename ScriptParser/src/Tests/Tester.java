@@ -20,7 +20,7 @@ public class Tester {
 		//baseTester.RunTest(null, 6, new BaseIEMLProvider(), null, null);
 		
 		ArrayList<String> list = new ArrayList<String>();
-		
+/*		
 		list.addAll(Arrays.asList(
 				"*(E:+S:+B:)(S:+B:+T:)E:.+M:M:E:.**", 						//ok
 				"*(S:+B:+T:)(S:+B:+T:)E:.+(S:+O:)(S:+B:+T:)E:.**", 		    //has to fail, ?
@@ -41,10 +41,12 @@ public class Tester {
 		list.add(ScriptExamples.NeSaurontPas);
 		list.add(ScriptExamples.UnCoteurraconteUneHistoire);
 		list.add(ScriptExamples.EnfantDeMaVoisine);
-		list.add(ScriptExamples.EnfantDeMaVoisin1);
+		list.add(ScriptExamples.EnfantDeMaVoisin1);*/
+		list.add(ScriptExamples.ieml1);
+		list.add(ScriptExamples.ieml2);
 		
 		for (String s:TermInterface.LoadDictionary(null).keySet()){
-			list.add("*"+s+"**");
+			//list.add("*"+s+"**");
 		}
 
 	
