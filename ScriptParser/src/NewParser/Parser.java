@@ -22,7 +22,7 @@ public class Parser {
 	public static List<Character> c_marks    = Arrays.asList(new Character[]{':', '.', '-', '’', ',', '_', ';'});
 	public static List<Character> c_star     = Arrays.asList(new Character[]{'*'});
 	
-	public static List<String> c_smallCapOrdered = Arrays.asList(new String[]{"wo", "wa","y","o","e","wu","we","u","a","i","j","g","s","b","t","h","c","k","m","n","p","x","d","f","l"});
+	//public static List<String> c_smallCapOrdered = Arrays.asList(new String[]{"wo", "wa","y","o","e","wu","we","u","a","i","j","g","s","b","t","h","c","k","m","n","p","x","d","f","l"});
 	
 	public enum States {
 		
@@ -330,6 +330,7 @@ public class Parser {
 				a_ws_sc(c);						
 				break;
 			default:
+				//sanity
 				throw new Exception("undefined transition from "+currentState+" to "+next);		
 		}
 		
@@ -582,11 +583,11 @@ public class Parser {
 	
 	public class Node {
 		
-		private int layer = -1;
-		private int taille = -1;
-		private boolean isTailleComputed = false;
+		public int layer = -1;
+		public int taille = -1;
+		public boolean isTailleComputed = false;
 		
-		private StringBuilder name = null;			
+		public StringBuilder name = null;			
 		public ArrayList<Node> nodes = new ArrayList<Node>();	
 		public Node parent = null;
 		public Character opCode = null;
