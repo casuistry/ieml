@@ -184,6 +184,10 @@ public class Tokenizer {
 	
 	protected void reset() {}
 	
+	public States GetCurrentState() {
+		return currentState;
+	}
+	
 	public int GetCounter(){
 		return counter;
 	}

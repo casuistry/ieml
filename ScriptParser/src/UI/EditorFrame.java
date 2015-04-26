@@ -9,8 +9,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 
-import NewParser.Parser;
-import NewParser.Parser.States;
+import NewParser.ParserImpl;
+import NewParser.Tokenizer;
 
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
@@ -32,7 +32,7 @@ public class EditorFrame extends JFrame {
     private JLabel iemlText;
     private JButton clearButton;
     HashMap<Character, JButton> buttons = new HashMap<Character, JButton>();
-    Parser parser = new Parser();
+    ParserImpl parser = new ParserImpl();
     private JPanel panel_1;
     private JLabel errorText;
     
@@ -85,7 +85,7 @@ public class EditorFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				iemlText.setText("");
 				errorText.setText("");
-				parser = new Parser();
+				parser = new ParserImpl();
 				
 				try {		
 					computeEnabled();			
@@ -96,13 +96,13 @@ public class EditorFrame extends JFrame {
 		});
 		
 		List<Character> list = new ArrayList<Character>();
-		list.addAll(Parser.c_star);			
-		list.addAll(Parser.c_addOp);		
-		list.addAll(Parser.c_wLetter);		
-		list.addAll(Parser.c_alphabet);		
-		list.addAll(Parser.c_smallCap);
-		list.addAll(Parser.c_marks);
-		list.addAll(Parser.c_ignore);
+		list.addAll(Tokenizer.c_star);			
+		list.addAll(Tokenizer.c_addOp);		
+		list.addAll(Tokenizer.c_wLetter);		
+		list.addAll(Tokenizer.c_alphabet);		
+		list.addAll(Tokenizer.c_smallCap);
+		list.addAll(Tokenizer.c_marks);
+		list.addAll(Tokenizer.c_ignore);
 		
 
 		for (int i = 0; i < list.size(); i++) {
@@ -140,15 +140,15 @@ public class EditorFrame extends JFrame {
 
 		ArrayList<Character> l = new ArrayList<Character>();
 		
-		switch (/*parser.GetCurrentState()*/States.state_a) {
+		switch (parser.GetCurrentState()) {
 		case state_a:
-			next(Parser.c_marks.get(0));
+			next(Tokenizer.c_marks.get(0));
 			return;
 		case state_d:
-			l.addAll(Parser.c_wLetter);		
-			l.addAll(Parser.c_alphabet);		
-			l.addAll(Parser.c_smallCap);
-			l.addAll(Parser.c_ignore);
+			l.addAll(Tokenizer.c_wLetter);		
+			l.addAll(Tokenizer.c_alphabet);		
+			l.addAll(Tokenizer.c_smallCap);
+			l.addAll(Tokenizer.c_ignore);
 			break;
 		case state_done:
 			break; //nothing to add
@@ -156,8 +156,8 @@ public class EditorFrame extends JFrame {
 			
 			Integer prev = null; //parser.getPreviousLM();
 			
-			l.addAll(Parser.c_addOp);	
-			l.addAll(Parser.c_ignore);
+			l.addAll(Tokenizer.c_addOp);	
+			l.addAll(Tokenizer.c_ignore);
 			
 			/*if (parser.canMultiplyNode()){
 				if (parser.canAddLayer(0))
@@ -167,32 +167,32 @@ public class EditorFrame extends JFrame {
 					l.addAll(Parser.c_smallCap);
 				}
 			}	*/		
-			if (prev != null && prev == Parser.c_marks.size()-1) {
-				next(Parser.c_star.get(0));
+			if (prev != null && prev == Tokenizer.c_marks.size()-1) {
+				next(Tokenizer.c_star.get(0));
 				return;
 			}
-			if (prev != null && prev < Parser.c_marks.size()-1) 
-				l.add(Parser.c_marks.get(prev+1));
+			if (prev != null && prev < Tokenizer.c_marks.size()-1) 
+				l.add(Tokenizer.c_marks.get(prev+1));
 			/*if (parser.canMovePost())
 				l.addAll(Parser.c_star);*/
 			break;
 		case state_i:
-			l.addAll(Parser.c_wLetter);		
-			l.addAll(Parser.c_alphabet);		
-			l.addAll(Parser.c_smallCap);
-			l.addAll(Parser.c_ignore);
+			l.addAll(Tokenizer.c_wLetter);		
+			l.addAll(Tokenizer.c_alphabet);		
+			l.addAll(Tokenizer.c_smallCap);
+			l.addAll(Tokenizer.c_ignore);
 			break;
 		case state_post:
-			next(Parser.c_star.get(0));
+			next(Tokenizer.c_star.get(0));
 			return;
 		case state_pre:
-			l.addAll(Parser.c_star);
+			l.addAll(Tokenizer.c_star);
 			break;
 		case state_sc:
-			next(Parser.c_marks.get(1));
+			next(Tokenizer.c_marks.get(1));
 			return;
 		case state_ws:
-			l.addAll(Parser.c_vowels);
+			l.addAll(Tokenizer.c_vowels);
 			break;
 		default:
 			throw new Exception("undefined state " /*+ parser.GetCurrentState().getFieldDescription()*/);
