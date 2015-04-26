@@ -200,7 +200,7 @@ public class ParserImpl extends Tokenizer {
 		stack.push(new Token(c));	
 	}
 	
-	//check if we can addition
+	//check if we can do addition
 	private void pushNode(Token n) throws Exception{
 
 		//sanity
@@ -242,7 +242,6 @@ public class ParserImpl extends Tokenizer {
 		newNode.AppendToName(addition);
 		newNode.AppendToName(n.GetName());
 		
-		//check if order is respected
 		ArrayList<Token> children = newNode.nodes;
 		Token lastChild = children.get(children.size()-1);	
 		
@@ -250,7 +249,112 @@ public class ParserImpl extends Tokenizer {
 		if (!lastChild.EvaluateOrder(n))
 			throw new Exception("standard order is not respected");
 		
+		//TODO: test cases
+		CheckExclusions(children, n);
+		
 		newNode.AddNode(n);
 		stack.push(newNode);
+	}
+	
+	private void CheckExclusions(ArrayList<Token> tokens, Token newToken) throws Exception {
+		if (newToken.layer == 0) {
+			Character c = newToken.GetName().charAt(0);
+			if (Tokenizer.m_alphabet.containsKey(c)) {
+				if (c.equals('I')){
+					if (tokens.size() != 0)
+						throw new Exception("cannot establish additive relation");
+				}
+				if (c.equals('F')){
+					if (tokens.size() != 0)
+						throw new Exception("cannot establish additive relation");					
+				}
+				if (c.equals('M')){
+					for (Token t : tokens) {
+						Character _c = t.GetName().charAt(0);
+						if (_c.equals('S') || _c.equals('B') || _c.equals('T'))
+							throw new Exception("M already contains previous characters");
+					}										
+				}
+				if (c.equals('O')){
+					for (Token t : tokens) {
+						Character _c = t.GetName().charAt(0);
+						if (_c.equals('U') || _c.equals('A') )
+							throw new Exception("O already contains previous characters");
+					}										
+				}
+				if (c.equals('S')){
+					boolean mutex = false;
+					for (Token t : tokens) {
+						Character _c = t.GetName().charAt(0);
+						if (_c.equals('M'))
+							throw new Exception("S contained in previous character");
+						if (_c.equals('B')) {
+							if (mutex)
+								throw new Exception("abbreviation needed");
+							mutex = true;
+						}
+						if (_c.equals('T')) {
+							if (mutex)
+								throw new Exception("abbreviation needed");
+							mutex = true;
+						}
+					}										
+				}
+				if (c.equals('B')){
+					boolean mutex = false;
+					for (Token t : tokens) {
+						Character _c = t.GetName().charAt(0);
+						if (_c.equals('M'))
+							throw new Exception("B contained in previous character");
+						if (_c.equals('S')) {
+							if (mutex)
+								throw new Exception("abbreviation needed");
+							mutex = true;
+						}
+						if (_c.equals('T')) {
+							if (mutex)
+								throw new Exception("abbreviation needed");
+							mutex = true;
+						}
+					}										
+				}
+				if (c.equals('T')){
+					boolean mutex = false;
+					for (Token t : tokens) {
+						Character _c = t.GetName().charAt(0);
+						if (_c.equals('M'))
+							throw new Exception("T contained in previous character");
+						if (_c.equals('S')) {
+							if (mutex)
+								throw new Exception("abbreviation needed");
+							mutex = true;
+						}
+						if (_c.equals('B')) {
+							if (mutex)
+								throw new Exception("abbreviation needed");
+							mutex = true;
+						}
+					}										
+				}
+				if (c.equals('U')){
+					for (Token t : tokens) {
+						Character _c = t.GetName().charAt(0);
+						if (_c.equals('O'))
+							throw new Exception("U contained in previous character");
+						if (_c.equals('A')) 
+							throw new Exception("abbreviation needed");
+					}										
+				}
+				if (c.equals('A')){
+					for (Token t : tokens) {
+						Character _c = t.GetName().charAt(0);
+						if (_c.equals('O'))
+							throw new Exception("A contained in previous character");
+						if (_c.equals('U')) 
+							throw new Exception("abbreviation needed");
+					}										
+				}
+			}
+		}
 	}
 }

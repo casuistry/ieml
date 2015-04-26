@@ -241,7 +241,6 @@ public class Token {
 		return parent;
 	}
 			
-	//Readable representation of a node and its children in a list-form
 	public void PrintNodes(String prepend){
 		
 		StringBuilder builder = new StringBuilder("[" + name.toString());
