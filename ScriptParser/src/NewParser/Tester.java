@@ -1,12 +1,9 @@
-package Tests;
+package NewParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import IEMLInterface.ScriptExamples;
 import IEMLInterface.TermInterface;
-import NewParser.ParserImpl;
-import NewParser.Token;
 
 
 public class Tester {

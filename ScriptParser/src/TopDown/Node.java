@@ -6,7 +6,6 @@ import java.util.PriorityQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import IEMLInterface.IEMLLang;
-import Inspector.BaseInspector;
 import Structures.CompMatch;
 import Structures.Counter;
 import Structures.Utilities;
@@ -124,21 +123,6 @@ public class Node {
 		return layer;
 	}
 	
-	//Readable representation of a node and its children in a list-form
-	public void PrintNodes(String prepend, BaseInspector inspector){
-		
-		String toPrint = inspector.Inspect(this);
-		
-		if (toPrint != null){
-			System.out.println(prepend + toPrint);
-		}
-
-		if (nodes != null) {
-			for(Node node : nodes){
-				node.PrintNodes(prepend+"\t", inspector);
-			}
-		}		
-	}
 		
 	//-----------------------------------------other methods----------------------------------- 
     

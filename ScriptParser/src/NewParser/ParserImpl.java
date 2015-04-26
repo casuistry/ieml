@@ -92,12 +92,6 @@ public class ParserImpl extends Tokenizer {
 			throw new Exception("must use vowel");				
 		stack.peek().AppendToName(c);
 	}
-	
-	//checks if layer mark is ok
-	//finds up to 3 nodes in multiplication relation (siblings)
-	//creates a new parent multiplication node and ads children
-	//fills with Empty as needed
-	//triggers more processing if required
 	protected void a_f_f(Character c) throws Exception{
 		
 		Token tempNode = stack.peek();
@@ -146,9 +140,6 @@ public class ParserImpl extends Tokenizer {
 	
 	//==================================================================================
 	
-	//node will be in additive relation
-	//check if layers match
-	//no further processing, need layer mark
 	private void pushNodeFromAdd(Character c) throws Exception{
 		//sanity
 		if (stack.isEmpty()) 
@@ -167,10 +158,6 @@ public class ParserImpl extends Tokenizer {
 		stack.push(new Token(c));
 	}
 	
-	//node will be in multiplicative relation
-	//check if layers match
-	//check if not too many nodes in relation already
-	//no further processing, need layer mark
 	private void pushNodeFromFinal(Character c) throws Exception{	
 		
 		//sanity
@@ -200,7 +187,6 @@ public class ParserImpl extends Tokenizer {
 		stack.push(new Token(c));	
 	}
 	
-	//check if we can do addition
 	private void pushNode(Token n) throws Exception{
 
 		//sanity
