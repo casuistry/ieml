@@ -16,11 +16,11 @@
 		Token n = parser.parse(s);				
 	} catch (Exception e) {
 		builder.append(e.getMessage()+":<br>");
-		builder.append(s+"<br>");
+		builder.append("<span>"+s+"</span><br>");
 		
-		for (int i = 0 ; i < parser.GetCounter(); i++)
-			builder.append(" ");
-		builder.append("<br>^<br>");
+		//for (int i = 0 ; i < parser.GetCounter(); i++)
+		builder.append("<span style=\"color: white\">"+s.substring(0,parser.GetCounter())+"</span>^<br>");
+		
 		//System.out.println(builder.toString());
 	}		
 	finally {
