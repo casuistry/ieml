@@ -15,8 +15,8 @@
  try {				
 		Token n = parser.parse(s);				
 	} catch (Exception e) {
-		System.out.println(e.getMessage());
-		System.out.println(s);
+		builder.append(e.getMessage()+":");
+		builder.append(s);
 		
 		for (int i = 0 ; i < parser.GetCounter(); i++)
 			builder.append(" ");
