@@ -19,8 +19,8 @@
 		builder.append(s+"<br>");
 		
 		for (int i = 0 ; i < parser.GetCounter(); i++)
-			builder.append(" <br>");
-		builder.append("^<br>");
+			builder.append(" ");
+		builder.append("<br>^<br>");
 		//System.out.println(builder.toString());
 	}		
 	finally {
