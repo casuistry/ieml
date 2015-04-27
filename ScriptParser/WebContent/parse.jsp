@@ -15,12 +15,12 @@
  try {				
 		Token n = parser.parse(s);				
 	} catch (Exception e) {
-		builder.append(e.getMessage()+":");
-		builder.append(s);
+		builder.append(e.getMessage()+":<br>");
+		builder.append(s+"<br>");
 		
 		for (int i = 0 ; i < parser.GetCounter(); i++)
-			builder.append(" ");
-		builder.append("^");
+			builder.append(" <br>");
+		builder.append("^<br>");
 		//System.out.println(builder.toString());
 	}		
 	finally {
