@@ -15,7 +15,7 @@ public class Tokenizer {
 	public static List<Character> c_ignore   = Arrays.asList(new Character[]{'(',')',' '});
 	public static List<Character> c_wLetter  = Arrays.asList(new Character[]{'w'});
 	public static List<Character> c_addOp    = Arrays.asList(new Character[]{'+'});
-	public static List<Character> c_marks    = Arrays.asList(new Character[]{':', '.', '-', '’', ',', '_', ';'});
+	public static List<Character> c_marks    = Arrays.asList(new Character[]{':', '.', '-', '\'', ',', '_', ';'});
 	public static List<Character> c_star     = Arrays.asList(new Character[]{'*'});
 
 	public enum States {
