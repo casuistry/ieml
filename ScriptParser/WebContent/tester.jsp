@@ -15,10 +15,12 @@ require([
          'dojo/dom-construct',
          'dojo/_base/lang',
          'dojo/_base/connect',
-          'dojo/_base/xhr'
+         'dojo/_base/xhr',
+         'dojo/domReady!'
          
      ], function (dom, domConstruct, lang, connect,xhr) {
-	var form = dom.byId("myform");
+	
+		var form = dom.byId("myform");
 
 	  dojo.connect(form, "onsubmit", function(event){
 	    // Stop the submit event since we want to control form submission.
