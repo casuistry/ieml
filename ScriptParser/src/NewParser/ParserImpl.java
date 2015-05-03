@@ -19,9 +19,12 @@ public class ParserImpl extends Tokenizer {
 		}
 		
 		//TODO: test case
-		if (currentState != States.state_done) {
+		if (currentState != States.state_f) 
 			throw new Exception("bad final state, missing *");
-		}
+		
+		//TODO:test case
+		if (stack.size() > 1)
+			throw new Exception("missing layer mark?");
 		
 		return stack.pop();
 	}
@@ -140,12 +143,6 @@ public class ParserImpl extends Tokenizer {
 		newNode.ComputeTaille();	
 		
 		pushNode(newNode);
-	}
-	
-	protected void a_f_p(Character c) throws Exception{
-		//TODO:test case
-		if (stack.size() > 1)
-			throw new Exception("missing layer mark?");
 	}
 	
 	//==================================================================================
@@ -270,7 +267,7 @@ public class ParserImpl extends Tokenizer {
 						if (_c.equals('S') || _c.equals('B') || _c.equals('T'))
 							throw new Exception("M already contains previous characters");
 						if (_c.equals('O'))
-							throw new Exception("abbreviation needed");
+							throw new Exception("abbreviation needed F");
 					}										
 				}
 				if (c.equals('O')){
@@ -288,12 +285,12 @@ public class ParserImpl extends Tokenizer {
 							throw new Exception("S contained in previous character");
 						if (_c.equals('B')) {
 							if (mutex)
-								throw new Exception("abbreviation needed");
+								throw new Exception("abbreviation needed M");
 							mutex = true;
 						}
 						if (_c.equals('T')) {
 							if (mutex)
-								throw new Exception("abbreviation needed");
+								throw new Exception("abbreviation needed M");
 							mutex = true;
 						}
 					}										
@@ -306,12 +303,12 @@ public class ParserImpl extends Tokenizer {
 							throw new Exception("B contained in previous character");
 						if (_c.equals('S')) {
 							if (mutex)
-								throw new Exception("abbreviation needed");
+								throw new Exception("abbreviation needed M");
 							mutex = true;
 						}
 						if (_c.equals('T')) {
 							if (mutex)
-								throw new Exception("abbreviation needed");
+								throw new Exception("abbreviation needed M");
 							mutex = true;
 						}
 					}										
@@ -324,12 +321,12 @@ public class ParserImpl extends Tokenizer {
 							throw new Exception("T contained in previous character");
 						if (_c.equals('S')) {
 							if (mutex)
-								throw new Exception("abbreviation needed");
+								throw new Exception("abbreviation needed M");
 							mutex = true;
 						}
 						if (_c.equals('B')) {
 							if (mutex)
-								throw new Exception("abbreviation needed");
+								throw new Exception("abbreviation needed M");
 							mutex = true;
 						}
 					}										
@@ -340,7 +337,7 @@ public class ParserImpl extends Tokenizer {
 						if (_c.equals('O'))
 							throw new Exception("U contained in previous character");
 						if (_c.equals('A')) 
-							throw new Exception("abbreviation needed");
+							throw new Exception("abbreviation needed O");
 					}										
 				}
 				if (c.equals('A')){
@@ -349,7 +346,7 @@ public class ParserImpl extends Tokenizer {
 						if (_c.equals('O'))
 							throw new Exception("A contained in previous character");
 						if (_c.equals('U')) 
-							throw new Exception("abbreviation needed");
+							throw new Exception("abbreviation needed O");
 					}										
 				}
 			}

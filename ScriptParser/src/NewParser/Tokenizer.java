@@ -22,15 +22,13 @@ public class Tokenizer {
 	public enum States {
 		
 		state_none("invalid state"),
-		state_pre("not started parsing yet"),
 		state_i("initial"),		
 		state_sc("small cap"),		
 		state_ws("start small cap wo, wa, wu and we"),		
 		state_a("primitives"),		
 		state_f("node completed"),	    
-		state_d("addition operation"),
-		state_post("finish parsing now"),
-		state_done("done");
+		state_d("addition operation");
+
 		
 	    private final String fieldDescription;
 
@@ -47,10 +45,7 @@ public class Tokenizer {
 	    }
 	}
 
-	public enum Transitions {
-		t_p_i,    
-		t_f_p,	  
-		t_p_p,    
+	public enum Transitions {    
 		t_i_sc,
 		t_i_ws,
 		t_i_a,
@@ -69,9 +64,6 @@ public class Tokenizer {
 	
 	public static HashMap<String, Transitions> transitionMap = new HashMap<String, Transitions>();
 	static {
-		transitionMap.put(States.GetKey(States.state_post, States.state_done), Transitions.t_p_p);
-		transitionMap.put(States.GetKey(States.state_f, States.state_post), Transitions.t_f_p);
-		transitionMap.put(States.GetKey(States.state_pre, States.state_i), Transitions.t_p_i);
 		transitionMap.put(States.GetKey(States.state_i, States.state_sc), Transitions.t_i_sc);
 		transitionMap.put(States.GetKey(States.state_i, States.state_ws), Transitions.t_i_ws);
 		transitionMap.put(States.GetKey(States.state_i, States.state_a), Transitions.t_i_a);
@@ -120,31 +112,31 @@ public class Tokenizer {
 	public static HashMap<String, String> scAbbrev = new HashMap<String, String>();
 	static {
 		try {		
-			scLookup.put("wo.", new ParserImpl().parse("*U:U:E:.**"));
-			scLookup.put("wa.", new ParserImpl().parse("*U:A:E:.**"));
-			scLookup.put("wu.", new ParserImpl().parse("*A:U:E:.**"));
-			scLookup.put("we.", new ParserImpl().parse("*A:A:E:.**"));
-			scLookup.put("y.", new ParserImpl().parse("*U:S:E:.**"));
-			scLookup.put("o.", new ParserImpl().parse("*U:B:E:.**"));
-			scLookup.put("e.", new ParserImpl().parse("*U:T:E:.**"));
-			scLookup.put("u.", new ParserImpl().parse("*A:S:E:.**"));
-			scLookup.put("a.", new ParserImpl().parse("*A:B:E:.**"));
-			scLookup.put("i.", new ParserImpl().parse("*A:T:E:.**"));
-			scLookup.put("j.", new ParserImpl().parse("*S:U:E:.**"));
-			scLookup.put("g.", new ParserImpl().parse("*S:A:E:.**"));
-			scLookup.put("s.", new ParserImpl().parse("*S:S:E:.**"));
-			scLookup.put("b.", new ParserImpl().parse("*S:B:E:.**"));
-			scLookup.put("t.", new ParserImpl().parse("*S:T:E:.**"));
-			scLookup.put("h.", new ParserImpl().parse("*B:U:E:.**"));
-			scLookup.put("c.", new ParserImpl().parse("*B:A:E:.**"));
-			scLookup.put("k.", new ParserImpl().parse("*B:S:E:.**"));
-			scLookup.put("m.", new ParserImpl().parse("*B:B:E:.**"));
-			scLookup.put("n.", new ParserImpl().parse("*B:T:E:.**"));
-			scLookup.put("p.", new ParserImpl().parse("*T:U:E:.**"));
-			scLookup.put("x.", new ParserImpl().parse("*T:A:E:.**"));
-			scLookup.put("d.", new ParserImpl().parse("*T:S:E:.**"));
-			scLookup.put("f.", new ParserImpl().parse("*T:B:E:.**"));
-			scLookup.put("l.", new ParserImpl().parse("*T:T:E:.**"));
+			scLookup.put("wo.", new ParserImpl().parse("U:U:E:."));
+			scLookup.put("wa.", new ParserImpl().parse("U:A:E:."));
+			scLookup.put("wu.", new ParserImpl().parse("A:U:E:."));
+			scLookup.put("we.", new ParserImpl().parse("A:A:E:."));
+			scLookup.put("y.", new ParserImpl().parse("U:S:E:."));
+			scLookup.put("o.", new ParserImpl().parse("U:B:E:."));
+			scLookup.put("e.", new ParserImpl().parse("U:T:E:."));
+			scLookup.put("u.", new ParserImpl().parse("A:S:E:."));
+			scLookup.put("a.", new ParserImpl().parse("A:B:E:."));
+			scLookup.put("i.", new ParserImpl().parse("A:T:E:."));
+			scLookup.put("j.", new ParserImpl().parse("S:U:E:."));
+			scLookup.put("g.", new ParserImpl().parse("S:A:E:."));
+			scLookup.put("s.", new ParserImpl().parse("S:S:E:."));
+			scLookup.put("b.", new ParserImpl().parse("S:B:E:."));
+			scLookup.put("t.", new ParserImpl().parse("S:T:E:."));
+			scLookup.put("h.", new ParserImpl().parse("B:U:E:."));
+			scLookup.put("c.", new ParserImpl().parse("B:A:E:."));
+			scLookup.put("k.", new ParserImpl().parse("B:S:E:."));
+			scLookup.put("m.", new ParserImpl().parse("B:B:E:."));
+			scLookup.put("n.", new ParserImpl().parse("B:T:E:."));
+			scLookup.put("p.", new ParserImpl().parse("T:U:E:."));
+			scLookup.put("x.", new ParserImpl().parse("T:A:E:."));
+			scLookup.put("d.", new ParserImpl().parse("T:S:E:."));
+			scLookup.put("f.", new ParserImpl().parse("T:B:E:."));
+			scLookup.put("l.", new ParserImpl().parse("T:T:E:."));
 		}catch (Exception e) {
 			System.out.println("mapping failed: " + e.getMessage());
 		}
@@ -168,10 +160,9 @@ public class Tokenizer {
 	public static String getEmptySequence(int l) {
 		
 		StringBuilder builder = new StringBuilder();
-		builder.append("*E");
+		builder.append("E");
 		for (int i = 0; i <= l; i++)
 			builder.append(c_marks.get(i));
-		builder.append("**");
 		return builder.toString();		
 	}
 	
@@ -179,12 +170,12 @@ public class Tokenizer {
 	protected int counter;
 	
 	public Tokenizer() {
-		currentState = States.state_pre;
+		currentState = States.state_i;
 		counter = 0;
 	}
 	
 	public void Reset() {
-		currentState = States.state_pre;
+		currentState = States.state_i;
 		counter = 0;
 		reset();
 	}
@@ -207,16 +198,7 @@ public class Tokenizer {
 	
 	private States stateDispatcher(char c) throws Exception {					
 		
-		if (m_star.containsKey(c)){			
-			if (currentState == States.state_pre)
-				return StateChangeActions(States.state_i, c);
-			else if (currentState == States.state_f)
-				return StateChangeActions(States.state_post, c);
-			else if (currentState == States.state_post)
-				return StateChangeActions(States.state_done, c);
-			throw new Exception("cannot process " + c + " in state " + currentState.getFieldDescription());
-		}
-		else if (m_addOp.containsKey(c)){			
+        if (m_addOp.containsKey(c)){			
 			if (currentState == States.state_f)
 				return StateChangeActions(States.state_d, c);
 			throw new Exception("cannot process " + c + " in state " + currentState.getFieldDescription());
@@ -255,13 +237,6 @@ public class Tokenizer {
 		
 		switch (transitionMap.get(transitionKey)){
 	
-			case t_p_p:				
-				break;
-			case t_f_p:				
-				a_f_p(c);
-				break;
-			case t_p_i:				
-				break;
 			case t_a_f:				
 				a_a_f(c);
 				break;
@@ -329,5 +304,4 @@ public class Tokenizer {
 	protected void a_sc_f(Character c) throws Exception{}
 	protected void a_ws_sc(Character c) throws Exception{}	
 	protected void a_f_f(Character c) throws Exception{}	
-	protected void a_f_p(Character c) throws Exception{}
 }
