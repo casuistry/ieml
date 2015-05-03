@@ -13,6 +13,14 @@ public class Tester {
 		ArrayList<String> list = new ArrayList<String>();
 	
 		list.addAll(Arrays.asList(
+				"*U:S:.E:.U:S:.-**", 
+				"*U:S:.U:S:.E:.-**", 
+				"*(k.o.-k.o.-E:.-') + (E:.y.M:.-') **",						//has to fail
+				"*(k.o.-k.o.-E:E:E:.-') + (E:.y.M:.-') **",					//has to fail
+				"*y.wo.E:.-**",						    					//has to fail, ?
+				"*U:S:E:.**",						    					//has to fail, ?
+				"*O: + M:**",						    					//has to fail, ?
+				"*M: + O:**",						    					//has to fail, ?
 				"*A: + O:**",						    					//has to fail, ?
 				"*S: + M:**",						    					//has to fail, ?
 				"*(S:B:E:.+S:T:E:.-)+E:O:M:.-**",						    //ok

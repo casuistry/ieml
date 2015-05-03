@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Tokenizer {
 
+	public static boolean initDone = false;
 	public static Character multiplication = '*';
 	public static Character addition = '+';	
 	
@@ -116,6 +117,7 @@ public class Tokenizer {
 	}
 	
 	public static HashMap<String, Token> scLookup = new HashMap<String, Token>();
+	public static HashMap<String, String> scAbbrev = new HashMap<String, String>();
 	static {
 		try {		
 			scLookup.put("wo.", new ParserImpl().parse("*U:U:E:.**"));
@@ -146,6 +148,9 @@ public class Tokenizer {
 		}catch (Exception e) {
 			System.out.println("mapping failed: " + e.getMessage());
 		}
+		
+		for (String key : scLookup.keySet())
+			scAbbrev.put(scLookup.get(key).GetName(), key);
 	}
 	
 	public static HashMap<Integer, Token> emptyLookup = new HashMap<Integer, Token>();
@@ -156,6 +161,8 @@ public class Tokenizer {
 		}catch (Exception e) {
 			System.out.println("mapping failed: " + e.getMessage());
 		}
+		
+		initDone = true;
 	}
 	
 	public static String getEmptySequence(int l) {

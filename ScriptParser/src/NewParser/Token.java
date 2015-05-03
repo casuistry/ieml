@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class Token {
 	
+	Boolean emptyToken = null;
 	public int layer = -1;
 	public int taille = -1;
 	public boolean isTailleComputed = false;
@@ -206,6 +207,25 @@ public class Token {
 		throw new Exception("unhandled case");
 	}
 
+	public boolean HasTrailingEmpty() throws Exception {
+		if (nodes.size() == 1) return false;		
+		return nodes.get(nodes.size()-1).IsEmpty();
+	}
+	
+	public boolean IsEmpty() throws Exception {		
+		if (emptyToken == null) {			
+			if (nodes == null || nodes.size() == 0)
+				emptyToken = GetName().equals("E:");
+			else
+				for (Token t : nodes) {
+					if (emptyToken == null) {
+						emptyToken = t.IsEmpty();
+					}						
+					emptyToken &= t.IsEmpty();
+				}					
+		}
+		return emptyToken;
+	}
 	//=============================================
 		
 	public void AddNodes(ArrayList<Token> list) throws Exception {

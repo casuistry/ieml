@@ -122,13 +122,23 @@ public class ParserImpl extends Tokenizer {
 			newNode.AppendToName(pop.GetName());
 			newNode.AddNode(pop);
 		}
+				
+		newNode.AppendToName(c);
 		
-		//empties not added to his name
+		if (newNode.layer == 1) {
+			if (scAbbrev.containsKey(newNode.GetName()))
+				throw new Exception("Abbreviation needed: " + scAbbrev.get(newNode.GetName()));					
+		}
+		
+		if (initDone && newNode.HasTrailingEmpty())
+			throw new Exception("trailing E");
+		
+		//empties not added to this name
 		while (newNode.nodes.size() < 3)	
 			newNode.AddNode(emptyLookup.get(newNode.layer-1));			
-
-		newNode.AppendToName(c);		
-		newNode.ComputeTaille();		
+		
+		newNode.ComputeTaille();	
+		
 		pushNode(newNode);
 	}
 	
@@ -259,6 +269,8 @@ public class ParserImpl extends Tokenizer {
 						Character _c = t.GetName().charAt(0);
 						if (_c.equals('S') || _c.equals('B') || _c.equals('T'))
 							throw new Exception("M already contains previous characters");
+						if (_c.equals('O'))
+							throw new Exception("abbreviation needed");
 					}										
 				}
 				if (c.equals('O')){
