@@ -150,8 +150,6 @@ public class EditorFrame extends JFrame {
 			l.addAll(Tokenizer.c_smallCap);
 			l.addAll(Tokenizer.c_ignore);
 			break;
-		case state_done:
-			break; //nothing to add
 		case state_f:
 			
 			Integer prev = null; //parser.getPreviousLM();
@@ -181,12 +179,6 @@ public class EditorFrame extends JFrame {
 			l.addAll(Tokenizer.c_alphabet);		
 			l.addAll(Tokenizer.c_smallCap);
 			l.addAll(Tokenizer.c_ignore);
-			break;
-		case state_post:
-			next(Tokenizer.c_star.get(0));
-			return;
-		case state_pre:
-			l.addAll(Tokenizer.c_star);
 			break;
 		case state_sc:
 			next(Tokenizer.c_marks.get(1));
