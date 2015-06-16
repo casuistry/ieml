@@ -11,7 +11,7 @@ public class Tester {
 	public static void main(String[] args) {		
 		
 		ArrayList<String> list = new ArrayList<String>();
-	
+	/*
 		list.addAll(Arrays.asList(
 				"U:S:.E:.U:S:.-", 
 				"U:S:.U:S:.E:.-", 
@@ -48,12 +48,15 @@ public class Tester {
 		list.add(ScriptExamples.EnfantDeMaVoisin1);
 		list.add(ScriptExamples.ieml1);
 		list.add(ScriptExamples.ieml2);
-		
+
 		for (String s:TermInterface.LoadDictionary(null).keySet()){
 			list.add(s);
 		}
-
-
+		*/
+		
+		Utilities.Helper.ProcessDictionaryV2(null);
+		
+		/*
 		ParserImpl parser = new ParserImpl();
 		for (String s:list){						
 			try {				
@@ -71,6 +74,7 @@ public class Tester {
 				parser.Reset();
 			}
 		}
+		*/
 	}
 }
 

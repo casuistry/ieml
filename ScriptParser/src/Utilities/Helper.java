@@ -4,11 +4,15 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import NewParser.ParserImpl;
+import NewParser.Token;
 
 public class Helper {
 
@@ -83,5 +87,51 @@ public class Helper {
 		WriteFile(outputPath, map);
 		
 		return map;
+	}
+	
+	public static void ProcessDictionaryV2(String filepath){
+				
+		String defaultPath = "C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.en.cleanup";
+		String outputPath = "C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.en.cleanup.csv";
+		
+		String usePath = filepath != null ? filepath : defaultPath;
+		
+		List<String> result = ReadFile(usePath);
+		
+		
+		ParserImpl parser = new ParserImpl();
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(outputPath));			
+			for (String s : result){
+				
+				String[] parts = s.split(",");
+				
+				try {			
+					
+					parser.parse(parts[1].trim());	
+					bw.write("\""+parts[1].trim()+"\",\""+parts[2].trim()+"\"\n" );
+					
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+					System.out.println(parts[1].trim() + " [" + parts[0].trim() + " " + parts[2].trim() + "]");
+					System.out.println();
+					//StringBuilder builder = new StringBuilder();
+					//for (int i = 0 ; i < parser.GetCounter(); i++)
+					//	builder.append(" ");
+					//builder.append("^");
+					//System.out.println(builder.toString());
+				}		
+				finally {
+					parser.Reset();
+				}
+			}
+			
+			bw.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
 	}
 }
