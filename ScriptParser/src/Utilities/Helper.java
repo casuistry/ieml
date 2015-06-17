@@ -90,48 +90,147 @@ public class Helper {
 	}
 	
 	public static void ProcessDictionaryV2(String filepath){
-				
-		String defaultPath = "C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.en.cleanup";
-		String outputPath = "C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.en.cleanup.csv";
-		
-		String usePath = filepath != null ? filepath : defaultPath;
-		
-		List<String> result = ReadFile(usePath);
-		
+						
+		List<String> resultFR = ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.fr.cleanup.csv");
+		List<String> resultEN = ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.en.cleanup.csv");
 		
 		ParserImpl parser = new ParserImpl();
+		HashMap<String, String> map = new HashMap<String, String>();
+		
+		for (String s : resultFR){
+			
+			String[] parts = s.split(",");
+			
+			try {			
+				
+				parser.parse(parts[0].trim());	
+				
+			    if (parts[1].trim().equalsIgnoreCase("null") || parts[1].trim().length() == 0) {
+					System.out.println(parts[0].trim() + " [" + parts[1].trim() + "]");
+					System.out.println();		
+					continue;
+			    }
+
+			    if (map.containsKey(parts[0].trim())) {
+			    	System.out.println("DUPLICATE");
+					System.out.println(parts[0].trim() + " [" + parts[1].trim() + "]");
+					System.out.println();		
+					continue;
+			    }
+			    
+			    map.put(parts[0].trim(), parts[1].trim());
+			    
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				System.out.println(parts[0].trim() + " [" + parts[1].trim() + "]");
+				System.out.println();
+			}		
+			finally {
+				parser.Reset();
+			}
+		}
+		
+		HashMap<String, String> engDup = new HashMap<String, String>(); 
+		
+		for (String s : resultEN){
+			
+			String[] parts = s.split(",");
+			
+			try {			
+				
+				parser.parse(parts[0].trim());	
+				
+			    if (parts[1].trim().equalsIgnoreCase("null") || parts[1].trim().length() == 0) {
+					System.out.println(parts[0].trim() + " [" + parts[1].trim() + "]");
+					System.out.println();		
+					continue;
+			    }
+
+			    if (engDup.containsKey(parts[0].trim()) ){
+			    	continue;
+			    }
+
+			    engDup.put(parts[0].trim(), parts[0].trim());
+			    
+			    if (map.containsKey(parts[0].trim())) {
+			    	map.put(parts[0].trim(), map.get(parts[0].trim()) + " , "+ parts[1].trim());		
+					continue;
+			    }
+			    
+			    map.put(parts[0].trim(), " , " + parts[1].trim());
+			    
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				System.out.println(parts[1].trim() + " [" + parts[0].trim() + " " + parts[2].trim() + "]");
+				System.out.println();
+			}		
+			finally {
+				parser.Reset();
+			}
+		}
 		
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(outputPath));			
-			for (String s : result){
-				
-				String[] parts = s.split(",");
-				
-				try {			
-					
-					parser.parse(parts[1].trim());	
-					bw.write("\""+parts[1].trim()+"\",\""+parts[2].trim()+"\"\n" );
-					
-				} catch (Exception e) {
-					System.out.println(e.getMessage());
-					System.out.println(parts[1].trim() + " [" + parts[0].trim() + " " + parts[2].trim() + "]");
-					System.out.println();
-					//StringBuilder builder = new StringBuilder();
-					//for (int i = 0 ; i < parser.GetCounter(); i++)
-					//	builder.append(" ");
-					//builder.append("^");
-					//System.out.println(builder.toString());
-				}		
-				finally {
-					parser.Reset();
-				}
+			BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.clean.csv"));			
+
+			for (String s : map.keySet()) {
+				bw.write(s+" , "+map.get(s)+"\n" );
 			}
-			
+						
 			bw.close();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
+		
+		nextCheck();
+	}
+	
+	public static void nextCheck(){
+		HashMap<String, String> engDup = new HashMap<String, String>(); 
+		ArrayList<String> next = new ArrayList<String>(); 
+		
+		List<String> result = ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.clean.csv");
+		for (String s : result){			
+			String[] parts = s.split(",");
+			
+			if (parts.length != 3) {
+				System.out.println(parts[0]);
+				continue;
+			}
+			
+			if (engDup.containsKey(parts[1]) ) {
+				System.out.println("DUP NL FR");
+				System.out.println(parts[0]);
+				continue;
+			}
+			else 
+				engDup.put(parts[1], parts[1]);
+			
+			if (engDup.containsKey(parts[2]) ) {
+				System.out.println("DUP NL EN");
+				System.out.println(parts[0]);
+				continue;
+			}
+			else 
+				engDup.put(parts[2], parts[2]);
+			
+			next.add(s);
+		}	
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.cleanv2.csv"));			
+
+			for (String s : next) {
+				bw.write(s+"\n" );
+			}
+						
+			bw.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		
 	}
 }

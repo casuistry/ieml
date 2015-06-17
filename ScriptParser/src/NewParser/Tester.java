@@ -54,7 +54,8 @@ public class Tester {
 		}
 		*/
 		
-		Utilities.Helper.ProcessDictionaryV2(null);
+		//Utilities.Helper.ProcessDictionaryV2(null);
+		Utilities.Helper.nextCheck();
 		
 		/*
 		ParserImpl parser = new ParserImpl();
