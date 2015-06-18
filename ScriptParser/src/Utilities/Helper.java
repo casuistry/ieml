@@ -218,6 +218,7 @@ public class Helper {
 			next.add(s);
 		}	
 		
+
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.cleanv2.csv"));			
 
@@ -231,6 +232,31 @@ public class Helper {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
+
+		
+		//create JSON
+		//{ ieml: "S:B:T:.", terms: [{lang:"FR",means:"something"},{lang:"EN",means:"somethingElse"}]  }
+		
+		List<String> db = ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db.csv");
+		
+		try {
+			BufferedWriter json = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.json"));			
+
+			for (String s : db) {
+				String[] parts = s.split(",");
+				
+				String j = String.format("{ieml:\"%s\",terms:[{lang:\"FR\",means:\"%s\"},{lang:\"EN\",means:\"%s\"}]}", 
+						parts[0].trim(), parts[1].trim().length() > 0 ? parts[1].trim():"", parts[2].trim().length() > 0 ? parts[2].trim():"");
+				json.write(j+"\n" );
+			}
+						
+			json.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 	}
 }
