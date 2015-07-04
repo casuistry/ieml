@@ -1,4 +1,8 @@
-﻿Added files or replaced with corresponding file:
+﻿git checkout
+npm install
+npm start
+
+Added files or replaced with corresponding file:
 
 views\layout.jade
 views\index.jade
