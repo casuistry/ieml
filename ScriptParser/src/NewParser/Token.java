@@ -297,4 +297,13 @@ public class Token {
 		
 		return builder.toString();
 	}
+	
+	public Token GetFirstToken() {
+		
+		if (nodes != null && nodes.size() > 0) {
+			return nodes.get(0).GetFirstToken();
+		}
+		
+		return this;
+	}
 }

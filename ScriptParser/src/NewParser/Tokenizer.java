@@ -19,6 +19,10 @@ public class Tokenizer {
 	public static List<Character> c_marks    = Arrays.asList(new Character[]{':', '.', '-', '\'', ',', '_', ';'});
 	public static List<Character> c_star     = Arrays.asList(new Character[]{'*'});
 
+	public static List<Character> c_verb     = Arrays.asList(new Character[]{'O', 'U', 'A'});
+    public static List<Character> c_noun     = Arrays.asList(new Character[]{'M', 'S', 'B', 'T'});
+    public static List<Character> c_aux      = Arrays.asList(new Character[]{'E'});
+
 	public enum States {
 		
 		state_none("invalid state"),
