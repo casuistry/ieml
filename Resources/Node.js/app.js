@@ -4,13 +4,24 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var db = require('mongoskin').db('mongodb://localhost:27017/test');
+
+var db_name='index_tests';
+var mongodb_connection_string = 'mongodb://127.0.0.1:27017/' + db_name;
+//take advantage of openshift env vars when available:
+if(process.env.OPENSHIFT_MONGODB_DB_URL){
+  mongodb_connection_string = process.env.OPENSHIFT_MONGODB_DB_URL + db_name+'?authSource=admin';
+}
+var db = require('mongoskin').db(mongodb_connection_string);
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var ieml_entries = require('./routes/ieml');
 
 var app = express();
+
+
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -71,3 +82,17 @@ app.use(function(err, req, res, next) {
 
 
 module.exports = app;
+
+/*var ipaddr = process.env.OPENSHIFT_INTERNAL_IP || "127.0.0.1";
+var port = process.env.OPENSHIFT_INTERNAL_PORT || 8080;
+
+
+
+  app.listen(port, ipaddr);*/
+
+  var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
+var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
+ 
+app.listen(server_port, server_ip_address, function () {
+  console.log( "Listening on " + server_ip_address + ", server_port " +server_port )
+});
