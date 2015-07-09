@@ -1,5 +1,6 @@
 
 Resources/Node.js/node_modules
+Resources/Node.js/public/libs/*
 # Windows image file caches
 Thumbs.db
 ehthumbs.db

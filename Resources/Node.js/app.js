@@ -16,10 +16,10 @@ var db = require('mongoskin').db(mongodb_connection_string);
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var ieml_entries = require('./routes/ieml');
+var restapi = require("./routes/restapi");
+//var ngindex = require("./routes/ng_index");
 
 var app = express();
-
-
 
 
 
@@ -34,6 +34,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'node_modules')));
 
 app.use(function (req, res, next) {
   console.log('Time:', Date.now());
@@ -48,6 +49,10 @@ app.use(function(req,res,next){
 app.use('/', routes);
 app.use('/users', users);
 app.use('/ieml', ieml_entries);
+//app.use('/ngindex', ngindex);
+
+
+app.all('/api/allieml', restapi.allieml);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

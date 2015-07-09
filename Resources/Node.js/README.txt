@@ -2,6 +2,9 @@
 npm install
 npm start
 
+for angular version 
+  bower install
+  
 Added files or replaced with corresponding file:
 
 views\layout.jade

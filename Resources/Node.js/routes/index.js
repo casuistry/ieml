@@ -6,4 +6,10 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'IEML' });
 });
 
+
+
+router.get('/ngindex', function(req, res, next) {
+  res.render('indexng', { title: 'IEML ANGULAR' });
+});
+
 module.exports = router;
