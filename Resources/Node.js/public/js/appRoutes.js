@@ -5,8 +5,8 @@
     $routeProvider
 
         // 
-        .when('/first', {
-            templateUrl: '../views/ngfirst',
+        .when('/second', {
+            templateUrl: '/partials/ngsecond',
             controller: 'FirstController'
         })
 

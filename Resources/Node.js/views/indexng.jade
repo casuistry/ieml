@@ -8,7 +8,7 @@ block body
           li
            a(href='/') Home
           li
-            a(href='/addPost') Add a new post
+            a(href='/second') Show view #2
 
 
     h1= title
@@ -16,13 +16,16 @@ block body
 
     
     div(ng-controller='FirstController')
-           p List of IEML
-           ul.page-sidebar-menu(ng-repeat='item in List')
+            label Name only
+                     input(ng-model='search._id')
+            p List of IEML
+
+            ul.page-sidebar-menu(ng-repeat='item in List | filter:search:strict')
                 li(ng-class='group.groupStyle')
                     a(href="{{item._id}}")
-                        i(ng-class='group.iconStyle')
-                        span.title {{item.ieml}}
-                        span(ng-class="group.spanStyle")
+                      i(ng-class='group.iconStyle')
+                      span.title {{item.ieml}}
+                    //span(ng-class="group.spanStyle")
     div(ng-view)
 
     script(src='../libs/angular/angular.js')
