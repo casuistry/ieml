@@ -1,4 +1,4 @@
-angular.module('iemlng', ['ngRoute','appRoutes', 'Ctrl1', 'AlliemlService']);
+angular.module('iemlng', ['ngRoute','appRoutes', 'Ctrl1', 'AlliemlService', 'ui.layout']);
 
 
 

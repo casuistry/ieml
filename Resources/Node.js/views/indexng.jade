@@ -2,37 +2,56 @@
 extends nglayout
 
 block body
-    div
-     h2 My Blog
-     ul
-          li
-           a(href='/') Home
-          li
-            a(href='/second') Show view #2
 
-
-    h1= title
-    p Welcome..... to #{title}
-
+    div(ui-layout)
+        div(ui-layout-container,class=" html-back", size="10%")
+          div
+             h2 IEML Menu will go here
+             ul
+                  li
+                   a(href='/') Home
+                  li
+                    a(href='/second') Show view #2
+        
+        div(ui-layout-container) 
+          div(ui-layout="{flow : 'column'}")
+            div(ui-layout-container, class=" html-back", size="20%")
+              div(ng-controller='FirstController')
+                  label ieml filter only 
+                           input(ng-model='search.ieml')
+                       p List of IEML
+                       ul.page-sidebar-menu(ng-repeat='item in List | filter:search')
+                          #searchObjResults
+                            li(ng-class='group.groupStyle')
+                               p
+                                   span.title {{item.ieml}}
+            div(ui-layout-container, class=" js-back")
+              p Dyn views here
+              div(ng-view)
+            // div(ui-layout-container, class=" css-back")
+        
+        
+      
+        // div(ui-layout-container, class=" css-back")
     
-    div(ng-controller='FirstController')
-      label ieml filter only 
-               input(ng-model='search.ieml')
-           p List of IEML
-           ul.page-sidebar-menu(ng-repeat='item in List | filter:search')
-              #searchObjResults
-                li(ng-class='group.groupStyle')
-                   p
-                       span.title {{item.ieml}}
-                     
-    div(ng-view)
 
     script(src='../libs/angular/angular.js')
+    // script(src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.10/angular.min.js")
+
     script(src='../libs/angular-route/angular-route.js')
+
+
+
+    // script(src="https://rawgithub.com/angular-ui/ui-layout/v1.0.5/ui-layout.min.js")
+
+    script(src='../libs/angular-ui-layout/ui-layout.min.js')
+    // script(src='../libs/raf/index.js')
+
     script(src='../js/controllers/Contr1.js')
     script(src='../js/services/AlliemlService.js')
     script(src='../js/appRoutes.js')
     script(src='../js/app.js')
+
                
 
 

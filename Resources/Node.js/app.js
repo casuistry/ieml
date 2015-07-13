@@ -21,8 +21,8 @@ var restapi = require("./routes/restapi");
 
 var app = express();
 
-
-
+//pretty print HTML
+app.locals.pretty = true;
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('partials', path.join(__dirname, 'views/partials'));

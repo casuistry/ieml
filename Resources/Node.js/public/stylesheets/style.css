@@ -1,3 +1,31 @@
+/*.ui-splitbar {
+      background-color: red;
+    }
+.ui-layout-container {
+      display: inline-block;
+    }
+    */
+.html-back{
+  background : #eee url("http://placehold.it/400x300/eee/666&text=HTML") no-repeat center;
+
+}
+.css-back{
+  background : #eee  no-repeat center;
+
+}
+.js-back{
+  background : #eee  no-repeat center;
+}
+
+.glyphicon-chevron-left,
+.glyphicon-chevron-right,
+.glyphicon-chevron-up,
+.glyphicon-chevron-down{
+  color: #aaa;
+}
+
+
+
 body {
   padding: 30px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
