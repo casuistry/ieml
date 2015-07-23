@@ -3,7 +3,7 @@ npm install
 npm start
 
 for angular version 
-  nom install bower -g
+  npm install bower -g
   bower install 
   note: may require to run git config url."https://".insteadOf git://    before bower install if connect error manifests
   
