@@ -11,7 +11,7 @@ block body
                   li
                    a(href='/') Home
                   li
-                    a(href='/second') Show view #2
+                    a(href='/second' ) Show view #2
         
         div(ui-layout-container) 
           div(ui-layout="{flow : 'column'}")
@@ -25,6 +25,8 @@ block body
                             li(ng-class='group.groupStyle')
                                p
                                    span.title {{item.ieml}}
+                                   a(href="/second" ng-click="openItemEdit(item.ieml,this)") {{item.ieml}}
+
             div(ui-layout-container, class=" js-back")
               p Dyn views here
               div(ng-view)

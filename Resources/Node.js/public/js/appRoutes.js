@@ -10,7 +10,7 @@
             controller: 'FirstController'
         })
 
-        // nerds page that will use the NerdController
+      
         .when('/something', {
             templateUrl: 'views/second',
             controller: 'SecondController'
