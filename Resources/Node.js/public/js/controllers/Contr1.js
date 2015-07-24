@@ -14,7 +14,7 @@ $scope.List=dev_ieml;
 	})
 */
 $scope.currIemlId='some val';
-console.log("some val set");
+
 $scope.openItemEdit = function(val, element){
      //https://docs.angularjs.org/error/$rootScope/inprog?p0=$apply  
 	 //http://jonathancreamer.com/working-with-all-the-different-kinds-of-scopes-in-angular/
@@ -30,9 +30,7 @@ $scope.openItemEdit = function(val, element){
         
      
 	
-		
-	
-		alert(this.currIemlId+' '+$scope.currIemlId);
+
      }
 
   //$scope.orderProp = 'age'; and so forth
