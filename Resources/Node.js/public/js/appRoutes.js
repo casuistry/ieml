@@ -3,7 +3,7 @@
 
 
     $routeProvider
-
+		
         // 
         .when('/second', {
             templateUrl: '/partials/ngsecond',
