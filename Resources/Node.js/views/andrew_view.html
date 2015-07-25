@@ -2,22 +2,17 @@
 <html data-ng-app="andrewApp1">
 <body>
 	
-	<div class="container" data-ng-controller='FirstController'>
-		Filter: <input type="text" data-ng-model="name"/> 
-		<br/>
-		<ul>
-			<li data-ng-repeat="entry in List | filter: name"> {{entry.ieml}} </li>
-		</ul>
+	<div>
+		<data-ng-view></data-ng-view>
 	</div>
 	
+	<a href="#/sidebar">Click</a>
+			
 	<!-- angular -->
 	<script src="../libs/angular/angular.js"></script>
-	<!-- REST API -->
-	<script src="../js/services/AlliemlService.js"></script>
-	<!-- update scope with data received from API -->
-	<script src="../js/controllers/Contr1.js"></script>
-	<!-- angular app module-->
+	<script src="../libs/angular-route/angular-route.js"></script>
+	<!-- app -->
 	<script src="../js/app_andrew.js"></script>
-		
+
 </body>
 </html>

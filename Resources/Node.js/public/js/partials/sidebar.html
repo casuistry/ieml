@@ -1,0 +1,7 @@
+	<div class="container">
+		Filter: <input type="text" data-ng-model="name"/> 
+		<br/>
+		<ul>
+			<li data-ng-repeat="entry in List | filter: name"> {{entry.ieml}} </li>
+		</ul>
+	</div>
