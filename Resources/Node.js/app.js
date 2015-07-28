@@ -52,10 +52,10 @@ app.use('/users', users);
 app.use('/ieml', ieml_entries);
 //app.use('/ngindex', ngindex);
 
-app.use('/andrew', routes);
+//app.use('/andrew', routes);
 
 app.all('/api/allieml', restapi.allieml);
-
+app.all('/api/newieml', restapi.newieml);
 
 //need to render views in views/partial folder
 app.get('/partials/:name', restapi.partials);

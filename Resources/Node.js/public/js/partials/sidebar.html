@@ -1,4 +1,14 @@
 	<div class="container">
+	
+		IEML: <input type="text" data-ng-model="newEntry.ieml"/><br/>
+		FR: <input type="text" data-ng-model="newEntry.fr"/><br/>
+		EN: <input type="text" data-ng-model="newEntry.en"/><br/>
+		<br/>
+		{{currentError}}
+		<br/>
+		<button data-ng-model="currentError" data-ng-click="addEntry()">Add</button><br/>
+		<br/>
+		
 		Filter: <input type="text" data-ng-model="name"/> 
 		<br/>
 		<ul>
