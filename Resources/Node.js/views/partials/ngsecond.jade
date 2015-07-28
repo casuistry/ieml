@@ -3,16 +3,20 @@
 
 block body
 
+	div()
 
-         div()
+		form(name='form' class='css-form' novalidate)
 
-            input(type='text', name='input', ng-model='currIemlId')
-          
-        
-          
-    
-               
+			input(type='text', name='iemlIn', ng-model='currIemlId', class='form-control', iemlval)
+			br
+			span(ng-show='form.iemlIn.$error.currIemlId') {{customIemlerror}}
+			br
+			button(type='submit' ng-disabled='form.iemlIn.$error.currIemlId') Save      
 
+style(type='text/css').
+		.css-form input.ng-invalid {
+		border-color: #FA787E;
+		}
 
    
 

@@ -51,5 +51,7 @@
 			<artifactId>jersey-core</artifactId>
 			<version>1.19</version>
 		</dependency>
+
+
 	</dependencies>
 </project>

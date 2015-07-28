@@ -28,7 +28,7 @@ block body
                                    a(href="/second" ng-click="openItemEdit(item.ieml,this)") {{item.ieml}}
 
             div(ui-layout-container, class=" js-back")
-              p Dyn views here
+              p Enter/Modify EML string:
               div(ng-view)
             // div(ui-layout-container, class=" css-back")
         
@@ -53,6 +53,7 @@ block body
     script(src='../js/services/AlliemlService.js')
     script(src='../js/appRoutes.js')
     script(src='../js/app.js')
+    script(src='../js/validation/iemlvalid.js')
 
                
 
