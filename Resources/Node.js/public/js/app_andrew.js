@@ -5,6 +5,8 @@ var andrewApp1 = angular.module('andrewApp1', ['ngRoute']);
 
 // http://adrianmejia.com/blog/2014/10/01/creating-a-restful-api-tutorial-with-nodejs-and-mongodb/
 
+// deleting item:
+// http://stackoverflow.com/questions/14250642/angularjs-how-to-remove-an-item-from-scope
 
 // associate controller to views through routes
 andrewApp1.config(function($routeProvider, $locationProvider) {
@@ -34,7 +36,7 @@ andrewApp1.factory('crudFactory', function($http) {
         },
 		
         remove : function(id) {
-            return $http.delete('/api/nerds/' + id);
+            return $http.delete('../api/remieml/' + id);
         }
 	}
 });
@@ -80,7 +82,24 @@ andrewApp1.controller('sidebarController', function($scope, crudFactory) {
 		error(function(data, status, headers, config) {
 			// called asynchronously if an error occurs
 			// or server returns response with an error status.
-			$scope.currentError = "boum!";
+			$scope.currentError = "Error adding new item";
 		});
 	};	
+	
+	$scope.deleteEntry = function ( index ) {
+				
+        var toBeRemoved = $scope.List[index].ieml;
+				
+		crudFactory.remove(toBeRemoved).success(function(data) {
+			$scope.currentError = "";
+			$scope.List.splice(index, 1);
+		}).
+		error(function(data, status, headers, config) {
+			// called asynchronously if an error occurs
+			// or server returns response with an error status.
+			$scope.currentError = "Error removing item";
+		});
+    };
+	
+
 });

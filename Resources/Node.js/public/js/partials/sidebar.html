@@ -9,9 +9,14 @@
 		<button data-ng-model="currentError" data-ng-click="addEntry()">Add</button><br/>
 		<br/>
 		
+		
+		
 		Filter: <input type="text" data-ng-model="name"/> 
 		<br/>
 		<ul>
-			<li data-ng-repeat="entry in List | filter: name"> {{entry.ieml}} </li>
+			<li data-ng-repeat="entry in List | filter: name"> 
+				{{entry.ieml}}  
+				<button data-ng-click="deleteEntry($index)">Rem</button> {{$index}}
+			</li>
 		</ul>
 	</div>

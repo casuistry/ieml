@@ -56,10 +56,10 @@ app.use('/ieml', ieml_entries);
 
 app.all('/api/allieml', restapi.allieml);
 app.all('/api/newieml', restapi.newieml);
+app.delete('/api/remieml/:id', restapi.remieml);
 
 //need to render views in views/partial folder
 app.get('/partials/:name', restapi.partials);
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

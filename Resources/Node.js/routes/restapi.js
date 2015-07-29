@@ -13,6 +13,7 @@ module.exports.allieml = function (req, res) {
 	});
 };
 
+//http://www.hacksparrow.com/mongoskin-tutorial-with-examples.html
 module.exports.newieml = function (req, res) {
 
 	var db = req.db;
@@ -34,13 +35,35 @@ module.exports.newieml = function (req, res) {
 	);
 };
 
-/*
-db.collection('bands').insert({name: "Guns N' Roses", members: ['Axl Rose', 'Slash', 'Izzy Stradlin', 'Matt Sorum', 'Duff McKagan'], year: 1986}, 
-function(err, result) {
-    if (err) throw err;
-    if (result) console.log('Added!');
-});
-*/
+//http://www.hacksparrow.com/mongoskin-tutorial-with-examples.html
+module.exports.remieml = function (req, res) {
+
+	var db = req.db;
+    console.log("before removing ieml");
+	console.log(req.params.id);
+	
+	//res.sendStatus(200);
+	
+	//db.collection('bands').remove({name:'Velvet Revolver'}, function(err, result) {
+    //if (!err) console.log('VR deleted!');
+    //});
+
+	
+	db.collection('collection1').remove(
+	    {ieml:req.params.id}, 
+		function(err, result) {
+			if (err) {
+				console.log("ERROR"+err);
+				throw err;
+			}
+			if (result) {
+				console.log('Removed!');
+				res.json(result);
+			}
+		}
+	);
+	
+};
 
 module.exports.partials = function (req, res) {
   var name = req.params.name;
