@@ -1,0 +1,35 @@
+<div>
+  <md-toolbar class="md-primary">
+    <h2 class="md-toolbar-tools" ng-model="formTitle">
+      {{formTitle}}
+    </h2>
+  </md-toolbar>
+  <md-content layout-padding>
+    <form name="projectForm">
+      <md-input-container>
+        <label>ieml</label>
+        <input md-maxlength="100" required name="ieml" ng-model="iemlValue">
+        <div ng-messages="projectForm.ieml.$error">
+          <div ng-message="required">This is required.</div>
+          <div ng-message="md-maxlength">The name has to be less than 100 characters long.</div>
+        </div>
+      </md-input-container>
+      <md-input-container>
+        <label>French</label>
+        <input required name="french" ng-model="frenchValue">
+        <div ng-messages="projectForm.french.$error">
+          <div ng-message="required">This is required.</div>
+        </div>
+      </md-input-container>
+      <md-input-container>
+        <label>English</label>
+        <input required name="english" ng-model="englishValue">
+        <div ng-messages="projectForm.english.$error">
+          <div ng-message="required">This is required.</div>
+        </div>
+      </md-input-container>
+    </form>
+	<md-button class="md-raised" ng-click="cancelEdit()" ng-disabled="projectForm.$invalid"> Submit </md-button>	
+	<md-button class="md-raised" ng-click="cancelEdit()"> Cancel </md-button>	
+  </md-content>
+</div>

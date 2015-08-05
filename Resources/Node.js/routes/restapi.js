@@ -35,6 +35,10 @@ module.exports.newieml = function (req, res) {
 	);
 };
 
+// timeouts for connections. Example: load all from db, then kill db, then make
+// a request ==> app keeps on trying for ever
+//http://blog.mongolab.com/2013/10/do-you-want-a-timeout/
+
 //http://www.hacksparrow.com/mongoskin-tutorial-with-examples.html
 module.exports.remieml = function (req, res) {
 
@@ -43,12 +47,7 @@ module.exports.remieml = function (req, res) {
 	console.log(req.params.id);
 	
 	//res.sendStatus(200);
-	
-	//db.collection('bands').remove({name:'Velvet Revolver'}, function(err, result) {
-    //if (!err) console.log('VR deleted!');
-    //});
 
-	
 	db.collection('collection1').remove(
 	    {ieml:req.params.id}, 
 		function(err, result) {

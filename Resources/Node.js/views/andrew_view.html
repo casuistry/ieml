@@ -1,8 +1,32 @@
 <!DOCTYPE html>
 <html data-ng-app="andrewApp1">
-<body>
+
+	<head>
+	    <meta charset="UTF-8">
+        <title>IEML</title>
+	    <link rel="stylesheet" href="../libs/angular-material/angular-material.css">
+	</head>
 	
+    <body>
+
 	<div>
+		<md-content>
+			<md-toolbar>
+			  <div class="md-toolbar-tools">
+				<md-button class="md-icon-button" aria-label="Settings">
+				  <md-icon md-svg-icon="../libs/material-design-icons/maps/svg/design/ic_local_cafe_48px.svg"></md-icon>
+				</md-button>
+				<h2>
+				  <span class="md-title">quickIEMLeditor</span>
+				</h2>
+			  </div>
+			</md-toolbar>
+		</md-content>
+		<br/>
+		<br/>
+	</div>
+
+	<div layout="col">
 		<data-ng-view></data-ng-view>
 	</div>
 	
@@ -11,8 +35,12 @@
 	<!-- angular -->
 	<script src="../libs/angular/angular.js"></script>
 	<script src="../libs/angular-route/angular-route.js"></script>
+    <!-- angular material-->
+	<script src="../libs/angular-aria/angular-aria.js"></script>
+    <script src="../libs/angular-animate/angular-animate.js"></script>
+	<script src="../libs/angular-material/angular-material.js"></script>
 	<!-- app -->
 	<script src="../js/app_andrew.js"></script>
 
-</body>
+    </body>
 </html>

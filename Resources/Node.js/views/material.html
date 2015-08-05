@@ -1,0 +1,123 @@
+<html lang="en" data-ng-app="materialApp">
+
+<!--md-icon md-svg-icon="../libs/material-design-icons/action/svg/production/ic_delete_24px.svg"></md-icon-->
+<!-- https://www.google.com/design/icons/-->
+
+  <head>
+    <link rel="stylesheet" href="../libs/angular-material/angular-material.css">
+	
+	<!-- Icons -->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	  
+	<!-- following css is required to get the "delete" button in side chips to look nice -->
+	<!--link rel="stylesheet" href="stylesheets/mystyle.css"-->
+	
+  </head>
+  
+  <body>
+  
+  
+    <!-- TOP TOOLBAR -->
+  	<div>
+		<md-content>
+			<md-toolbar>
+			  <div class="md-toolbar-tools">
+				<md-button class="md-icon-button" aria-label="Settings">
+				  <i class="material-icons">language</i>
+				</md-button>
+				<h2>
+				  <span class="md-title">quickIEMLeditor</span>
+				</h2>
+			  </div>
+			</md-toolbar>
+			<br/><br/>
+		</md-content>
+	</div>
+	<!-- END TOP TOOLBAR -->
+	
+	<div layout="row">
+	  
+	  <!-- LEFT NAVIGATION -->
+	  <div ng-controller="loadIEMLController" layout="column" style="height: 700px;">			
+		<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
+		  
+		  <div> <!-- without this div, the 'add' icon gets squished -->
+			  <!-- if md-primary is not included, icon will be pink otherwise it will be blue -->
+			  <!-- md-fab-bottom-left to position elsewhere -->
+			  <md-button class="md-fab md-primary" ng-click="editEntry(-1)">
+				<i class="material-icons">add</i>
+			  </md-button>
+			
+			  <form>
+				<md-input-container >
+				  <label for="filterInput">Filter</label>
+				  <input type="text" id="filterInput" data-ng-model="filterText" md-sidenav-focus>
+				</md-input-container>
+			  </form>	
+		  </div>
+		  
+		  <!--scrollable content -->
+		  <md-content>
+		  
+			<!--md-chips class="custom-chips" ng-model="List" readonly="true">
+			  <md-chip-template>
+				<strong>{{$chip.ieml}}</strong>
+			  </md-chip-template>
+			  <button md-chip-remove class="md-primary vegetablechip">
+				<md-icon md-svg-icon="md-close"></md-icon>				
+			  </button>
+			</md-chips-->
+
+			<!-- ieml list -->
+			<md-list >
+			  <md-list-item ng-repeat="entry in List | filter: filterText">  
+				<div layout="row" layout-align="start center">
+				
+				  <!-- md-primary for blue color, md-mini for smaller icon-->
+				  <md-button class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, $index)">
+					<i class="material-icons">remove</i>
+				  </md-button>				
+				
+				  <md-button class="md-fab md-primary md-mini" ng-click="editEntry($index)">
+					<i class="material-icons">settings</i>
+				  </md-button>
+					
+				  <!-- style="text-transform: none;" otherwise it will be all caps -->	
+				  <md-button class="md-raised" style="text-transform: none;" ng-click="viewEntry($index)">
+					{{entry.ieml}}
+				  </md-button>					
+				  
+				</div> 
+			  </md-list-item>
+			</md-list>
+			<!-- end ieml list -->
+					
+		  </md-content>
+		</md-sidenav>
+	  </div>	
+		<!-- END LEFT NAVIGATION -->	
+		
+	  <!-- MIDDLE -->
+	  <div flex layout-padding>
+		<md-content>
+          <ng-view></ng-view>
+		</md-content>	
+	  </div>
+	  <!-- END MIDDLE -->
+	  
+	</div>
+	
+	<!-- angular -->
+	<script src="../libs/angular/angular.js"></script>
+	<script src="../libs/angular-route/angular-route.js"></script>
+    <!-- angular material-->
+	<script src="../libs/angular-aria/angular-aria.js"></script>
+    <script src="../libs/angular-animate/angular-animate.js"></script>
+	<script src="../libs/angular-material/angular-material.js"></script>
+	<!-- angular messages-->
+	<script src="../libs/angular-messages/angular-messages.js"></script>
+	<!-- app -->
+	<script src="../js/material.js"></script>
+	
+  </body>
+</html>

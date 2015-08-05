@@ -1,4 +1,8 @@
-var andrewApp1 = angular.module('andrewApp1', ['ngRoute']);
+var andrewApp1 = angular.module('andrewApp1', ['ngRoute','ngMaterial']);
+
+// ngRoute -- required as of v1.2? 
+// ngMaterial -- widgets
+// ngMessages -- input with errors?
 
 // http://stackoverflow.com/questions/19501300/angular-js-startswith-custom-filter
 // https://docs.angularjs.org/api/ng/filter/filter
@@ -100,6 +104,4 @@ andrewApp1.controller('sidebarController', function($scope, crudFactory) {
 			$scope.currentError = "Error removing item";
 		});
     };
-	
-
 });
