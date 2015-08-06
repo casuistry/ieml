@@ -56,12 +56,89 @@ module.exports.remieml = function (req, res) {
 				throw err;
 			}
 			if (result) {
-				console.log('Removed!');
+				console.log(result);
 				res.json(result);
 			}
 		}
 	);
+};
+
+// Verify that new or modified field values are unique.
+// Two ways: A) verify prior to submission, B) submit and handle errors
+// Going with A) on the assumption that it will provide a better user experience 
+//http://docs.mongodb.org/manual/reference/operator/query/all/
+module.exports.verifyIeml = function (req, res) {
+
+	var db = req.db;
+    console.log("before verifying ieml");
+	console.log(req.params.id);
 	
+	//res.sendStatus(200);  test, all was ok
+    // db.collection1.find({ "ieml": "f.u.-f.u.-'" })
+	
+	//db.collection('bands').find({name:'Road Crew'}).toArray(
+	//  function(err, result) {
+    //    console.log('Band members of Road Crew');
+    //    console.log(result[0].members);
+    //  }
+	//);
+
+	db.collection('collection1').find({ieml:req.params.id}).toArray(
+		function(err, result) {
+			if (err) {
+				console.log("ERROR"+err);
+				throw err;
+			}
+			if (result) {		
+				console.log(result);			
+				res.json(result);
+			}
+		}
+	);
+};
+module.exports.verifyFr = function (req, res) {
+
+	var db = req.db;
+    console.log("before verifying FR");
+	console.log(req.params.id);
+	
+	//res.sendStatus(200);  test, all was ok
+    // db.collection1.find( { terms: { $all: [ { "$elemMatch" : { lang: "FR", means: "illusion" } } ] } } )
+	
+	db.collection('collection1').find({ terms: { $all: [ { "$elemMatch" : { lang: "FR", means: req.params.id } } ] } }).toArray(
+		function(err, result) {
+			if (err) {
+				console.log("ERROR"+err);
+				throw err;
+			}
+			if (result) {
+				console.log('verified FR!');
+				res.json(result);
+			}
+		}
+	);
+};
+module.exports.verifyEn = function (req, res) {
+
+	var db = req.db;
+    console.log("before verifying FR");
+	console.log(req.params.id);
+	
+	//res.sendStatus(200);  test, all was ok
+    // db.collection1.find( { terms: { $all: [ { "$elemMatch" : { lang: "FR", means: "illusion" } } ] } } )
+	
+	db.collection('collection1').find({ terms: { $all: [ { "$elemMatch" : { lang: "EN", means: req.params.id } } ] } }).toArray(
+		function(err, result) {
+			if (err) {
+				console.log("ERROR"+err);
+				throw err;
+			}
+			if (result) {
+				console.log('verified EN!');
+				res.json(result);
+			}
+		}
+	);
 };
 
 module.exports.partials = function (req, res) {

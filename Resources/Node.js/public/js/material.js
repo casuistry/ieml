@@ -35,7 +35,19 @@ angular
 		
         remove : function(id) {
             return $http.delete('../api/remieml/' + id);
-        }
+        },
+		
+		verifyIeml : function(id) {
+            return $http.get('../api/verifyIeml/' + id);
+        },
+		
+		verifyFr : function(id) {
+            return $http.get('../api/verifyFr/' + id);
+        },
+
+		verifyEn : function(id) {
+            return $http.get('../api/verifyEn/' + id);
+        }		
 	}
   }) 
   .controller('materialController', function ($scope, $timeout, $mdSidenav, $mdUtil, $log) {
@@ -76,17 +88,24 @@ angular
   //http://stackoverflow.com/questions/6429225/javascript-null-or-undefined
   .service('sharedProperties', function () {
     var property;
-
-    return {
+    var isDB = false; // default
+    
+	return {
       getProperty: function () {
         return property;
       },
       setProperty: function(value) {
         property = value;
-      }
-    };
+      },
+      getDb: function () {
+        return isDB;
+      },
+      setDb: function(value) {
+        isDB = value;
+      }	  
+    };	
   })
-  .controller('editController', function ($scope, $location, sharedProperties) {
+  .controller('editController', function ($scope, $location, sharedProperties, crudFactory) {
 	  
 	init();
 	
@@ -109,6 +128,70 @@ angular
         $location.path(earl);	 
 	};	
 	
+	$scope.tempString = '';
+    $scope.changeiemlValue = function() {
+	    if (sharedProperties.getDb() == true) {
+			
+			crudFactory.verifyIeml($scope.iemlValue).success(function(data) {
+				if (data.length == 0) {
+					$scope.tempString = '';
+				}
+				else {
+					$scope.tempString = $scope.iemlValue + ' already exists in database';
+				}
+			}).
+			error(function(data, status, headers, config) {
+				// called asynchronously if an error occurs
+				// or server returns response with an error status.
+				$scope.tempString = "Error verifying ieml item";
+			});		
+		}
+		else {
+			$scope.tempString = '';
+		}
+    };
+    $scope.changefrenchValue = function() {
+	    if (sharedProperties.getDb() == true) {
+			
+			crudFactory.verifyFr($scope.frenchValue).success(function(data) {
+				if (data.length == 0) {
+					$scope.tempString = '';
+				}
+				else {
+					$scope.tempString = $scope.frenchValue + ' already exists in database';
+				}
+			}).
+			error(function(data, status, headers, config) {
+				// called asynchronously if an error occurs
+				// or server returns response with an error status.
+				$scope.tempString = "Error verifying ieml item";
+			});			
+		}
+		else {
+			$scope.tempString = '';
+		}
+    };
+    $scope.changeenglishValue = function() {
+	    if (sharedProperties.getDb() == true) {
+			
+			crudFactory.verifyEn($scope.englishValue).success(function(data) {
+				if (data.length == 0) {
+					$scope.tempString = '';
+				}
+				else {
+					$scope.tempString = $scope.englishValue + ' already exists in database';
+				}
+			}).
+			error(function(data, status, headers, config) {
+				// called asynchronously if an error occurs
+				// or server returns response with an error status.
+				$scope.tempString = "Error verifying ieml item";
+			});	
+		}
+		else {
+			$scope.tempString = '';
+		}
+    };		  
   })  
   .controller('loadIEMLController', function($scope, $location, $mdDialog, crudFactory, sharedProperties) {
 
@@ -123,6 +206,7 @@ angular
 		crudFactory.get().success(function(data) {
 			$scope.List = data;
 			$scope.loadedfromDB = true;
+			sharedProperties.setDb(true);
 		});
 	};
 	
@@ -134,6 +218,7 @@ angular
 			{ieml:"o.wa.-",terms:[{lang:"FR",means:"utiliser le droit administratif | utiliser le droit commercial"},{lang:"EN",means:"to use administrative law | to use commercial law"}],paradigm:"0",layer:"2",class:"1"}
 		];
 		$scope.List = dev;
+		sharedProperties.setDb(false);
 	};
 	
 	$scope.showConfirm = function(callBack, index) {
