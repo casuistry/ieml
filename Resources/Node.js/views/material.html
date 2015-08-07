@@ -69,24 +69,24 @@
 			</md-chips-->
 
 			<!-- ieml list -->
+			<!-- http://stackoverflow.com/questions/20756694/angularjs-find-the-index-position-of-filtered-value-in-the-original-array -->
 			<md-list >
 			  <md-list-item ng-repeat="entry in List | filter: filterText">  
 				<div layout="row" layout-align="start center">
 				
 				  <!-- md-primary for blue color, md-mini for smaller icon-->
-				  <md-button class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, $index)">
+				  <md-button class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, List.indexOf(entry))">
 					<i class="material-icons">remove</i>
 				  </md-button>				
 				
-				  <md-button class="md-fab md-primary md-mini" ng-click="editEntry($index)">
+				  <md-button class="md-fab md-primary md-mini" ng-click="editEntry(List.indexOf(entry))">
 					<i class="material-icons">settings</i>
 				  </md-button>
 					
 				  <!-- style="text-transform: none;" otherwise it will be all caps -->	
-				  <md-button class="md-raised" style="text-transform: none;" ng-click="viewEntry($index)">
+				  <md-button class="md-raised" style="text-transform: none;" ng-click="viewEntry(List.indexOf(entry))">
 					{{entry.ieml}}
 				  </md-button>					
-				  
 				</div> 
 			  </md-list-item>
 			</md-list>

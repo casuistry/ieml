@@ -1,4 +1,4 @@
-//bower install angular-messages for ngMessages
+// http://stackoverflow.com/questions/17348058/how-to-improve-performance-of-ngrepeat-over-a-huge-dataset-angular-js
 
 angular
   .module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages'])
