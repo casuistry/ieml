@@ -27,6 +27,7 @@ angular
     return {
 		
         create : function(newData) {
+			$http.defaults.headers.post["Content-Type"] = "application/json";
             return $http.post('../api/newieml', newData);
         },
 
@@ -53,6 +54,12 @@ angular
       require: 'ngModel',
       link: function(scope, element, attributes, controller) {
         controller.$asyncValidators.exists = function(modelValue) {
+		  
+		  if (attributes.name=="ieml" && scope.doNotValidate) {
+			// if we edit (instead of creating a new one) an entry, 
+			// no need to validate as ieml will be readonly
+            return $q.when();
+          }
 		  
           if (controller.$isEmpty(modelValue)) {
             // consider empty model valid
@@ -90,6 +97,12 @@ angular
       link: function(scope, element, attributes, controller) {
         controller.$asyncValidators.iemlvalid = function(modelValue) {
 		  
+		  if (scope.doNotValidate) {
+			// if we edit (instead of creating a new one) an entry, 
+			// no need to validate as ieml will be readonly
+            return $q.when();
+          }
+		  
           if (controller.$isEmpty(modelValue)) {
             // consider empty model valid
             return $q.when();
@@ -116,7 +129,7 @@ angular
             scope.tempString = "Error executing 'iemlvalid' directive. Is validation service running?";
             deferred.reject();
           });
-		  
+
 		  return deferred.promise;
         };
       }
@@ -168,18 +181,22 @@ angular
   })
   .controller('iemlEntryEditorController', function($scope, $location, sharedProperties) {
 
+    $scope.doNotValidate = false;
+	
   	init();
 	
 	function init() {
       var v = sharedProperties.getIemlEntry();
 	  if (v == null) {
 		$scope.formTitle = 'Adding new entry';
+		$scope.doNotValidate = false;
 	  }
 	  else {
 		  $scope.formTitle = 'Editing ' + v.ieml;
 		  $scope.iemlValue = v.ieml;
 		  $scope.frenchValue = v.terms[0].means;
 		  $scope.englishValue = v.terms[1].means;
+		  $scope.doNotValidate = true;
 	  }
 	};
 	

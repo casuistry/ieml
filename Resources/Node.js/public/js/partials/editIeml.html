@@ -11,7 +11,7 @@
       <md-input-container>
         <label>ieml</label>
 		<!-- can also use the following to trigger validation: ng-change="changeiemlValue()"   md-maxlength="100"-->
-        <input type="text" required iemlvalid exists md-maxlength="100" name="ieml" ng-model="iemlValue" /> 
+        <input type="text" required iemlvalid exists md-maxlength="100" name="ieml" ng-model="iemlValue" ng-readonly="doNotValidate"/> 
         <div ng-messages="projectForm.ieml.$error">
           <div ng-message="required">This is required.</div>
           <div ng-message="exists">Value already exists in database.</div>
