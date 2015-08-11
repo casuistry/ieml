@@ -1,3 +1,5 @@
+<!-- http://codepen.io/salalaslam/pen/wajGMx -->
+
 <div>
   <md-toolbar class="md-primary">
     <h2 class="md-toolbar-tools" ng-model="formTitle">
@@ -8,29 +10,35 @@
     <form name="projectForm">
       <md-input-container>
         <label>ieml</label>
-        <input type="text" md-maxlength="100" required name="ieml" ng-model="iemlValue" ng-change="changeiemlValue()">
+		<!-- can also use the following to trigger validation: ng-change="changeiemlValue()"   md-maxlength="100"-->
+        <input type="text" required iemlvalid exists md-maxlength="100" name="ieml" ng-model="iemlValue" /> 
         <div ng-messages="projectForm.ieml.$error">
           <div ng-message="required">This is required.</div>
+          <div ng-message="exists">Value already exists in database.</div>
+          <div ng-message="iemlvalid">Not a valid IEML.</div>			  
           <div ng-message="md-maxlength">The name has to be less than 100 characters long.</div>
         </div>
       </md-input-container>
       <md-input-container>
         <label>French</label>
-        <input required name="french" ng-model="frenchValue" ng-change="changefrenchValue()">
-        <div ng-messages="projectForm.french.$error">
+        <input type="text" required exists name="FR" ng-model="frenchValue">
+        <div ng-messages="projectForm.FR.$error">
           <div ng-message="required">This is required.</div>
+		  <div ng-message="exists">Value already exists in database.</div>	
         </div>
       </md-input-container>
       <md-input-container>
         <label>English</label>
-        <input required name="english" ng-model="englishValue" ng-change="changeenglishValue()">
-        <div ng-messages="projectForm.english.$error">
+        <input type="text" required exists name="EN" ng-model="englishValue">
+        <div ng-messages="projectForm.EN.$error">
           <div ng-message="required">This is required.</div>
+		  <div ng-message="exists">Value already exists in database.</div>	
         </div>
       </md-input-container>
     </form>
 	<md-button class="md-raised" ng-click="cancelEdit()" ng-disabled="projectForm.$invalid"> Submit </md-button>	
 	<md-button class="md-raised" ng-click="cancelEdit()"> Cancel </md-button>
+	<br/><br/>
 	<label>{{tempString}}</label>
   </md-content>
 </div>

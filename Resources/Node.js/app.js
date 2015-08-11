@@ -57,9 +57,9 @@ app.use('/ieml', ieml_entries);
 app.all('/api/allieml', restapi.allieml);
 app.all('/api/newieml', restapi.newieml);
 app.delete('/api/remieml/:id', restapi.remieml);
-app.all('/api/verifyIeml/:id', restapi.verifyIeml);
-app.all('/api/verifyFr/:id', restapi.verifyFr);
-app.all('/api/verifyEn/:id', restapi.verifyEn);
+app.all('/api/exists/ieml/:id', restapi.verifyIeml);
+app.all('/api/exists/FR/:id', restapi.verifyFr);
+app.all('/api/exists/EN/:id', restapi.verifyEn);
 
 //need to render views in views/partial folder
 app.get('/partials/:name', restapi.partials);

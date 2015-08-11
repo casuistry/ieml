@@ -9,17 +9,18 @@ angular
 		
 	$routeProvider
 		.when('/default', {
-			controller: 'editController',
+			controller: 'loadIEMLController',
 			templateUrl: '/js/partials/default.html'
 		})
 		.when('/empty', {
-			controller: 'editController',
+			controller: 'loadIEMLController',
 			templateUrl: '/js/partials/empty.html'
 		})
 		.when('/edit/:id', {
-			controller: 'editController',
+			controller: 'loadIEMLController',
 			templateUrl: '/js/partials/editIeml.html'
-		});
+		})
+		;
 		//.otherwise({redirectTo: '/js/partials/test3.html'});
   })  
   .factory('crudFactory', function($http) {
@@ -37,53 +38,90 @@ angular
             return $http.delete('../api/remieml/' + id);
         },
 		
-		verifyIeml : function(id) {
-            return $http.get('../api/verifyIeml/' + id);
-        },
-		
-		verifyFr : function(id) {
-            return $http.get('../api/verifyFr/' + id);
+		exists : function(input, inputType) {
+            return $http.get('../api/exists/' + inputType + '/' + input);
         },
 
-		verifyEn : function(id) {
-            return $http.get('../api/verifyEn/' + id);
+		iemlvalid : function(input) {			
+          $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+          return $http.post('http://test-ieml.rhcloud.com/ScriptParser/rest/iemlparser', 'iemltext='+encodeURIComponent(input))			
         }		
 	}
+  })
+  .directive('exists', function($q, $timeout, $http, crudFactory) {
+    return {
+      require: 'ngModel',
+      link: function(scope, element, attributes, controller) {
+        controller.$asyncValidators.exists = function(modelValue) {
+		  
+          if (controller.$isEmpty(modelValue)) {
+            // consider empty model valid
+            return $q.when();
+          }
+		
+          var deferred = $q.defer();
+  
+          // use attributes.name to know which line in the form is being written
+          crudFactory.exists(modelValue, attributes.name).
+          success(function(data, status, headers, config) {
+			  
+			if (data.length == 0) {
+			  // no documents found	
+			  deferred.resolve();
+			}
+			else {
+			  // at least one document found
+			  deferred.reject();
+			}                
+          }).
+          error(function(data, status, headers, config) {
+            scope.tempString = "Error executing 'exists' directive.";
+            deferred.reject();
+          });
+		  
+		  return deferred.promise;
+        };
+      }
+    };
+  })
+  .directive('iemlvalid', function($q, crudFactory) {
+    return {
+      require: 'ngModel',
+      link: function(scope, element, attributes, controller) {
+        controller.$asyncValidators.iemlvalid = function(modelValue) {
+		  
+          if (controller.$isEmpty(modelValue)) {
+            // consider empty model valid
+            return $q.when();
+          }
+
+          var deferred = $q.defer();
+  
+		  // for invalid ieml, for some reason,
+		  // the message is not displayed automatically 
+		  // so we temporarily supply our own.
+		  
+          crudFactory.iemlvalid(modelValue).
+          success(function(data, status, headers, config) {
+			if (data.success === true) {
+				scope.tempString = '';
+				deferred.resolve();
+			}
+            else {
+                scope.tempString=data.exception;
+                deferred.reject();
+            }               
+          }).
+          error(function(data, status, headers, config) {
+            scope.tempString = "Error executing 'iemlvalid' directive. Is validation service running?";
+            deferred.reject();
+          });
+		  
+		  return deferred.promise;
+        };
+      }
+    };
   }) 
-  .controller('materialController', function ($scope, $timeout, $mdSidenav, $mdUtil, $log) {
-    $scope.toggleLeft = buildToggler('left');
-    $scope.toggleRight = buildToggler('right');
-    /**
-     * Build handler to open/close a SideNav; when animation finishes
-     * report completion in console
-     */
-    function buildToggler(navID) {
-      var debounceFn =  $mdUtil.debounce(function(){
-            $mdSidenav(navID)
-              .toggle()
-              .then(function () {
-                $log.debug("toggle " + navID + " is done");
-              });
-          },300);
-      return debounceFn;
-    }
-  })
-  .controller('LeftCtrl', function ($scope, $timeout, $mdSidenav, $log) {
-    $scope.close = function () {
-      $mdSidenav('left').close()
-        .then(function () {
-          $log.debug("close LEFT is done");
-        });
-    };
-  })
-  .controller('RightCtrl', function ($scope, $timeout, $mdSidenav, $log) {
-    $scope.close = function () {
-      $mdSidenav('right').close()
-        .then(function () {
-          $log.debug("close RIGHT is done");
-        });
-    };
-  })
   //http://stackoverflow.com/questions/12008908/how-can-i-pass-variables-between-controllers
   //http://stackoverflow.com/questions/6429225/javascript-null-or-undefined
   .service('sharedProperties', function () {
@@ -104,103 +142,15 @@ angular
         isDB = value;
       }	  
     };	
-  })
-  .controller('editController', function ($scope, $location, sharedProperties, crudFactory) {
-	  
-	init();
-	
-	function init() {
-      var v = sharedProperties.getProperty();
-	  if (v == null) {
-		$scope.formTitle = 'Adding new entry';
-	  }
-	  else {
-		  $scope.formTitle = 'Editing ' + v.ieml;
-		  $scope.iemlValue = v.ieml;
-		  $scope.frenchValue = v.terms[0].means;
-		  $scope.englishValue = v.terms[1].means;
-	  }
-	};  
-	
-	$scope.cancelEdit = function() {
-		//do nothing, return to default (previous ?) screen
-		var earl = '/default/';
-        $location.path(earl);	 
-	};	
-	
-	$scope.tempString = '';
-    $scope.changeiemlValue = function() {
-	    if (sharedProperties.getDb() == true) {
-			
-			crudFactory.verifyIeml($scope.iemlValue).success(function(data) {
-				if (data.length == 0) {
-					$scope.tempString = '';
-				}
-				else {
-					$scope.tempString = $scope.iemlValue + ' already exists in database';
-				}
-			}).
-			error(function(data, status, headers, config) {
-				// called asynchronously if an error occurs
-				// or server returns response with an error status.
-				$scope.tempString = "Error verifying ieml item";
-			});		
-		}
-		else {
-			$scope.tempString = '';
-		}
-    };
-    $scope.changefrenchValue = function() {
-	    if (sharedProperties.getDb() == true) {
-			
-			crudFactory.verifyFr($scope.frenchValue).success(function(data) {
-				if (data.length == 0) {
-					$scope.tempString = '';
-				}
-				else {
-					$scope.tempString = $scope.frenchValue + ' already exists in database';
-				}
-			}).
-			error(function(data, status, headers, config) {
-				// called asynchronously if an error occurs
-				// or server returns response with an error status.
-				$scope.tempString = "Error verifying ieml item";
-			});			
-		}
-		else {
-			$scope.tempString = '';
-		}
-    };
-    $scope.changeenglishValue = function() {
-	    if (sharedProperties.getDb() == true) {
-			
-			crudFactory.verifyEn($scope.englishValue).success(function(data) {
-				if (data.length == 0) {
-					$scope.tempString = '';
-				}
-				else {
-					$scope.tempString = $scope.englishValue + ' already exists in database';
-				}
-			}).
-			error(function(data, status, headers, config) {
-				// called asynchronously if an error occurs
-				// or server returns response with an error status.
-				$scope.tempString = "Error verifying ieml item";
-			});	
-		}
-		else {
-			$scope.tempString = '';
-		}
-    };		  
-  })  
+  }) 
   .controller('loadIEMLController', function($scope, $location, $mdDialog, crudFactory, sharedProperties) {
 
     //just for safety
     $scope.loadedfromDB = false;
 
 	$scope.List = [];
-	init();
-	//initDev();
+	//init();
+	initDev();
 	
 	function init() {
 		crudFactory.get().success(function(data) {
@@ -237,9 +187,7 @@ angular
 		});
 	};	
 	
-	
-	$scope.addEntry = function() {
-		
+	$scope.addEntry = function() {	
 		// assume parser says it is ok
 		var toBeAdded = {
 			ieml:$scope.newEntry.ieml,
@@ -298,24 +246,54 @@ angular
       );
     };	
 	
+	// need to declare in the controller's scope otherwise we will not see it
+	$scope.formTitle = '';
+	$scope.iemlValue = '';
+	$scope.frenchValue = '';
+	$scope.englishValue = '';
+	$scope.globalTest = 'global value';
+	
 	//http://stackoverflow.com/questions/11003916/how-do-i-switch-views-in-angularjs-from-a-controller-function
 	$scope.editEntry = function ( index ) {
-		
+  
 	  if (index === -1) {
 		sharedProperties.setProperty(null);
+		$scope.formTitle = 'Adding new entry';
+		$scope.iemlValue = '';
+	    $scope.frenchValue = '';
+	    $scope.englishValue = '';
 	    var earl = '/edit/new';
+		$scope.globalTest = 'global value new';
         $location.path(earl);		  
 	  }
 	  else {
 	    var toBeEdited = $scope.List[index];
 	    sharedProperties.setProperty(toBeEdited);
+		$scope.formTitle = 'Editing ' + toBeEdited.ieml;
+		$scope.iemlValue = toBeEdited.ieml;
+		$scope.frenchValue = toBeEdited.terms[0].means;
+		$scope.englishValue = toBeEdited.terms[1].means;		
 	    var earl = '/edit/' + toBeEdited.ieml;
+		$scope.globalTest = 'global value edit';
+		
         $location.path(earl);	
 	  }  
+	  
     };
 	
 	$scope.viewEntry = function ( index ) {
 	  var earl = '/empty/';
       $location.path(earl);	 	  
     };	
+	
+	$scope.cancelEdit = function() {
+		$scope.showAlert($scope.formTitle, $scope.globalTest);
+		//do nothing, return to default (previous ?) screen
+		var earl = '/default/';
+        $location.path(earl);	 
+	};	
+	
+	// temporary place-holder tempString for debug messages:
+	$scope.tempString = '';	 
+	
 });
