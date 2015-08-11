@@ -45,7 +45,7 @@ andrewApp1.factory('crudFactory', function($http) {
 	}
 });
 
-andrewApp1.controller('sidebarController', function($scope, crudFactory) {
+andrewApp1.controller('sidebarController', function($scope, $mdDialog, crudFactory) {
 
 	$scope.List = [];
 	init();
@@ -78,6 +78,8 @@ andrewApp1.controller('sidebarController', function($scope, crudFactory) {
 			//class:"2"
 		}
 		
+		$scope.showAlert('adding:', toBeAdded);
+		
 		// push to db
 		crudFactory.create(toBeAdded).success(function(data) {
 			$scope.currentError = "";
@@ -104,4 +106,14 @@ andrewApp1.controller('sidebarController', function($scope, crudFactory) {
 			$scope.currentError = "Error removing item";
 		});
     };
+	
+    $scope.showAlert = function(title, status) {
+      $mdDialog.show(
+        $mdDialog.alert()
+          .parent(angular.element(document.body))
+          .title(title)
+          .content(status)
+          .ok('Dismiss')
+      );
+    };	
 });

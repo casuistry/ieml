@@ -44,7 +44,7 @@ angular
 
 		iemlvalid : function(input) {			
           $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
-          return $http.post('http://test-ieml.rhcloud.com/ScriptParser/rest/iemlparser', 'iemltext='+encodeURIComponent(input))			
+          return $http.post('http://test-ieml.rhcloud.com/ScriptParser/rest/iemlparser', 'iemltext='+encodeURIComponent(input));
         }		
 	}
   })
@@ -126,6 +126,7 @@ angular
   //http://stackoverflow.com/questions/6429225/javascript-null-or-undefined
   .service('sharedProperties', function ($rootScope) {
     var iemlEntry;
+	var newIemlEntry;
     var isDB = false; // default
     
 	return {
@@ -135,6 +136,12 @@ angular
       setIemlEntry: function(value) {
         iemlEntry = value;
       },
+      setNewIemlEntry: function(value) {
+        newIemlEntry = value;
+      },
+	  getNewIemlEntry: function() {
+        return newIemlEntry;
+      },
       iemlEntryUpdated: function() {
         $rootScope.$broadcast("iemlEntryUpdated");
       },	  
@@ -143,10 +150,22 @@ angular
       },
       setDb: function(value) {
         isDB = value;
-      },
-      	  
+      }
     };	
   }) 
+  .service('popup', function ($rootScope, $mdDialog) {
+	return {
+      display: function (title, status) {
+		$mdDialog.show(
+          $mdDialog.alert()
+          .parent(angular.element(document.body))
+          .title(title)
+          .content(status)
+          .ok('Dismiss')
+        );
+	  }
+	};
+  })
   .controller('iemlEntryEditorController', function($scope, $location, sharedProperties) {
 
   	init();
@@ -182,7 +201,7 @@ angular
 			//class:"2"
 		}		
 		
-		sharedProperties.setIemlEntry(toBeAdded);
+		sharedProperties.setNewIemlEntry(toBeAdded);
 		sharedProperties.iemlEntryUpdated();
 		
 		var earl = '/default/';
@@ -239,34 +258,31 @@ angular
 	// when there is a new ieml entry, do something with it. 
 	$scope.$on('iemlEntryUpdated', function() {
         //$scope.showAlert('entry to save:', sharedProperties.getIemlEntry());
-		var val = sharedProperties.getIemlEntry();
+		var val = sharedProperties.getNewIemlEntry();
 		if (val === null) {
 			$scope.showAlert('error', 'entry to save is null');
 		}
 		else{
-			$scope.addEntry(sharedProperties.getIemlEntry());
+			$scope.addEntry(val);
 		}	
     });
 	
 	$scope.addEntry = function(toBeAdded) {	
 
-	// http://docs.mongodb.org/manual/reference/limits/#Restrictions-on-Field-Names
-	
+        //$scope.showAlert('adding:', toBeAdded);		
+		
 		if ($scope.loadedfromDB == true) {
 			crudFactory.create(toBeAdded).success(function(data) {
-				$scope.currentError = "";
 				$scope.List.push(toBeAdded);
 			}).
 			error(function(data, status, headers, config) {
 				// called asynchronously if an error occurs
 				// or server returns response with an error status.
-				$scope.currentError = "Error adding new item";
 			});
 		} 
 		else {
-			$scope.currentError = "";
 			$scope.List.push(toBeAdded);
-		}
+		}		
 	};	
 	
 	$scope.deleteEntry = function ( index ) {
@@ -300,37 +316,21 @@ angular
           .ok('Dismiss')
       );
     };	
-	
-	// need to declare in the controller's scope otherwise we will not see it
-	$scope.formTitle = '';
-	$scope.iemlValue = '';
-	$scope.frenchValue = '';
-	$scope.englishValue = '';
-	$scope.globalTest = 'global value';
-	
+		
 	//http://stackoverflow.com/questions/11003916/how-do-i-switch-views-in-angularjs-from-a-controller-function
 	$scope.editEntry = function ( index ) {
   
 	  if (index === -1) {
 		sharedProperties.setIemlEntry(null);
-		$scope.formTitle = 'Adding new entry';
 	    var earl = '/edit/new';
-		$scope.globalTest = 'global value new';
         $location.path(earl);		  
 	  }
 	  else {
 	    var toBeEdited = $scope.List[index];
-	    sharedProperties.setIemlEntry(toBeEdited);
-		$scope.formTitle = 'Editing ' + toBeEdited.ieml;
-		$scope.iemlValue = toBeEdited.ieml;
-		$scope.frenchValue = toBeEdited.terms[0].means;
-		$scope.englishValue = toBeEdited.terms[1].means;		
-	    var earl = '/edit/' + toBeEdited.ieml;
-		$scope.globalTest = 'global value edit';
-		
+	    sharedProperties.setIemlEntry(toBeEdited);	
+	    var earl = '/edit/' + toBeEdited.ieml;	
         $location.path(earl);	
 	  }  
-	  
     };
 	
 	$scope.viewEntry = function ( index ) {
