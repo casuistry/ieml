@@ -17,7 +17,7 @@ angular
 			templateUrl: '/js/partials/empty.html'
 		})
 		.when('/edit/:id', {
-			controller: 'loadIEMLController',
+			controller: 'iemlEntryEditorController',
 			templateUrl: '/js/partials/editIeml.html'
 		})
 		;
@@ -124,33 +124,82 @@ angular
   }) 
   //http://stackoverflow.com/questions/12008908/how-can-i-pass-variables-between-controllers
   //http://stackoverflow.com/questions/6429225/javascript-null-or-undefined
-  .service('sharedProperties', function () {
-    var property;
+  .service('sharedProperties', function ($rootScope) {
+    var iemlEntry;
     var isDB = false; // default
     
 	return {
-      getProperty: function () {
-        return property;
+      getIemlEntry: function () {
+        return iemlEntry;
       },
-      setProperty: function(value) {
-        property = value;
+      setIemlEntry: function(value) {
+        iemlEntry = value;
       },
+      iemlEntryUpdated: function() {
+        $rootScope.$broadcast("iemlEntryUpdated");
+      },	  
       getDb: function () {
         return isDB;
       },
       setDb: function(value) {
         isDB = value;
-      }	  
+      },
+      	  
     };	
   }) 
+  .controller('iemlEntryEditorController', function($scope, $location, sharedProperties) {
+
+  	init();
+	
+	function init() {
+      var v = sharedProperties.getIemlEntry();
+	  if (v == null) {
+		$scope.formTitle = 'Adding new entry';
+	  }
+	  else {
+		  $scope.formTitle = 'Editing ' + v.ieml;
+		  $scope.iemlValue = v.ieml;
+		  $scope.frenchValue = v.terms[0].means;
+		  $scope.englishValue = v.terms[1].means;
+	  }
+	};
+	
+    // form was cancelled by user, we discard all entered information and just return.
+  	$scope.cancelEdit = function() {
+		//do nothing, return to default (previous ?) screen
+		var earl = '/default/';
+        $location.path(earl);	 
+	};	
+	
+	// form was submitted by user
+  	$scope.submitEdit = function() {
+
+		var toBeAdded = {
+			ieml:$scope.iemlValue,
+			terms:[{lang:"FR",means:$scope.frenchValue},{lang:"EN",means:$scope.englishValue}],
+			paradigm:"0",
+			layer:"3"
+			//class:"2"
+		}		
+		
+		sharedProperties.setIemlEntry(toBeAdded);
+		sharedProperties.iemlEntryUpdated();
+		
+		var earl = '/default/';
+        $location.path(earl);	 
+	};
+	
+	// temporary place-holder tempString for debug messages:
+	$scope.tempString = '';	
+  })
   .controller('loadIEMLController', function($scope, $location, $mdDialog, crudFactory, sharedProperties) {
 
     //just for safety
     $scope.loadedfromDB = false;
 
 	$scope.List = [];
-	//init();
-	initDev();
+	init();
+	//initDev();
 	
 	function init() {
 		crudFactory.get().success(function(data) {
@@ -187,16 +236,22 @@ angular
 		});
 	};	
 	
-	$scope.addEntry = function() {	
-		// assume parser says it is ok
-		var toBeAdded = {
-			ieml:$scope.newEntry.ieml,
-			terms:[{lang:"FR",means:$scope.newEntry.fr},{lang:"EN",means:$scope.newEntry.en}],
-			paradigm:"0",
-			layer:"3"
-			//class:"2"
+	// when there is a new ieml entry, do something with it. 
+	$scope.$on('iemlEntryUpdated', function() {
+        //$scope.showAlert('entry to save:', sharedProperties.getIemlEntry());
+		var val = sharedProperties.getIemlEntry();
+		if (val === null) {
+			$scope.showAlert('error', 'entry to save is null');
 		}
+		else{
+			$scope.addEntry(sharedProperties.getIemlEntry());
+		}	
+    });
+	
+	$scope.addEntry = function(toBeAdded) {	
 
+	// http://docs.mongodb.org/manual/reference/limits/#Restrictions-on-Field-Names
+	
 		if ($scope.loadedfromDB == true) {
 			crudFactory.create(toBeAdded).success(function(data) {
 				$scope.currentError = "";
@@ -257,18 +312,15 @@ angular
 	$scope.editEntry = function ( index ) {
   
 	  if (index === -1) {
-		sharedProperties.setProperty(null);
+		sharedProperties.setIemlEntry(null);
 		$scope.formTitle = 'Adding new entry';
-		$scope.iemlValue = '';
-	    $scope.frenchValue = '';
-	    $scope.englishValue = '';
 	    var earl = '/edit/new';
 		$scope.globalTest = 'global value new';
         $location.path(earl);		  
 	  }
 	  else {
 	    var toBeEdited = $scope.List[index];
-	    sharedProperties.setProperty(toBeEdited);
+	    sharedProperties.setIemlEntry(toBeEdited);
 		$scope.formTitle = 'Editing ' + toBeEdited.ieml;
 		$scope.iemlValue = toBeEdited.ieml;
 		$scope.frenchValue = toBeEdited.terms[0].means;
@@ -284,16 +336,5 @@ angular
 	$scope.viewEntry = function ( index ) {
 	  var earl = '/empty/';
       $location.path(earl);	 	  
-    };	
-	
-	$scope.cancelEdit = function() {
-		$scope.showAlert($scope.formTitle, $scope.globalTest);
-		//do nothing, return to default (previous ?) screen
-		var earl = '/default/';
-        $location.path(earl);	 
-	};	
-	
-	// temporary place-holder tempString for debug messages:
-	$scope.tempString = '';	 
-	
+    };	 
 });
