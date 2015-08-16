@@ -344,8 +344,8 @@ angular
 	  }
 	  else {
 	    var toBeEdited = $scope.List[index];
-	    sharedProperties.setIemlEntry(toBeEdited);	
-	    var earl = '/edit/' + toBeEdited.ieml;	
+	    sharedProperties.setIemlEntry(toBeEdited);		
+	    var earl = '/edit/' + index;	
         $location.path(earl);	
 	  }  
     };
