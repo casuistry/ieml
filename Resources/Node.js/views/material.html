@@ -11,7 +11,7 @@
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	  
 	<!-- following css is required to get the "delete" button in side chips to look nice -->
-	<!--link rel="stylesheet" href="stylesheets/mystyle.css"-->
+	<link rel="stylesheet" href="stylesheets/mystyle.css">
 	
   </head>
   
@@ -39,7 +39,7 @@
 	<div layout="row">
 	  
 	  <!-- LEFT NAVIGATION -->
-	  <div ng-controller="loadIEMLController" layout="column" style="height: 700px;">			
+	  <div ng-controller="loadIEMLController" layout="column" style="height: 700px;">		
 		<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
 		  
 		  <div> <!-- without this div, the 'add' icon gets squished -->
@@ -57,43 +57,27 @@
 			  </form>	
 		  </div>
 		  
-		  <!--scrollable content -->
-		  <md-content>
-		  
-			<!--md-chips class="custom-chips" ng-model="List" readonly="true">
-			  <md-chip-template>
-				<strong>{{$chip.ieml}}</strong>
-			  </md-chip-template>
-			  <button md-chip-remove class="md-primary vegetablechip">
-				<md-icon md-svg-icon="md-close"></md-icon>				
-			  </button>
-			</md-chips-->
+		  <md-content>  
+		    <md-virtual-repeat-container id="vertical-container">
+              <div md-virtual-repeat="item in List | filter: filterText" class="repeated-item" flex> 
+			  
+			  	<!-- md-primary for blue color, md-mini for smaller icon-->
+				<md-button class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, List.indexOf(item))">
+				  <i class="material-icons">remove</i>
+				</md-button>	
+				  
+                <md-button class="md-fab md-primary md-mini" ng-click="editEntry(List.indexOf(item))">
+				  <i class="material-icons">settings</i>
+				</md-button>
+				  
+				<md-button class="md-raised" style="text-transform: none;" ng-click="viewEntry(List.indexOf(item))">
+				  {{item.ieml}} 
+				</md-button>	
+				
+			  </div>
+            </md-virtual-repeat-container>
+	      </md-content>
 
-			<!-- ieml list -->
-			<!-- http://stackoverflow.com/questions/20756694/angularjs-find-the-index-position-of-filtered-value-in-the-original-array -->
-			<md-list >
-			  <md-list-item ng-repeat="entry in List | filter: filterText">  
-				<div layout="row" layout-align="start center">
-				
-				  <!-- md-primary for blue color, md-mini for smaller icon-->
-				  <md-button class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, List.indexOf(entry))">
-					<i class="material-icons">remove</i>
-				  </md-button>				
-				
-				  <md-button class="md-fab md-primary md-mini" ng-click="editEntry(List.indexOf(entry))">
-					<i class="material-icons">settings</i>
-				  </md-button>
-					
-				  <!-- style="text-transform: none;" otherwise it will be all caps -->	
-				  <md-button class="md-raised" style="text-transform: none;" ng-click="viewEntry(List.indexOf(entry))">
-					{{entry.ieml}}
-				  </md-button>					
-				</div> 
-			  </md-list-item>
-			</md-list>
-			<!-- end ieml list -->
-					
-		  </md-content>
 		</md-sidenav>
 	  </div>	
 		<!-- END LEFT NAVIGATION -->	

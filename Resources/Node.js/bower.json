@@ -12,6 +12,6 @@
     "angular-messages": "latest"
   },
   "resolutions": {
-    "angular": "1.4.3"
+    "angular": "1.4.4"
   }
 }
