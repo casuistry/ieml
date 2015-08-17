@@ -1,15 +1,16 @@
 
  #vertical-container {
-  height: 292px;
-  width: 400px; }
+  height: 345px;
+  width: 375px; }
  .repeated-item {
-
+  border-bottom: 1px solid #ddd;
   box-sizing: border-box;
-  height: 40px;
-  padding-top: 10px; }
+  height: 60px;
+  padding-top: 6px; }
  md-content {
-  margin: 16px; }
- 
+  margin: 0px; }
+  md-virtual-repeat-container {
+    border: solid 1px grey; } 
  .md-virtual-repeat-container .md-virtual-repeat-offsetter {
   padding-left: 16px; }
   

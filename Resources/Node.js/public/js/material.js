@@ -1,4 +1,3 @@
-// http://stackoverflow.com/questions/17348058/how-to-improve-performance-of-ngrepeat-over-a-huge-dataset-angular-js
 
 angular
   .module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages'])
@@ -135,8 +134,6 @@ angular
       }
     };
   }) 
-  //http://stackoverflow.com/questions/12008908/how-can-i-pass-variables-between-controllers
-  //http://stackoverflow.com/questions/6429225/javascript-null-or-undefined
   .service('sharedProperties', function ($rootScope) {
     var iemlEntry;
 	var newIemlEntry;
@@ -192,10 +189,10 @@ angular
 		$scope.doNotValidate = false;
 	  }
 	  else {
-		  $scope.formTitle = 'Editing ' + v.ieml;
-		  $scope.iemlValue = v.ieml;
-		  $scope.frenchValue = v.terms[0].means;
-		  $scope.englishValue = v.terms[1].means;
+		  $scope.formTitle = 'Editing ' + v.IEML;
+		  $scope.iemlValue = v.IEML;
+		  $scope.frenchValue = v.FR;
+		  $scope.englishValue = v.EN;
 		  $scope.doNotValidate = true;
 	  }
 	};
@@ -211,11 +208,13 @@ angular
   	$scope.submitEdit = function() {
 
 		var toBeAdded = {
-			ieml:$scope.iemlValue,
-			terms:[{lang:"FR",means:$scope.frenchValue},{lang:"EN",means:$scope.englishValue}],
-			paradigm:"0",
-			layer:"3"
-			//class:"2"
+			IEML:$scope.iemlValue,
+			FR:$scope.frenchValue,
+			EN:$scope.englishValue,
+			//terms:[{lang:"FR",means:$scope.frenchValue},{lang:"EN",means:$scope.englishValue}],
+			PARADIGM:"0",
+			LAYER:"3",
+			CLASS:"2"
 		}		
 		
 		sharedProperties.setNewIemlEntry(toBeAdded);
@@ -248,10 +247,13 @@ angular
 	function initDev() {		
 		var dev =
 		[
-			{ieml:"t.e.-m.u.-'",terms:[{lang:"FR",means:"représentation dramatique"},{lang:"EN",means:"dramatic representation"}],paradigm:"0",layer:"3",class:"2"},
-			{ieml:"t.i.-s.i.-'",terms:[{lang:"FR",means:"véhicule"},{lang:"EN",means:"vehicle"}],paradigm:"0",layer:"3",class:"2"},
-			{ieml:"o.wa.-",terms:[{lang:"FR",means:"utiliser le droit administratif | utiliser le droit commercial"},{lang:"EN",means:"to use administrative law | to use commercial law"}],paradigm:"0",layer:"2",class:"1"}
-		];
+			//{ieml:"t.e.-m.u.-'",terms:[{lang:"FR",means:"représentation dramatique"},{lang:"EN",means:"dramatic representation"}],paradigm:"0",layer:"3",class:"2"},
+			//{ieml:"t.i.-s.i.-'",terms:[{lang:"FR",means:"véhicule"},{lang:"EN",means:"vehicle"}],paradigm:"0",layer:"3",class:"2"},
+			//{ieml:"o.wa.-",terms:[{lang:"FR",means:"utiliser le droit administratif | utiliser le droit commercial"},{lang:"EN",means:"to use administrative law | to use commercial law"}],paradigm:"0",layer:"2",class:"1"}
+			{IEML:"t.e.-m.u.-'",FR:"représentation dramatique",EN:"dramatic representation",PARADIGM:"0",LAYER:"3",CLASS:"2"},
+			{IEML:"t.i.-s.i.-'",FR:"véhicule",EN:"vehicle",PARADIGM:"0",LAYER:"3",CLASS:"2"},
+			{IEML:"o.wa.-",FR:"utiliser le droit administratif | utiliser le droit commercial",EN:"to use administrative law | to use commercial law",PARADIGM:"0",LAYER:"2",CLASS:"1"}
+			];
 		$scope.List = dev;
 		sharedProperties.setDb(false);
 	};
@@ -304,7 +306,7 @@ angular
 	
 	$scope.deleteEntry = function ( index ) {
 		
-        var toBeRemoved = $scope.List[index].ieml;
+        var toBeRemoved = $scope.List[index].IEML;
 				
 		if ($scope.loadedfromDB == true) {
 			crudFactory.remove(toBeRemoved).success(function(data) {

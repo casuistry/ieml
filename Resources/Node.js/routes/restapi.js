@@ -4,7 +4,7 @@ module.exports.allieml = function (req, res) {
 
 	var db = req.db;
     console.log("before loading ieml");
-    db.collection('collection1').find().toArray(function(err, result) {
+    db.collection('terms').find().toArray(function(err, result) {
 		if (err) {
 			console.log("ERROR"+err);
 			throw err;
@@ -20,7 +20,7 @@ module.exports.newieml = function (req, res) {
     console.log("before adding ieml");
 	console.log(req.body);
 	
-	db.collection('collection1').insert(
+	db.collection('terms').insert(
 		req.body, 
 		function(err, result) {
 			if (err) {
@@ -48,8 +48,8 @@ module.exports.remieml = function (req, res) {
 	
 	//res.sendStatus(200);
 
-	db.collection('collection1').remove(
-	    {ieml:req.params.id}, 
+	db.collection('terms').remove(
+	    {IEML:req.params.id}, 
 		function(err, result) {
 			if (err) {
 				console.log("ERROR"+err);
@@ -74,7 +74,7 @@ module.exports.verifyIeml = function (req, res) {
 	console.log(req.params.id);
 	
 	//res.sendStatus(200);  test, all was ok
-    // db.collection1.find({ "ieml": "f.u.-f.u.-'" })
+    // db.terms.find({ "ieml": "f.u.-f.u.-'" })
 	
 	//db.collection('bands').find({name:'Road Crew'}).toArray(
 	//  function(err, result) {
@@ -83,7 +83,7 @@ module.exports.verifyIeml = function (req, res) {
     //  }
 	//);
 
-	db.collection('collection1').find({ieml:req.params.id}).toArray(
+	db.collection('terms').find({IEML:req.params.id}).toArray(
 		function(err, result) {
 			if (err) {
 				console.log("ERROR"+err);
@@ -103,9 +103,10 @@ module.exports.verifyFr = function (req, res) {
 	console.log(req.params.id);
 	
 	//res.sendStatus(200);  test, all was ok
-    // db.collection1.find( { terms: { $all: [ { "$elemMatch" : { lang: "FR", means: "illusion" } } ] } } )
+    // db.terms.find( { terms: { $all: [ { "$elemMatch" : { lang: "FR", means: "illusion" } } ] } } )
 	
-	db.collection('collection1').find({ terms: { $all: [ { "$elemMatch" : { lang: "FR", means: req.params.id } } ] } }).toArray(
+	//db.collection('terms').find({ terms: { $all: [ { "$elemMatch" : { lang: "FR", means: req.params.id } } ] } }).toArray(
+    db.collection('terms').find({FR:req.params.id}).toArray(	
 		function(err, result) {
 			if (err) {
 				console.log("ERROR"+err);
@@ -124,11 +125,13 @@ module.exports.verifyEn = function (req, res) {
     console.log("before verifying FR");
 	console.log(req.params.id);
 	
-	//res.sendStatus(200);  test, all was ok
-    // db.collection1.find( { terms: { $all: [ { "$elemMatch" : { lang: "FR", means: "illusion" } } ] } } )
 	
-	db.collection('collection1').find({ terms: { $all: [ { "$elemMatch" : { lang: "EN", means: req.params.id } } ] } }).toArray(
-		function(err, result) {
+	//res.sendStatus(200);  test, all was ok
+    // db.terms.find( { terms: { $all: [ { "$elemMatch" : { lang: "FR", means: "illusion" } } ] } } )
+	
+	//db.collection('terms').find({ terms: { $all: [ { "$elemMatch" : { lang: "EN", means: req.params.id } } ] } }).toArray(
+    db.collection('terms').find({EN:req.params.id}).toArray(
+	    function(err, result) {
 			if (err) {
 				console.log("ERROR"+err);
 				throw err;
