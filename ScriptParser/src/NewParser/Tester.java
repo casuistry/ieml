@@ -11,6 +11,8 @@ public class Tester {
 	public static void main(String[] args) {		
 		
 		ArrayList<String> list = new ArrayList<String>();
+		list.add("A: ");
+		
 	/*
 		list.addAll(Arrays.asList(
 				"U:S:.E:.U:S:.-", 
@@ -55,9 +57,9 @@ public class Tester {
 		*/
 		
 		//Utilities.Helper.ProcessDictionaryV2(null);
-		Utilities.Helper.nextCheck();
+		//Utilities.Helper.nextCheck();
 		
-		/*
+		
 		ParserImpl parser = new ParserImpl();
 		for (String s:list){						
 			try {				
@@ -75,7 +77,7 @@ public class Tester {
 				parser.Reset();
 			}
 		}
-		*/
+		
 	}
 }
 

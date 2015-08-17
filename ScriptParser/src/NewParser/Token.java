@@ -306,4 +306,61 @@ public class Token {
 		
 		return this;
 	}
+	
+	public int GetTokenClass() throws Exception {
+
+		ArrayList<Token> firstTokens = new ArrayList<Token>();
+		
+		if (opCode != null && opCode.equals(Tokenizer.addition)) {
+			for (Token n : nodes) {
+				firstTokens.add(n.GetFirstToken());
+			}
+		}
+		else {
+			firstTokens.add(this.GetFirstToken());
+		}
+		
+		int result = 0;
+		
+		
+		System.out.print(GetName());
+		StringBuilder builder = new StringBuilder();
+		for (int i=0;i<50-GetName().length();i++)
+			builder.append(" ");
+		System.out.print(builder.toString());
+		
+		for (Token t : firstTokens){
+			
+			char c = t.GetName().charAt(0);
+			
+			if (Tokenizer.c_verb.contains(c)) {
+				result |= Tokenizer.GrammaticalClass.verb.getNumVal();
+			}
+			
+			if (Tokenizer.c_noun.contains(c)) {
+				result |= Tokenizer.GrammaticalClass.noun.getNumVal();
+			}
+			
+			if (Tokenizer.c_aux.contains(c)) {
+				result |= Tokenizer.GrammaticalClass.auxiliary.getNumVal();
+			}
+			
+			if (Tokenizer.c_full.contains(c)) {
+				result |= Tokenizer.GrammaticalClass.full.getNumVal();
+			}
+			
+			if (Tokenizer.c_inf.contains(c)) {
+				result |= Tokenizer.GrammaticalClass.info.getNumVal();
+			}
+			
+			System.out.print(t.GetName().charAt(0) + " " + result + "\t");
+		}
+		
+		System.out.println();
+		
+		if (result < 1 || result > 7)
+			throw new Exception("bad grammatical class");
+		
+		return result;
+	}	
 }

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import NewParser.ParserImpl;
+import NewParser.ScriptExamples;
 import NewParser.Token;
 import NewParser.Tokenizer;
 
@@ -18,8 +19,38 @@ public class JsonGenerator {
 		//json.verify();
 		//json.generate_paradigms();
 		json.generate();
+		//json.testGrammaticalClassCalculation();
 	}
 
+	public void testGrammaticalClassCalculation() {
+		
+		ArrayList<String> list = new ArrayList<String>();
+		list.add(ScriptExamples.StudentLearnsMathematics);
+		list.add(ScriptExamples.CesJeux);
+		//list.add(ScriptExamples.JeSaurai);
+		//list.add(ScriptExamples.NeSaurontPas);
+		list.add(ScriptExamples.UnCoteurraconteUneHistoire);
+		//list.add(ScriptExamples.EnfantDeMaVoisine);
+		list.add(ScriptExamples.EnfantDeMaVoisin1);
+		list.add(ScriptExamples.ieml1);
+		list.add(ScriptExamples.ieml2);
+		
+		ParserImpl parser = new ParserImpl();
+		for (String s:list){						
+			try {				
+				Token n = parser.parse(s);
+				n.GetTokenClass();
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				System.out.println(s);
+			}		
+			finally {
+				parser.Reset();
+			}
+		}
+		
+	}
+	
 	public void verify() {
 		List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db.csv");
 		HashMap<String, String> map = new HashMap<String, String>();
@@ -75,6 +106,7 @@ public class JsonGenerator {
 		}
 	}
 	
+	// create ieml.db{xx}.csv file from base db file
 	public void add_paradigms() {
 		
 		ParserImpl parser = new ParserImpl();
@@ -91,7 +123,8 @@ public class JsonGenerator {
 		
 		try {
 			
-			BufferedWriter para_clean = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db2.csv"));
+			//BufferedWriter para_clean = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db2.csv"));
+			BufferedWriter para_clean = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv"));
 			BufferedWriter first = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\firstToken.csv"));
 			
 			for (String s : db) {
@@ -99,19 +132,8 @@ public class JsonGenerator {
 				String[] parts = s.split(",");
 								
 				try {				
-					Token n = parser.parse(parts[0].trim());	
-						
-					int ieml_class = 0; //undefined
-					Token first_token = n.GetFirstToken();
-					char f = first_token.GetName().charAt(0);
-					if (Tokenizer.c_verb.contains(f))
-						ieml_class = 1;
-					if (Tokenizer.c_noun.contains(f))
-						ieml_class = 2;
-					if (Tokenizer.c_aux.contains(f))
-						ieml_class = 3;
-					
-					first.write(parts[0].trim() + "," + first_token.GetName() + "\n");
+					Token n = parser.parse(parts[0].trim());							
+					int ieml_class = n.GetTokenClass();
 					
 					if (p_map.containsKey(parts[0].trim())){
 						p_map.put(parts[0].trim(), p_map.get(parts[0].trim()) + 1);
@@ -206,6 +228,7 @@ public class JsonGenerator {
 		}
 	}
 	
+	// generate json file using ieml.db{xx}.csv file
 	public void generate(){
 						
         add_paradigms();
@@ -213,7 +236,8 @@ public class JsonGenerator {
 		HashMap<String, String> duplicates = new HashMap<String, String>();
 		HashMap<String, String> duplicates_fr = new HashMap<String, String>();
 		HashMap<String, String> duplicates_en = new HashMap<String, String>();
-		List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db2.csv");
+		//List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db2.csv");
+		List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
 		
 		try {
 			BufferedWriter json = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.json"));			
@@ -269,10 +293,14 @@ public class JsonGenerator {
 				try {				
 					Token n = parser.parse(ieml);	
 					
-					//create JSON
-					//{ ieml: "S:B:T:.", terms: [{lang:"FR",means:"something"},{lang:"EN",means:"somethingElse"}], paradigm: "", layer: "", class: ""  }
-					String j = String.format("{ieml:\"%s\",terms:[{lang:\"FR\",means:\"%s\"},{lang:\"EN\",means:\"%s\"}],paradigm:\"%s\",layer:\"%s\",class:\"%s\"}", 
-							ieml, fr, en, pa, la, cl);
+					//create JSON terms: 
+					//{ IEML: "S:B:T:.", FR:"qqchose", EN:"something", PARADIGM: "", LAYER: "", CLASS: ""  }
+					
+					//String j = String.format("{ieml:\"%s\",terms:[{lang:\"FR\",means:\"%s\"},{lang:\"EN\",means:\"%s\"}],paradigm:\"%s\",layer:\"%s\",class:\"%s\"}", 
+					//		ieml, fr, en, pa, la, cl);
+					
+					String j = String.format("{IEML:\"%s\",FR:\"%s\",EN:\"%s\",PARADIGM:\"%s\",LAYER:\"%s\",CLASS:\"%s\"}", ieml, fr, en, pa, la, cl);
+					
 					json.write(j+"\n" );
 					fren.write(fr+"\n");
 					engl.write(en+"\n");

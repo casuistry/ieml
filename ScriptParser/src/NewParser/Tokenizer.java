@@ -22,7 +22,28 @@ public class Tokenizer {
 	public static List<Character> c_verb     = Arrays.asList(new Character[]{'O', 'U', 'A'});
     public static List<Character> c_noun     = Arrays.asList(new Character[]{'M', 'S', 'B', 'T'});
     public static List<Character> c_aux      = Arrays.asList(new Character[]{'E'});
+    public static List<Character> c_full      = Arrays.asList(new Character[]{'F'});
+    public static List<Character> c_inf      = Arrays.asList(new Character[]{'I'});
+	
+	public enum GrammaticalClass {
+		
+		auxiliary(1),
+		verb(2),		
+		noun(4),		
+		full(6),		
+		info(7);
+		
+	    private int numVal;
 
+	    GrammaticalClass(int numVal) {
+	        this.numVal = numVal;
+	    }
+
+	    public int getNumVal() {
+	        return numVal;
+	    }
+	}
+	
 	public enum States {
 		
 		state_none("invalid state"),
