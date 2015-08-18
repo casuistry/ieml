@@ -49,17 +49,49 @@
 				<i class="material-icons">add</i>
 			  </md-button>
 			
+              <div layout="row">
+                <md-input-container>
+                  <label>Display</label>
+                    <md-select ng-model="filterParadigm" ng-change="triggerFiltering('PARADIGM')" >
+                      <md-option ng-repeat="filterParadigm in filterParadigmChoices" value="{{filterParadigm}}">
+					    {{filterParadigm}}
+					  </md-option>
+                    </md-select>
+                </md-input-container>
+                <md-input-container>
+                  <label>Display</label>
+                    <md-select ng-model="filterClass" ng-change="triggerFiltering('CLASS')">
+                      <md-optgroup label="Primary">
+                        <md-option ng-value="filterClass.name" ng-repeat="filterClass in filterClassChoices | filter: {category: 'primary' }">{{filterClass.name}}</md-option>
+                      </md-optgroup>
+                      <md-optgroup label="Secondary">
+                        <md-option ng-value="filterClass.name" ng-repeat="filterClass in filterClassChoices | filter: {category: 'secondary' }">{{filterClass.name}}</md-option>
+                      </md-optgroup>
+                      <md-optgroup label="Tertiary">
+                        <md-option ng-value="filterClass.name" ng-repeat="filterClass in filterClassChoices | filter: {category: 'tertiary' }">{{filterClass.name}}</md-option>
+                      </md-optgroup>					  
+                    </md-select>
+                </md-input-container>
+				<md-input-container>
+                  <label>Display</label>
+                    <md-select ng-model="filterLayer" ng-change="triggerFiltering('LAYER')">
+                      <md-option ng-repeat="filterLayer in filterLayerChoices" value="{{filterLayer}}">{{filterLayer}}</md-option>
+                    </md-select>
+                </md-input-container>				
+              </div>
+	
 			  <form>
 				<md-input-container >
 				  <label for="filterInput">Filter</label>
 				  <input type="text" id="filterInput" data-ng-model="filterText" md-sidenav-focus>
 				</md-input-container>
-			  </form>	
+			  </form>
+			  
 		  </div>
 		  
 		  <md-content>  
 		    <md-virtual-repeat-container id="vertical-container">
-              <div md-virtual-repeat="item in List | filter: filterText" class="repeated-item" flex> 
+              <div md-virtual-repeat="item in List | filter: filterText | filter: {PARADIGM:filterParadigmChoices.indexOf(filterParadigm)} | filter:filterGrammaticalClass(filterClass) | filter:filterItemLayer(filterLayer)" class="repeated-item" flex> 
 			  
 			  	<!-- md-primary for blue color, md-mini for smaller icon-->
 				<md-button class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, List.indexOf(item))">

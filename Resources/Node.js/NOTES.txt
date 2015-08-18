@@ -1,0 +1,106 @@
+======================================================================================================
+													REST
+======================================================================================================
+
+From Node
+------------------------------------------------------------------------------------------------------
+Required to interact with validation service
+Either Browser does it or Node does it (as a proxy fro Browser)
+http://stackoverflow.com/questions/5643321/how-to-make-remote-rest-call-inside-node-js-any-curl
+
+======================================================================================================
+													JAVASCRIPT
+======================================================================================================
+
+NULL
+or undefined
+------------------------------------------------------------------------------------------------------
+http://stackoverflow.com/questions/6429225/javascript-null-or-undefined
+
+
+======================================================================================================
+													ANGULAR JS
+======================================================================================================
+
+FILTERING
+index changes 
+------------------------------------------------------------------------------------------------------
+http://stackoverflow.com/questions/20756694/angularjs-find-the-index-position-of-filtered-value-in-the-original-array
+
+filtering on a property (checkbox for example)
+http://stackoverflow.com/questions/17945861/how-do-i-filter-an-array-with-angularjs-and-use-a-property-of-the-filtered-objec
+
+passing arguments to filters
+http://stackoverflow.com/questions/11753321/passing-arguments-to-angularjs-filters
+
+CONTROLLERS
+sharing variables
+------------------------------------------------------------------------------------------------------
+http://stackoverflow.com/questions/12008908/how-can-i-pass-variables-between-controllers
+  
+SWITCHING VIEWS
+control flow
+------------------------------------------------------------------------------------------------------
+http://stackoverflow.com/questions/11003916/how-do-i-switch-views-in-angularjs-from-a-controller-function
+  
+======================================================================================================
+													ANGULAR MATERIAL
+======================================================================================================
+
+NG_REPEAT
+slow performance for large lists
+------------------------------------------------------------------------------------------------------
+http://stackoverflow.com/questions/17348058/how-to-improve-performance-of-ngrepeat-over-a-huge-dataset-angular-js
+
+
+======================================================================================================
+													MONGO DB
+======================================================================================================
+
+CRUD with mongoskin/mongoDB
+simple examples
+------------------------------------------------------------------------------------------------------
+http://www.hacksparrow.com/mongoskin-tutorial-with-examples.html
+
+TIMEOUTS
+need to revisit
+------------------------------------------------------------------------------------------------------
+timeouts for connections. Example: load all from db, then kill db, then make
+a request ==> app keeps on trying for ever
+http://blog.mongolab.com/2013/10/do-you-want-a-timeout/
+
+
+QUERY Operators
+------------------------------------------------------------------------------------------------------
+Verify that new or modified field values are unique.
+Two ways: A) verify prior to submission, B) submit and handle errors
+Going with A) on the assumption that it will provide a better user experience 
+http://docs.mongodb.org/manual/reference/operator/query/all/
+
+
+======================================================================================================
+													OTHER
+======================================================================================================
+
+Finding a document for the specified ieml string:
+------------------------------------------------------------------------------------------------------
+
+db.collection1.find({ ieml: { $all: [ "f.u.-f.u.-'" ] } })
+db.collection1.find({ "ieml": "f.u.-f.u.-'" })
+
+both return:
+
+{ "_id" : ObjectId("5582310750c6e430d6ca64e4"), "ieml" : "f.u.-f.u.-'", "terms"
+: [ { "lang" : "FR", "means" : "illusion" }, { "means" : "illusion", "lang" : "EN" } ] }
+
+Finding a document for the specified term string:
+
+db.collection1.find( { terms: { $all: [ { "$elemMatch" : { lang: "FR", means: "illusion" } } ] } } )
+				   
+returns:
+
+{ "_id" : ObjectId("5582310750c6e430d6ca64e4"), "ieml" : "f.u.-f.u.-'", "terms"
+: [ { "lang" : "FR", "means" : "illusion" }, { "means" : "illusion", "lang" : "EN" } ] }
+
+
+Returns no document if not found. Mongoskin changes this a bit, see implementation.

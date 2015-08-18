@@ -232,6 +232,97 @@ angular
     //just for safety
     $scope.loadedfromDB = false;
 
+	var fParadigms = "Paradigms";
+	var fAllTerms = "All terms";
+	var fAllClasses = "All classes";
+	var fAuxClass = "Auxiliary class";
+	var fVerbClass = "Verb class";
+	var fNounClass = "Noun class";
+	var favClass = "A/V classes";
+	var fanClass = "A/N classes";
+	var fvnClass = "V/N classes";
+	var fAllLayers = "All layers";
+	var fLayer0 = "Layer 0";
+	var fLayer1 = "Layer 1";
+	var fLayer2 = "Layer 2";
+	var fLayer3 = "Layer 3";
+	var fLayer4 = "Layer 4";
+	var fLayer5 = "Layer 5";
+	var fLayer6 = "Layer 6";
+	
+	$scope.filterParadigmChoices = [
+      fAllTerms,
+	  fParadigms
+    ];
+    $scope.filterClassChoices = [
+	  { category: 'tertiary', name: fAllClasses },
+      { category: 'primary', name: fAuxClass },
+      { category: 'primary', name: fVerbClass },
+      { category: 'primary', name: fNounClass },
+      { category: 'secondary', name: favClass },
+      { category: 'secondary', name: fanClass },
+      { category: 'secondary', name: fvnClass }
+    ];
+    $scope.filterLayerChoices = [
+	  fAllLayers,
+      fLayer0,
+      fLayer1,
+      fLayer2,
+      fLayer3,
+      fLayer4,
+      fLayer5,
+      fLayer6		  
+    ];
+	  
+	// set defaults
+	$scope.filterParadigm = fAllTerms; //default value
+	$scope.filterClass = fAllClasses; //default value
+	$scope.filterLayer = fAllLayers; //default value
+	
+	$scope.triggerFiltering = function (selection) {
+      //alert(selection);
+    };	
+	
+	//http://stackoverflow.com/questions/11753321/passing-arguments-to-angularjs-filters
+	$scope.filterGrammaticalClass = function(selection) {
+      return function(input) {
+		if (selection === fAllClasses)
+		  return true;
+	  
+	    var v;
+        if (selection === fAuxClass)
+			v = 1;
+		if (selection === fVerbClass)
+			v = 2;
+		if (selection === fNounClass)
+			v = 4;	
+		if (selection === favClass)
+			v = 3;				
+		if (selection === fanClass)
+			v = 5;	
+		if (selection === fvnClass)
+			v = 6;	
+
+        if (input.CLASS == v)
+          return true;
+	  
+		return false;
+      }
+    };
+	
+	$scope.filterItemLayer = function(selection) {
+      return function(input) {
+		  
+		if (selection === fAllLayers)
+		  return true;
+
+        if (input.LAYER == $scope.filterLayerChoices.indexOf(selection) - 1)
+          return true;
+	  
+		return false;
+      }
+    };
+	
 	$scope.List = [];
 	init();
 	//initDev();
@@ -336,7 +427,6 @@ angular
       );
     };	
 		
-	//http://stackoverflow.com/questions/11003916/how-do-i-switch-views-in-angularjs-from-a-controller-function
 	$scope.editEntry = function ( index ) {
   
 	  if (index === -1) {
