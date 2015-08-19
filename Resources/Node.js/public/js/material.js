@@ -19,6 +19,10 @@ angular
 			controller: 'iemlEntryEditorController',
 			templateUrl: '/js/partials/editIeml.html'
 		})
+		.when('/dicEdit', {
+			controller: 'iemlDictionaryController',
+			templateUrl: '/js/partials/dictionaryEdit.html'
+		})
 		;
 		//.otherwise({redirectTo: '/js/partials/test3.html'});
   })  
@@ -133,8 +137,7 @@ angular
         };
       }
     };
-  }) 
-  .service('sharedProperties', function ($rootScope) {
+  }).service('sharedProperties', function ($rootScope) {
     var iemlEntry;
 	var newIemlEntry;
     var isDB = false; // default
@@ -441,9 +444,45 @@ angular
         $location.path(earl);	
 	  }  
     };
+
+    $scope.showDicEdit = function() {
+      var earl = '/dicEdit/';
+      $location.path(earl);	
+    };
 	
 	$scope.viewEntry = function ( index ) {
 	  var earl = '/empty/';
       $location.path(earl);	 	  
     };	 
+}).controller('iemlDictionaryController', function($scope, $location, crudFactory, sharedProperties) {
+	$scope.tiles=[
+		{span:{row:1, col:4}, background:'gray', value:'Script of table1', edit:false},
+		{span:{row:1, col:1}, background:'green', value:'Script sub-row 1.1', edit:false},
+		
+		{span:{row:3, col:1}, background:'blue', value:'Script col 1', edit:false},
+		{span:{row:3, col:1}, background:'blue', value:'Script col 2', edit:false},
+		{span:{row:3, col:1}, background:'blue', value:'Script col 3', edit:false},
+
+		{span:{row:1, col:1}, background:'green', value:'Script sub-row 1.2', edit:false},
+		{span:{row:1, col:1}, background:'green', value:'Script sub-row 1.3', edit:false},
+
+		{span:{row:4, col:1}, background:'gray', value:'script row 1', edit:false},
+		
+		{span:{row:1, col:1}, background:'gray', value:'script cell 1,1', edit:false},
+		{span:{row:1, col:1}, background:'gray', value:'script cell 1,2', edit:false},
+		{span:{row:1, col:1}, background:'gray', value:'script cell 1,3', edit:false},
+
+		{span:{row:1, col:1}, background:'blue', value:'script1', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script2', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script3', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script4', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script5', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script6', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script7', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script8', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script9', edit:true}
+		
+
+	];
+
 });

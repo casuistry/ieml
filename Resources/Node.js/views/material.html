@@ -23,9 +23,39 @@
 		<md-content>
 			<md-toolbar>
 			  <div class="md-toolbar-tools">
-				<md-button class="md-icon-button" aria-label="Settings">
+
+<div  ng-controller="loadIEMLController">
+ 
+    
+    <md-menu>
+
+    <md-button class="md-icon-button" aria-label="Settings" ng-click="$mdOpenMenu( $event)">
 				  <i class="material-icons">language</i>
-				</md-button>
+	</md-button>
+      
+      <md-menu-content width="4">
+        <md-menu-item>
+          <md-button ng-click="showDicEdit()">
+            <i class="material-icons">view_list</i>
+            Edit Dictionary
+          </md-button>
+        </md-menu-item>
+        <md-menu-item>
+          <md-button disabled="disabled" ng-click="ctrl.checkVoicemail()">
+          	<i class="material-icons">do_not_disturb</i>
+            Disabled Action
+          </md-button>
+        </md-menu-item>
+        <md-menu-divider></md-menu-divider>
+        <md-menu-item>
+          <md-button ng-click="ctrl.toggleNotifications()">
+            <i class="material-icons">do_not_disturb</i>
+            Action
+          </md-button>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>
+  </div>
 				<h2>
 				  <span class="md-title">quickIEMLeditor</span>
 				</h2>
