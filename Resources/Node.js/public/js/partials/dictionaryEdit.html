@@ -1,23 +1,9 @@
 <!-- http://codepen.io/salalaslam/pen/wajGMx -->
 
-<<<<<<< HEAD
 <div ng-controller="iemlDictionaryController" class="gridListDynamicTiles"  >
   <md-grid-list md-cols="4" md-row-height="40px" md-gutter="0px">
     <md-grid-tile ng-repeat="tile in tiles" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}" style=" border-style: solid;
         border-width: 1px; border-color: black;" ng-class="tile.background">  
-=======
-<div ng-controller="iemlDictionaryController as vm"  class="gridListDynamicTiles"  >
-  <md-grid-list md-cols="4"   md-row-height="40px"  md-gutter="0px"   >
-
-
-    <md-grid-tile ng-repeat="tile in tiles" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}"   style=" border-style: solid;
-    border-width: 1px; border-color: black;" ng-class="tile.background">
-      
-
-      
-
-        
->>>>>>> cc8492833fde786727a29acd8f3cbd7592abe10c
         <input ng-model="tile.value" ng-show="tile.edit">
         <h3 ng-show="!tile.edit">{{tile.value}}</h3>
     </md-grid-tile>
