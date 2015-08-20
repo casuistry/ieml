@@ -48,7 +48,8 @@
        .custom-chips .md-chip .md-chip-remove-container button.vegetablechip:hover,  .custom-chips .md-chip .md-chip-remove-container button.vegetablechip:focus {
         background: rgba(255, 0, 0, 0.8); }
 
-<!-- styles for dictionary edit-->
+/* styles for dictionary edit-*/
+
 .gridListDynamicTiles .gray {
   background: #f5f5f5; }
 .gridListDynamicTiles .green {
@@ -58,6 +59,7 @@
 .gridListDynamicTiles .blue {
   background: #84ffff; }
 
+/* styles needed to aling main menu icons with lables*/
 
 i.material-icons {
     vertical-align: middle;
