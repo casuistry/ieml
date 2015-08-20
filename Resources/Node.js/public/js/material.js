@@ -445,18 +445,42 @@ angular
 	  }  
     };
 
-    $scope.showDicEdit = function() {
-      var earl = '/dicEdit/';
-      $location.path(earl);	
+    $scope.showDicEdit = function( index ) {
+		
+	  if (index === -1) {
+		  // do nothing: this needs to be refactored
+	  }
+	  else {
+		var toBeEdited = $scope.List[index];
+	    sharedProperties.setIemlEntry(toBeEdited);
+        var earl = '/dicEdit/';
+        $location.path(earl);		  
+	  }	
     };
 	
 	$scope.viewEntry = function ( index ) {
 	  var earl = '/empty/';
       $location.path(earl);	 	  
     };	 
-}).controller('iemlDictionaryController', function($scope, $location, crudFactory, sharedProperties) {
+  })
+  .controller('iemlDictionaryController', function($scope, $location, crudFactory, sharedProperties) {
+	  
+	var tableTitle = "void";
+	  
+  	init();
+
+	function init() {
+      var v = sharedProperties.getIemlEntry();
+	  if (v == null) {
+        // to be refactored
+	  }
+	  else {
+		  tableTitle = v.IEML;
+	  }
+	};
+	
 	$scope.tiles=[
-		{span:{row:1, col:4}, background:'gray', value:'Script of table1', edit:false},
+		{span:{row:1, col:4}, background:'gray', value:tableTitle, edit:false},
 		{span:{row:1, col:1}, background:'green', value:'Script sub-row 1.1', edit:false},
 		
 		{span:{row:3, col:1}, background:'blue', value:'Script col 1', edit:false},
@@ -481,8 +505,5 @@ angular
 		{span:{row:1, col:1}, background:'blue', value:'script7', edit:true},
 		{span:{row:1, col:1}, background:'blue', value:'script8', edit:true},
 		{span:{row:1, col:1}, background:'blue', value:'script9', edit:true}
-		
-
 	];
-
-});
+  });

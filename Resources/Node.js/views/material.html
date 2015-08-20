@@ -20,49 +20,48 @@
   
     <!-- TOP TOOLBAR -->
   	<div>
-		<md-content>
-			<md-toolbar>
-			  <div class="md-toolbar-tools">
-
-<div  ng-controller="loadIEMLController">
- 
-    
-    <md-menu>
-
-    <md-button class="md-icon-button" aria-label="Settings" ng-click="$mdOpenMenu( $event)">
+	  <md-content>
+		<md-toolbar>
+		  <div class="md-toolbar-tools">	
+		    <div ng-controller="loadIEMLController">
+              <md-menu>
+                <md-button class="md-icon-button" aria-label="Settings" ng-click="$mdOpenMenu( $event)">
 				  <i class="material-icons">language</i>
-	</md-button>
+	            </md-button>
       
-      <md-menu-content width="4">
-        <md-menu-item>
-          <md-button ng-click="showDicEdit()">
-            <i class="material-icons">view_list</i>
-            Edit Dictionary
-          </md-button>
-        </md-menu-item>
-        <md-menu-item>
-          <md-button disabled="disabled" ng-click="ctrl.checkVoicemail()">
-          	<i class="material-icons">do_not_disturb</i>
-            Disabled Action
-          </md-button>
-        </md-menu-item>
-        <md-menu-divider></md-menu-divider>
-        <md-menu-item>
-          <md-button ng-click="ctrl.toggleNotifications()">
-            <i class="material-icons">do_not_disturb</i>
-            Action
-          </md-button>
-        </md-menu-item>
-      </md-menu-content>
-    </md-menu>
-  </div>
-				<h2>
-				  <span class="md-title">quickIEMLeditor</span>
-				</h2>
-			  </div>
-			</md-toolbar>
-			<br/><br/>
-		</md-content>
+				  <md-menu-content width="4">
+					<md-menu-item>
+					  <md-button disabled="disabled" ng-click="showDicEdit(-1)">
+						<i class="material-icons">view_list</i>
+						Edit Dictionary
+					  </md-button>
+					</md-menu-item>
+					<md-menu-item>
+					  <md-button disabled="disabled" ng-click="ctrl.checkVoicemail()">
+						<i class="material-icons">do_not_disturb</i>
+						Disabled Action
+					  </md-button>
+					</md-menu-item>
+					<md-menu-divider></md-menu-divider>
+					<md-menu-item>
+					  <md-button ng-click="ctrl.toggleNotifications()">
+						<i class="material-icons">do_not_disturb</i>
+						Action
+					  </md-button>
+					</md-menu-item>
+				  </md-menu-content>
+			  </md-menu>
+            </div>
+			<h2>
+			  <span class="md-title">quickIEMLeditor</span>
+			</h2>
+
+		  </div>
+		</md-toolbar>
+		
+		<br/><br/>
+		
+	  </md-content>
 	</div>
 	<!-- END TOP TOOLBAR -->
 	
@@ -132,7 +131,7 @@
 				  <i class="material-icons">settings</i>
 				</md-button>
 				  
-				<md-button class="md-raised" style="text-transform: none;" ng-click="viewEntry(List.indexOf(item))">
+				<md-button class="md-raised" style="text-transform: none;" ng-click="showDicEdit(List.indexOf(item))">
 				  {{item.IEML}} 
 				</md-button>	
 				

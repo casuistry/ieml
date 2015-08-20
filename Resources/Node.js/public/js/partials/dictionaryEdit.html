@@ -1,24 +1,11 @@
 <!-- http://codepen.io/salalaslam/pen/wajGMx -->
 
-<div ng-controller="iemlDictionaryController as vm"  class="gridListDynamicTiles"  >
-  <md-grid-list md-cols="4"   md-row-height="40px"  md-gutter="0px"   >
-
-  <script>
-    alert(tiles);
-  </script>
-
-    <md-grid-tile ng-repeat="tile in tiles" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}"   style=" border-style: solid;
-    border-width: 1px; border-color: black;" ng-class="tile.background">
-      
-
-      
-
-        
+<div ng-controller="iemlDictionaryController" class="gridListDynamicTiles"  >
+  <md-grid-list md-cols="4" md-row-height="40px" md-gutter="0px">
+    <md-grid-tile ng-repeat="tile in tiles" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}" style=" border-style: solid;
+        border-width: 1px; border-color: black;" ng-class="tile.background">  
         <input ng-model="tile.value" ng-show="tile.edit">
         <h3 ng-show="!tile.edit">{{tile.value}}</h3>
-
-      
-   
     </md-grid-tile>
   </md-grid-list>
 </div>
