@@ -1,8 +1,59 @@
 <div layout="column" style="padding-bottom: 15px;">
 
+  <md-content class="md-padding" layout="column">
+    <div class="lock-size" layout="row" layout-align="left center">
+      <md-fab-speed-dial md-open="isOpen" md-direction="{{selectedDirection}}"
+                         ng-class="selectedMode">
+        <md-fab-trigger>
+          <md-button aria-label="menu" class="md-fab md-warn">
+			<i class="material-icons">menu</i>
+          </md-button>
+        </md-fab-trigger>
+        <md-fab-actions>
+          <md-button aria-label="twitter" class="md-fab md-raised md-mini" ng-click="viewEntry(-1)">
+		    <i class="material-icons">view_list</i>
+          </md-button>
+          <md-button aria-label="facebook" class="md-fab md-raised md-mini">
+		    <i class="material-icons">do_not_disturb</i>		  
+          </md-button>
+          <md-button aria-label="Google Hangout" class="md-fab md-raised md-mini">
+		    <i class="material-icons">do_not_disturb</i>		  
+          </md-button>
+        </md-fab-actions>
+      </md-fab-speed-dial>
+    </div>
+    <!--div layout="row" layout-align="space-around">
+      <div layout="column">
+        <b>Direction</b>
+        <md-radio-group ng-model="selectedDirection">
+          <md-radio-button ng-repeat="direction in availableDirections"
+                           ng-value="direction" class="text-capitalize">
+            {{direction}}
+          </md-radio-button>
+        </md-radio-group>
+      </div>
+      <div layout="column">
+        <b>Open/Closed</b>
+        <md-radio-group ng-model="isOpen">
+          <md-radio-button ng-value="true">Open</md-radio-button>
+          <md-radio-button ng-value="false">Closed</md-radio-button>
+        </md-radio-group>
+      </div>
+      <div layout="column">
+        <b>Animation Modes</b>
+        <md-radio-group ng-model="selectedMode">
+          <md-radio-button ng-repeat="mode in availableModes" ng-value="mode">
+            {{mode}}
+          </md-radio-button>
+        </md-radio-group>
+      </div>
+    </div-->
+  </md-content>
+
   <md-content layout-padding style="height: 600px;padding: 24px;">
     <h2 class="md-flex">What is new</h2>
-    <h3> Aug 20th, 2015</h3>
-    <p>Filtering, table</p>
+    <h3> Aug 21th, 2015</h3>
+    <p>You can now browse the entire terms database. You can delete terms and create new terms. 
+	Filtering is available to focus on specific terms.</p>
   </md-content>
 </div>

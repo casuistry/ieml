@@ -7,13 +7,13 @@ angular
   .config(function($routeProvider, $locationProvider) {
 		
 	$routeProvider
-		.when('/default', {
+		.when('/', {
+			controller: 'welcomeController',
+			templateUrl: '/js/partials/welcome.html'
+		})	
+		.when('/loadTerms', {
 			controller: 'loadIEMLController',
-			templateUrl: '/js/partials/default.html'
-		})
-		.when('/empty', {
-			controller: 'loadIEMLController',
-			templateUrl: '/js/partials/empty.html'
+			templateUrl: '/js/partials/loadTerms.html'
 		})
 		.when('/edit/:id', {
 			controller: 'iemlEntryEditorController',
@@ -137,12 +137,20 @@ angular
         };
       }
     };
-  }).service('sharedProperties', function ($rootScope) {
+  })
+  .service('sharedProperties', function ($rootScope) {
     var iemlEntry;
 	var newIemlEntry;
     var isDB = false; // default
     
 	return {
+	  newItemSubscriber: function(scope, callback) {
+        /*var handler = */$rootScope.$on('newItem', callback);
+        //scope.$on('$destroy', handler);
+      },
+	  onNewItem: function(data) {
+        $rootScope.$emit('newItem', data);
+      },
       getIemlEntry: function () {
         return iemlEntry;
       },
@@ -156,30 +164,17 @@ angular
         return newIemlEntry;
       },
       iemlEntryUpdated: function() {
-        $rootScope.$broadcast("iemlEntryUpdated");
+        $rootScope.$emit("iemlEntryUpdated");
       },	  
       getDb: function () {
         return isDB;
       },
       setDb: function(value) {
         isDB = value;
-      }
+      }  
     };	
   }) 
-  .service('popup', function ($rootScope, $mdDialog) {
-	return {
-      display: function (title, status) {
-		$mdDialog.show(
-          $mdDialog.alert()
-          .parent(angular.element(document.body))
-          .title(title)
-          .content(status)
-          .ok('Dismiss')
-        );
-	  }
-	};
-  })
-  .controller('iemlEntryEditorController', function($scope, $location, sharedProperties) {
+  .controller('iemlEntryEditorController', function($scope, $location, crudFactory, sharedProperties) {
 
     $scope.doNotValidate = false;
 	
@@ -203,7 +198,7 @@ angular
     // form was cancelled by user, we discard all entered information and just return.
   	$scope.cancelEdit = function() {
 		//do nothing, return to default (previous ?) screen
-		var earl = '/default/';
+		var earl = '/loadTerms/';
         $location.path(earl);	 
 	};	
 	
@@ -214,16 +209,29 @@ angular
 			IEML:$scope.iemlValue,
 			FR:$scope.frenchValue,
 			EN:$scope.englishValue,
-			//terms:[{lang:"FR",means:$scope.frenchValue},{lang:"EN",means:$scope.englishValue}],
 			PARADIGM:"0",
 			LAYER:"3",
 			CLASS:"2"
 		}		
 		
-		sharedProperties.setNewIemlEntry(toBeAdded);
-		sharedProperties.iemlEntryUpdated();
+		//$rootScope.$emit("iemlEntryUpdated", toBeAdded);
 		
-		var earl = '/default/';
+		if (sharedProperties.getDb() == true) {
+			crudFactory.create(toBeAdded).success(function(data) {
+
+			}).
+			error(function(data, status, headers, config) {
+				// called asynchronously if an error occurs
+				// or server returns response with an error status.
+				alert(status);
+			});
+		}
+		//sharedProperties.onNewItem(toBeAdded);
+		
+		//sharedProperties.setNewIemlEntry(toBeAdded);
+		//sharedProperties.iemlEntryUpdated();
+		
+		var earl = '/loadTerms/';
         $location.path(earl);	 
 	};
 	
@@ -231,7 +239,7 @@ angular
 	$scope.tempString = '';	
   })
   .controller('loadIEMLController', function($scope, $location, $mdDialog, crudFactory, sharedProperties) {
-
+		
     //just for safety
     $scope.loadedfromDB = false;
 
@@ -368,9 +376,9 @@ angular
 		});
 	};	
 	
-	// when there is a new ieml entry, do something with it. 
+	/*
 	$scope.$on('iemlEntryUpdated', function() {
-        //$scope.showAlert('entry to save:', sharedProperties.getIemlEntry());
+        $scope.showAlert('entry to save:', sharedProperties.getIemlEntry());
 		var val = sharedProperties.getNewIemlEntry();
 		if (val === null) {
 			$scope.showAlert('error', 'entry to save is null');
@@ -378,6 +386,19 @@ angular
 		else{
 			$scope.addEntry(val);
 		}	
+    });
+    */
+
+	// http://www.codelord.net/2015/05/04/angularjs-notifying-about-changes-from-services-to-controllers/
+	// http://toddmotto.com/all-about-angulars-emit-broadcast-on-publish-subscribing/
+  	/*var myListener = $rootScope.$on('iemlEntryUpdated', function (event, data) {
+	  alert(data);
+	  //event.stopPropagation();
+	});	*/
+	//$scope.$on('$destroy', myListener);
+
+	sharedProperties.newItemSubscriber($scope, function somethingChanged(event, data) {
+        $scope.addEntry(data);
     });
 	
 	$scope.addEntry = function(toBeAdded) {	
@@ -431,9 +452,9 @@ angular
     };	
 		
 	$scope.editEntry = function ( index ) {
-  
+	  
 	  if (index === -1) {
-		sharedProperties.setIemlEntry(null);
+		sharedProperties.setIemlEntry(null);		
 	    var earl = '/edit/new';
         $location.path(earl);		  
 	  }
@@ -446,7 +467,6 @@ angular
     };
 
     $scope.showDicEdit = function( index ) {
-		
 	  if (index === -1) {
 		  // do nothing: this needs to be refactored
 	  }
@@ -456,12 +476,8 @@ angular
         var earl = '/dicEdit/';
         $location.path(earl);		  
 	  }	
-    };
+    }; 	
 	
-	$scope.viewEntry = function ( index ) {
-	  var earl = '/empty/';
-      $location.path(earl);	 	  
-    };	 
   })
   .controller('iemlDictionaryController', function($scope, $location, crudFactory, sharedProperties) {
 	  
@@ -506,4 +522,39 @@ angular
 		{span:{row:1, col:1}, background:'blue', value:'script8', edit:true},
 		{span:{row:1, col:1}, background:'blue', value:'script9', edit:true}
 	];
+	
+    // form was cancelled by user, we discard all entered information and just return.
+  	$scope.cancelEdit = function() {
+		//do nothing, return to default (previous ?) screen
+		var earl = '/loadTerms/';
+        $location.path(earl);	 
+	};	
+	
+  })
+  .controller('welcomeController', function($scope, $location) {
+
+    $scope.topDirections = ['left', 'up'];
+    $scope.bottomDirections = ['down', 'right'];
+    $scope.isOpen = false;
+    $scope.availableModes = ['md-fling', 'md-scale'];
+    $scope.selectedMode = 'md-scale';
+    $scope.availableDirections = ['up', 'down', 'left', 'right'];
+    $scope.selectedDirection = 'right';
+	  
+  	init();
+	
+	function init() {
+        //var earl = '/welcome';
+        //$location.path(earl);
+	};
+	
+	$scope.viewEntry = function ( index ) {
+	  var earl = '/loadTerms/';
+      $location.path(earl);	 	  
+    };	
+	
   });
+  
+  
+  
+  

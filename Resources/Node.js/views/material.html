@@ -17,21 +17,19 @@
   
   <body>
   
-  
     <!-- TOP TOOLBAR -->
   	<div>
 	  <md-content>
 		<md-toolbar>
 		  <div class="md-toolbar-tools">	
-		    <div ng-controller="loadIEMLController">
+		    <div>
               <md-menu>
                 <md-button class="md-icon-button" aria-label="Settings" ng-click="$mdOpenMenu( $event)">
 				  <i class="material-icons">language</i>
 	            </md-button>
-      
-				  <md-menu-content width="4">
+				  <!--md-menu-content width="4">
 					<md-menu-item>
-					  <md-button disabled="disabled" ng-click="showDicEdit(-1)">
+					  <md-button ng-click="viewEntry(-1)">
 						<i class="material-icons">view_list</i>
 						Edit Dictionary
 					  </md-button>
@@ -49,13 +47,12 @@
 						Action
 					  </md-button>
 					</md-menu-item>
-				  </md-menu-content>
+				  </md-menu-content-->
 			  </md-menu>
             </div>
 			<h2>
 			  <span class="md-title">quickIEMLeditor</span>
 			</h2>
-
 		  </div>
 		</md-toolbar>
 		
@@ -65,93 +62,16 @@
 	</div>
 	<!-- END TOP TOOLBAR -->
 	
-	<div layout="row">
-	  
-	  <!-- LEFT NAVIGATION -->
-	  <div ng-controller="loadIEMLController" layout="column" style="height: 700px;">		
-		<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
-		  
-		  <div> <!-- without this div, the 'add' icon gets squished -->
-			  <!-- if md-primary is not included, icon will be pink otherwise it will be blue -->
-			  <!-- md-fab-bottom-left to position elsewhere -->
-			  <md-button class="md-fab md-primary" ng-click="editEntry(-1)">
-				<i class="material-icons">add</i>
-			  </md-button>
-			
-              <div layout="row">
-                <md-input-container>
-                  <label>Display</label>
-                    <md-select ng-model="filterParadigm" ng-change="triggerFiltering('PARADIGM')" >
-                      <md-option ng-repeat="filterParadigm in filterParadigmChoices" value="{{filterParadigm}}">
-					    {{filterParadigm}}
-					  </md-option>
-                    </md-select>
-                </md-input-container>
-                <md-input-container>
-                  <label>Display</label>
-                    <md-select ng-model="filterClass" ng-change="triggerFiltering('CLASS')">
-                      <md-optgroup label="Primary">
-                        <md-option ng-value="filterClass.name" ng-repeat="filterClass in filterClassChoices | filter: {category: 'primary' }">{{filterClass.name}}</md-option>
-                      </md-optgroup>
-                      <md-optgroup label="Secondary">
-                        <md-option ng-value="filterClass.name" ng-repeat="filterClass in filterClassChoices | filter: {category: 'secondary' }">{{filterClass.name}}</md-option>
-                      </md-optgroup>
-                      <md-optgroup label="Tertiary">
-                        <md-option ng-value="filterClass.name" ng-repeat="filterClass in filterClassChoices | filter: {category: 'tertiary' }">{{filterClass.name}}</md-option>
-                      </md-optgroup>					  
-                    </md-select>
-                </md-input-container>
-				<md-input-container>
-                  <label>Display</label>
-                    <md-select ng-model="filterLayer" ng-change="triggerFiltering('LAYER')">
-                      <md-option ng-repeat="filterLayer in filterLayerChoices" value="{{filterLayer}}">{{filterLayer}}</md-option>
-                    </md-select>
-                </md-input-container>				
-              </div>
-	
-			  <form>
-				<md-input-container >
-				  <label for="filterInput">Filter</label>
-				  <input type="text" id="filterInput" data-ng-model="filterText" md-sidenav-focus>
-				</md-input-container>
-			  </form>
-			  
-		  </div>
-		  
-		  <md-content>  
-		    <md-virtual-repeat-container id="vertical-container">
-              <div md-virtual-repeat="item in List | filter: filterText | filter: {PARADIGM:filterParadigmChoices.indexOf(filterParadigm)} | filter:filterGrammaticalClass(filterClass) | filter:filterItemLayer(filterLayer)" class="repeated-item" flex> 
-			  
-			  	<!-- md-primary for blue color, md-mini for smaller icon-->
-				<md-button class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, List.indexOf(item))">
-				  <i class="material-icons">remove</i>
-				</md-button>	
-				  
-                <md-button class="md-fab md-primary md-mini" ng-click="editEntry(List.indexOf(item))">
-				  <i class="material-icons">settings</i>
-				</md-button>
-				  
-				<md-button class="md-raised" style="text-transform: none;" ng-click="showDicEdit(List.indexOf(item))">
-				  {{item.IEML}} 
-				</md-button>	
-				
-			  </div>
-            </md-virtual-repeat-container>
-	      </md-content>
-
-		</md-sidenav>
-	  </div>	
-		<!-- END LEFT NAVIGATION -->	
+	<!-- MIDDLE -->
+	<div flex layout-padding style="width: 1000px;">
+	  <md-content>
+        <ng-view>	
 		
-	  <!-- MIDDLE -->
-	  <div flex layout-padding>
-		<md-content>
-          <ng-view></ng-view>
-		</md-content>	
-	  </div>
-	  <!-- END MIDDLE -->
-	  
+		</ng-view>
+	  </md-content>	
 	</div>
+	<!-- END MIDDLE -->
+	  
 	
 	<!-- angular -->
 	<script src="../libs/angular/angular.js"></script>
