@@ -14,10 +14,7 @@ if(process.env.OPENSHIFT_MONGODB_DB_URL){
 var db = require('mongoskin').db(mongodb_connection_string);
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
-var ieml_entries = require('./routes/ieml');
 var restapi = require("./routes/restapi");
-//var ngindex = require("./routes/ng_index");
 
 var app = express();
 
@@ -30,6 +27,7 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
+
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -48,12 +46,6 @@ app.use(function(req,res,next){
 });
 
 app.use('/', routes);
-app.use('/users', users);
-app.use('/ieml', ieml_entries);
-//app.use('/ngindex', ngindex);
-
-//app.use('/andrew', routes);
-
 app.all('/api/allieml', restapi.allieml);
 app.all('/api/newieml', restapi.newieml);
 app.delete('/api/remieml/:id', restapi.remieml);
@@ -95,17 +87,13 @@ app.use(function(err, req, res, next) {
   });
 });*/
 
-
 module.exports = app;
 
 /*var ipaddr = process.env.OPENSHIFT_INTERNAL_IP || "127.0.0.1";
 var port = process.env.OPENSHIFT_INTERNAL_PORT || 8080;
+app.listen(port, ipaddr);*/
 
-
-
-  app.listen(port, ipaddr);*/
-
-  var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
+var server_port = process.env.OPENSHIFT_NODEJS_PORT || 8080
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
  
 app.listen(server_port, server_ip_address, function () {

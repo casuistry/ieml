@@ -2,7 +2,6 @@
 angular
   .module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages'])
   
-  
 // associate controller to views through routes
   .config(function($routeProvider, $locationProvider) {
 		
