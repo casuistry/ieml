@@ -59,6 +59,8 @@ public class ParserService {
 		 try {				
 				Token n = parser.parse(iemltext);
 				jsonObject.put("success", true); 
+				jsonObject.put("class", n.GetTokenClass());
+				jsonObject.put("level", n.layer);
 				
 			} catch (Exception e) {
 				
@@ -90,6 +92,9 @@ public class ParserService {
 		 try {				
 				Token n = parser.parse(iemltext);
 				jsonObject.put("success", true); 
+				jsonObject.put("class", n.GetTokenClass());
+				jsonObject.put("level", n.layer);
+				
 				
 			} catch (Exception e) {
 				
