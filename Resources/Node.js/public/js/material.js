@@ -119,6 +119,10 @@ angular
           crudFactory.iemlvalid(modelValue).
           success(function(data, status, headers, config) {
 			if (data.success === true) {
+				// attach info to scope
+				// {"level":0,"class":4,"success":true}
+				scope.data.layer = data.level;
+				scope.data.gclass = data.class;
 				scope.tempString = '';
 				deferred.resolve();
 			}
@@ -175,6 +179,11 @@ angular
   }) 
   .controller('iemlEntryEditorController', function($scope, $location, crudFactory, sharedProperties) {
 
+    $scope.data = {};
+    $scope.data.isParadigm = false;
+	$scope.data.layer = 'n/a';
+	$scope.data.gclass = 'n/a';
+	
     $scope.doNotValidate = false;
 	
   	init();
@@ -191,6 +200,9 @@ angular
 		  $scope.frenchValue = v.FR;
 		  $scope.englishValue = v.EN;
 		  $scope.doNotValidate = true;
+		  $scope.data.isParadigm = v.PARADIGM == "1" ? true : false;
+		  $scope.data.layer = v.LAYER;
+		  $scope.data.gclass = v.CLASS;
 	  }
 	};
 	
@@ -207,10 +219,10 @@ angular
 		var toBeAdded = {
 			IEML:$scope.iemlValue,
 			FR:$scope.frenchValue,
-			EN:$scope.englishValue,
-			PARADIGM:"0",
-			LAYER:"3",
-			CLASS:"2"
+			EN:$scope.englishValue,	
+			PARADIGM:$scope.data.isParadigm ? "1" : "0",
+			LAYER:$scope.data.layer.toString(),
+			CLASS:$scope.data.gclass.toString()
 		}		
 		
 		//$rootScope.$emit("iemlEntryUpdated", toBeAdded);
