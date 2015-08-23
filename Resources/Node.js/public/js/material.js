@@ -57,6 +57,16 @@ angular
       link: function(scope, element, attributes, controller) {
         controller.$asyncValidators.exists = function(modelValue) {
 		  
+//skips first validation on edit.
+if (scope.doNotValidate) {
+         			 
+         	if (!scope.dirtyInputs[attributes.name]){ 
+			 	scope.dirtyInputs[attributes.name]=true;
+			 	 return $q.when();
+			 	}
+			 
+		}
+
 		  if (attributes.name=="ieml" && scope.doNotValidate) {
 			// if we edit (instead of creating a new one) an entry, 
 			// no need to validate as ieml will be readonly
@@ -200,6 +210,7 @@ angular
 		  $scope.frenchValue = v.FR;
 		  $scope.englishValue = v.EN;
 		  $scope.doNotValidate = true;
+		  $scope.dirtyInputs = [];
 		  $scope.data.isParadigm = v.PARADIGM == "1" ? true : false;
 		  $scope.data.layer = v.LAYER;
 		  $scope.data.gclass = v.CLASS;
@@ -483,7 +494,7 @@ angular
         $location.path(earl);		  
 	  }
 	  else {
-	    var toBeEdited = $scope.List[index];
+	  	var toBeEdited = $scope.List[index];
 	    sharedProperties.setIemlEntry(toBeEdited);		
 	    var earl = '/edit/' + index;	
         $location.path(earl);	
