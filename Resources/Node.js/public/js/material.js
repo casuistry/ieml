@@ -57,21 +57,24 @@ angular
       link: function(scope, element, attributes, controller) {
         controller.$asyncValidators.exists = function(modelValue) {
 		  
-//skips first validation on edit.
-if (scope.doNotValidate) {
+	//skips first validation on edit or when original value is entered
+		if (scope.doNotValidate) {
          			 
-         	if (!scope.dirtyInputs[attributes.name]){ 
-			 	scope.dirtyInputs[attributes.name]=true;
+         	if (!(scope.dirtyInputs[attributes.name]&&scope.dirtyInputs[attributes.name].isDirty)){ 
+			 	scope.dirtyInputs[attributes.name]={"isDirty":true, "original_val":modelValue};
 			 	 return $q.when();
+			 	} else {
+			 		if (scope.dirtyInputs[attributes.name].original_val==modelValue) return $q.when();
 			 	}
 			 
 		}
 
-		  if (attributes.name=="ieml" && scope.doNotValidate) {
+		/*  if (attributes.name=="ieml" && scope.doNotValidate) {
 			// if we edit (instead of creating a new one) an entry, 
 			// no need to validate as ieml will be readonly
             return $q.when();
           }
+		  */
 		  
           if (controller.$isEmpty(modelValue)) {
             // consider empty model valid
