@@ -112,11 +112,11 @@ angular
       link: function(scope, element, attributes, controller) {
         controller.$asyncValidators.iemlvalid = function(modelValue) {
 		  
-		  if (scope.doNotValidate) {
+/*		  if (scope.doNotValidate) {
 			// if we edit (instead of creating a new one) an entry, 
 			// no need to validate as ieml will be readonly
             return $q.when();
-          }
+          }*/
 		  
           if (controller.$isEmpty(modelValue)) {
             // consider empty model valid
