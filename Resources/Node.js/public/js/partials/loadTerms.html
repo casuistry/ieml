@@ -38,7 +38,7 @@
   <div>
     <md-content>  
 	  <md-virtual-repeat-container id="vertical-container">
-	    <div md-virtual-repeat="item in List | filter: filterText | filter: {PARADIGM:filterParadigmChoices.indexOf(filterParadigm)} | filter:filterGrammaticalClass(filterClass) | filter:filterItemLayer(filterLayer)" class="repeated-item" flex> 
+	    <div md-virtual-repeat="item in List | filter: filterText | filter:filterItemParadigm(filterParadigm) | filter:filterGrammaticalClass(filterClass) | filter:filterItemLayer(filterLayer)" class="repeated-item" flex> 
 	  
 		  <!-- md-primary for blue color, md-mini for smaller icon-->
 		  <md-button class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, List.indexOf(item))">

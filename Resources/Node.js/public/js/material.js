@@ -325,7 +325,7 @@ angular
 		if (selection === fvnClass)
 			v = 6;	
 
-        if (input.CLASS == v)
+        if (input.CLASS == v.toString())
           return true;
 	  
 		return false;
@@ -338,7 +338,20 @@ angular
 		if (selection === fAllLayers)
 		  return true;
 
-        if (input.LAYER == $scope.filterLayerChoices.indexOf(selection) - 1)
+        if (input.LAYER == ($scope.filterLayerChoices.indexOf(selection) - 1).toString())
+          return true;
+	  
+		return false;
+      }
+    };
+	
+	$scope.filterItemParadigm = function(selection) {
+      return function(input) {
+		  
+		if (selection === fAllTerms)
+		  return true;
+
+        if (input.PARADIGM == "1")
           return true;
 	  
 		return false;
