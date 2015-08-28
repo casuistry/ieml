@@ -256,7 +256,13 @@ public class Helper {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static String niceString(String s) {
 		
-		
+		StringBuilder builder = new StringBuilder(s);
+		for (int i=0;i<50-s.length();i++)
+			builder.append(" ");
+		return builder.toString();
 	}
 }

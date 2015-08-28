@@ -11,10 +11,10 @@ public class Tester {
 	public static void main(String[] args) {		
 		
 		ArrayList<String> list = new ArrayList<String>();
-		list.add("A: ");
 		
-	/*
+
 		list.addAll(Arrays.asList(
+				"E:+F:",
 				"U:S:.E:.U:S:.-", 
 				"U:S:.U:S:.E:.-", 
 				"(k.o.-k.o.-E:.-') + (E:.y.M:.-')",						//has to fail
@@ -51,10 +51,6 @@ public class Tester {
 		list.add(ScriptExamples.ieml1);
 		list.add(ScriptExamples.ieml2);
 
-		for (String s:TermInterface.LoadDictionary(null).keySet()){
-			list.add(s);
-		}
-		*/
 		
 		//Utilities.Helper.ProcessDictionaryV2(null);
 		//Utilities.Helper.nextCheck();

@@ -133,6 +133,22 @@ public class Tokenizer {
 			m_star.put(c, c_star.indexOf(c));
 	}
 	
+	public static HashMap<String, Token> primitiveLookup = new HashMap<String, Token>();
+	public static HashMap<String, String> primitiveAbbrev = new HashMap<String, String>();
+	static {
+		try {
+			primitiveLookup.put("O:", new ParserImpl().parse("U:+A:"));
+			primitiveLookup.put("M:", new ParserImpl().parse("S:+B:+T:"));
+			primitiveLookup.put("F:", new ParserImpl().parse("U:+A:+S:+B:+T:"));
+			primitiveLookup.put("I:", new ParserImpl().parse("E:+U:+A:+S:+B:+T:"));
+		}catch (Exception e) {
+			System.out.println("mapping failed: " + e.getMessage());
+		}
+		
+		for (String key : primitiveLookup.keySet())
+			primitiveAbbrev.put(primitiveLookup.get(key).GetName(), key);
+	}
+	
 	public static HashMap<String, Token> scLookup = new HashMap<String, Token>();
 	public static HashMap<String, String> scAbbrev = new HashMap<String, String>();
 	static {

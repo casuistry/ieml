@@ -1,6 +1,7 @@
 package NewParser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class Token {
@@ -14,6 +15,8 @@ public class Token {
 	public ArrayList<Token> nodes = new ArrayList<Token>();	
 	public Token parent = null;
 	public Character opCode = null;
+	
+	private HashMap<String, String> properties = new HashMap<String, String>();
 	
 	public Token(Character c){
 		name = new StringBuilder();
@@ -207,12 +210,12 @@ public class Token {
 		throw new Exception("unhandled case");
 	}
 
-	public boolean HasTrailingEmpty() throws Exception {
+	public boolean HasTrailingEmpty()  {
 		if (nodes.size() == 1) return false;		
 		return nodes.get(nodes.size()-1).IsEmpty();
 	}
 	
-	public boolean IsEmpty() throws Exception {		
+	public boolean IsEmpty() {		
 		if (emptyToken == null) {			
 			if (nodes == null || nodes.size() == 0)
 				emptyToken = GetName().equals("E:");
@@ -252,6 +255,10 @@ public class Token {
 	}
 	
 	//=============================================
+	
+	public void ReplaceName(String newName) {
+		name = new StringBuilder(newName);
+	}
 	
 	public String GetName(){
 		return name.toString();
@@ -363,4 +370,114 @@ public class Token {
 		
 		return result;
 	}	
+	
+	public void removeFromTableGenetration() {
+		
+		if (!properties.containsKey("removeFromTableGenetration")) {
+			
+			properties.put("removeFromTableGenetration", "removeFromTableGenetration");
+			
+			if (nodes != null) {
+				for (Token child : nodes) {
+					child.removeFromTableGenetration();
+				}
+			}
+		}
+	}
+	
+	public void addToTableGenetration() {
+		
+		if (properties.containsKey("removeFromTableGenetration")) {
+			
+			properties.remove("removeFromTableGenetration", "removeFromTableGenetration");
+			
+			if (nodes != null) {
+				for (Token child : nodes) {
+					child.addToTableGenetration();
+				}
+			}
+		}
+	}	
+	
+	public boolean isInTableGenetration() {
+		
+		if (properties.containsKey("removeFromTableGenetration")) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public String GenerateCleanSequenceForTable(boolean useParanthesis) {
+		
+		String result = GenerateSequenceForTable(useParanthesis);
+		
+		if (result == null) 
+			return null;
+		
+		// handle abbreviation for addition
+		for (String abrev : Tokenizer.primitiveAbbrev.keySet()) {
+			result = result.replace(abrev, Tokenizer.primitiveAbbrev.get(abrev));
+		}
+		
+		// handle abbreviation for multiplication
+		for (String abrev : Tokenizer.scAbbrev.keySet()) {
+			result = result.replace(abrev, Tokenizer.scAbbrev.get(abrev));
+		}
+		
+		// handle trailing empties
+		int index = Tokenizer.c_marks.indexOf(result.charAt(result.length()-1)) - 1;
+		for (int i = index; i >= 0; i--){
+			String empties = Tokenizer.emptyLookup.get(i).GenerateSequenceForTable(false) + Tokenizer.c_marks.get(i+1);
+			//System.out.println(empties);
+			for (int j=0;j<3;j++){
+				result = result.replace(empties, Tokenizer.c_marks.get(i+1).toString());
+			}
+		}
+		
+		return result;
+	}
+	
+	public String GenerateSequenceForTable(boolean useParanthesis) {
+		
+		if (isInTableGenetration()) {
+			
+			StringBuilder builder = new StringBuilder();
+			
+			if (nodes != null && opCode != null) {
+								
+				ArrayList<String> accumulator = new ArrayList<String>();
+				
+				for (Token t : nodes){					
+					String child = t.GenerateSequenceForTable(useParanthesis);
+					if (child != null)
+						accumulator.add(child);					
+				}
+				
+				String op = opCode.equals(Tokenizer.addition) ? "+" : null;
+				
+				if (useParanthesis && op != null)
+					builder.append("(");
+					
+				for (int i = 0; i < accumulator.size(); i++) {
+					builder.append(accumulator.get(i));
+					if (op != null && (i < accumulator.size() - 1))
+						builder.append(op);						
+				}	
+				
+				if (useParanthesis && op != null)
+					builder.append(")");
+				
+				if (op == null)
+					builder.append(Tokenizer.c_marks.get(layer));
+			}
+			else {
+				builder.append(GetName());
+			}
+						
+			return builder.toString();
+		}
+		
+		return null;
+	}
 }

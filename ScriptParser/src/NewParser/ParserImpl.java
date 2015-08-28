@@ -74,6 +74,13 @@ public class ParserImpl extends Tokenizer {
 		pop.layer = m_marks.get(c);
 			
 		pop.ComputeTaille();
+		
+		if (primitiveLookup.containsKey(pop.GetName())) {
+			pop.layer = m_marks.get(c);
+			pop.opCode = addition;
+			pop.AddNodes(primitiveLookup.get(pop.GetName()).nodes);
+		}
+		
 		pushNode(pop);
 	}
 	protected void a_sc_f(Character c) throws Exception{ 
@@ -129,8 +136,9 @@ public class ParserImpl extends Tokenizer {
 		newNode.AppendToName(c);
 		
 		if (newNode.layer == 1) {
-			if (scAbbrev.containsKey(newNode.GetName()))
-				throw new Exception("Abbreviation needed: " + scAbbrev.get(newNode.GetName()));					
+			if (scAbbrev.containsKey(newNode.GetName())) {
+				throw new Exception("Abbreviation needed: " + scAbbrev.get(newNode.GetName()));			
+			}
 		}
 		
 		if (initDone && newNode.HasTrailingEmpty())
@@ -243,7 +251,8 @@ public class ParserImpl extends Tokenizer {
 			throw new Exception("standard order is not respected");
 		
 		//TODO: test cases
-		CheckExclusions(children, n);
+        if (initDone)
+		    CheckExclusions(children, n);
 		
 		newNode.AddNode(n);
 		stack.push(newNode);
