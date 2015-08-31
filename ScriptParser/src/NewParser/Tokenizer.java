@@ -207,6 +207,34 @@ public class Tokenizer {
 		return builder.toString();		
 	}
 	
+	public static String MakeParsable(String ieml) {
+		
+		if (ieml == null) 
+			return null;
+		
+		// handle abbreviation for addition
+		for (String abrev : primitiveAbbrev.keySet()) {
+			ieml = ieml.replace(abrev, primitiveAbbrev.get(abrev));
+		}
+		
+		// handle abbreviation for multiplication
+		for (String abrev : scAbbrev.keySet()) {
+			ieml = ieml.replace(abrev, scAbbrev.get(abrev));
+		}
+		
+		// handle trailing empties
+		int index = c_marks.indexOf(ieml.charAt(ieml.length()-1)) - 1;
+		for (int i = index; i >= 0; i--){
+			String empties = emptyLookup.get(i).GenerateSequenceForTable(false) + c_marks.get(i+1);
+			//System.out.println(empties);
+			for (int j=0;j<3;j++){
+				ieml = ieml.replace(empties, c_marks.get(i+1).toString());
+			}
+		}
+		
+		return ieml;
+	}
+	
 	protected States currentState;
 	protected int counter;
 	

@@ -1,7 +1,4 @@
 package Utilities;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,13 +6,35 @@ import java.util.List;
 import NewParser.ParserImpl;
 import NewParser.Token;
 import NewParser.Tokenizer;
-import NewParser.Tokenizer.States;
-import Utilities.Helper;
-
-
 
 public class TableGenerator {
 
+	public enum TableType {
+		
+		undefined("undefined"),
+		no_table("no variables"),
+		row_mode("one variable in mode"),	
+		row_attribut("one variable in attribut"),	
+		row_substance("one variable in substance"),
+		matrix_mode("two or more variables in mode"),	
+		matrix_attribut("two or more variables in attribut"),
+		matrix_substance("two or more variables in substance"),		
+		double_mode("constant mode"),		
+		double_attribut("constant attibut"),	    
+		double_substance("constant_substance"),
+		triple("at least one variable in each seme");
+
+	    private final String fieldDescription;
+
+	    TableType(String descr) {
+	        this.fieldDescription = descr;
+	    }
+	    
+	    public String getFieldDescription() {
+	        return fieldDescription;
+	    }
+	}
+	
 	public static void main(String[] args) {
 		TableGenerator tGen = new TableGenerator();
 		
@@ -24,9 +43,12 @@ public class TableGenerator {
 	
 	public void generate(){
 		
-		List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
-		//ArrayList<String> db = new ArrayList<String>();
-		//db.add("U:+M: , 2, 3, 4, 5, 6");
+		//List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
+		ArrayList<String> db = new ArrayList<String>();
+		db.add("M:.+O:M:.- , 2, 3, 4, 5, 6");
+		//db.add("(S:+B:)(S:+T:).f.- , 2, 3, 4, 5, 6");
+		//db.add("l.o.-f.o.-' , 2, 3, 4, 5, 6");
+		
 		//E:M:.M:M:.-
 		//try {
 			
@@ -51,7 +73,25 @@ public class TableGenerator {
 							
 				try {				
 					Token n = parser.parse(ieml);	
-					GenerateTables(n);
+					ArrayList<Token> tables = CreateTableSet(n);
+										
+					StringBuilder builder = new StringBuilder();
+					
+					for (Token table : tables) {
+						String tableDesc = GenerateTables(table);
+						if (tableDesc != null)
+							builder.append(tableDesc);
+					}
+					
+					String toPrint = builder.toString();
+					
+					if (toPrint.length() > 0)
+					{
+						System.out.println(n.GetName());
+						System.out.println(toPrint);
+					}
+					
+					//GenerateTables(n);
 					//String recreated = n.GenerateCleanSequenceForTable(false);					
 					
 					//n.PrintNodes(" ");
@@ -90,7 +130,6 @@ public class TableGenerator {
 		Token n = null;
 		
 		ParserImpl parser = new ParserImpl();
-		//parser.recover = true;
 		
 		try {				
 			n = parser.parse(toParse);	
@@ -105,45 +144,33 @@ public class TableGenerator {
 		}
 	}
 		
-	public void GenerateTables(Token start) {	
+	public String GenerateTables(Token start) {	
 		
 		HashMap<Token, ArrayList<ArrayList<Token>>> result = getTableInflectionPoints(start);
 		
-		for (Token t : result.keySet()) {
-			generateTable(t, result.get(t));
+		if (result.isEmpty()) {
+			return null;
 		}
-	}
-	
-	public enum TableType {
 		
-		undefined("undefined"),
-		no_table("no variables"),
-		row_mode("one variable in mode"),	
-		row_attribut("one variable in attribut"),	
-		row_substance("one variable in substance"),
-		matrix_mode("two or more variables in mode"),	
-		matrix_attribut("two or more variables in attribut"),
-		matrix_substance("two or more variables in substance"),		
-		double_mode("constant mode"),		
-		double_attribut("constant attibut"),	    
-		double_substance("constant_substance"),
-		triple("at least one variable in each seme");
-
-	    private final String fieldDescription;
-
-	    TableType(String descr) {
-	        this.fieldDescription = descr;
-	    }
-	    
-	    public String getFieldDescription() {
-	        return fieldDescription;
-	    }
+		StringBuilder builder = new StringBuilder();
+		
+		for (Token t : result.keySet()) {
+			try {
+				String s = generateTable(t, result.get(t));
+				if (s != null)
+					builder.append(s);
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		
+		return builder.toString();
 	}
-	
+		
 	// generates one table
-	public String generateTable(Token start, ArrayList<ArrayList<Token>> table){
+	public String generateTable(Token start, ArrayList<ArrayList<Token>> table) throws Exception{
 		
-		StringBuilder builder = new StringBuilder("creating table for " + start.GetName() + " ");
+		StringBuilder builder = new StringBuilder("  creating table for " + start.GetName() + " ");
 		
 		TableType tableType = TableType.undefined;
 		
@@ -199,26 +226,35 @@ public class TableGenerator {
 			tableType = TableType.double_substance;
 		}
 		
-		builder.append("["+tableType.getFieldDescription()+"]");
+		builder.append("["+tableType.getFieldDescription()+"]\n");
 		
 		//if (tableType == TableType.undefined) 
 		//if (tableType == TableType.no_table) 	
 		if (tableType != TableType.no_table) {
-			System.out.println(builder.toString());
+			
+			//System.out.println(builder.toString());
 			
 			if (tableType == TableType.double_substance) {
 				
 				// substance is constant				
 				String s = start.nodes.get(0).GenerateCleanSequenceForTable(false);
 				
+				//attribute constant, vary mode
 				ArrayList<String> row_headers = new ArrayList<String>();
+				for (Token pivot : mode) {
+					
+					if (!pivot.opCode.equals(Tokenizer.addition))
+						throw new Exception("not good");
+					
+					
+				}
 
-				
+				// mode constant, vary attributr
 				ArrayList<String> col_headers = new ArrayList<String>();
 				
 			}
 			
-			return "";
+			return builder.toString();
 		}
 		else {
 			return null;
@@ -239,30 +275,14 @@ public class TableGenerator {
 		}
 		else {
 			if (start.opCode.equals(Tokenizer.multiplication) ){
-				result.put(start, getScriptInflectionPoints(start));
+				ArrayList<ArrayList<Token>> r = new ArrayList<ArrayList<Token>>();
+				r.add(getSemeInflectionPoints(start.nodes.get(0)));
+				r.add(getSemeInflectionPoints(start.nodes.get(1)));
+				r.add(getSemeInflectionPoints(start.nodes.get(2)));
+				result.put(start, r);
 			}
-			if (start.opCode.equals(Tokenizer.addition) ){
-				for (Token token : start.nodes){
-					result.put(token, getScriptInflectionPoints(token));
-				}				
-			}
-		}
-		
-		return result;
-	}
-	
-	// inflection points for 3 semes
-	public ArrayList<ArrayList<Token>> getScriptInflectionPoints(Token start) {
-		
-		ArrayList<ArrayList<Token>> result = new ArrayList<ArrayList<Token>>();
-		
-		if (start.opCode == null || !start.opCode.equals(Tokenizer.multiplication) ){
-			System.out.println("ERROR in getScriptInflectionPoints");
-		}
-		else {
-			result.add(getSemeInflectionPoints(start.nodes.get(0)));
-			result.add(getSemeInflectionPoints(start.nodes.get(1)));
-			result.add(getSemeInflectionPoints(start.nodes.get(2)));
+			else 
+				System.out.println("ERROR in getTableInflectionPoints");
 		}
 		
 		return result;
@@ -285,6 +305,68 @@ public class TableGenerator {
 		return result;
 	}
 	
+	public ArrayList<Token> CreateTableSet(Token parent) {
+
+		ArrayList<Token> result = new ArrayList<Token>();
+		
+		for (String s : createSet(parent)) {
+
+			ParserImpl parser = new ParserImpl();
+			
+			try {				
+				result.add(parser.parse(Tokenizer.MakeParsable(s)));	
+			} catch (Exception e) {
+				System.out.println("ERROR CreateTableSet [" + e.getMessage()+"]");
+			}		
+			finally {
+				parser.Reset();			
+			}
+		}
+		
+		return result;
+	}
+	
+	public ArrayList<String> createSet(Token parent) {
+		
+		ArrayList<String> result = new ArrayList<String>();
+		
+		if (parent.opCode != null && parent.layer > 0) {
+			if (parent.opCode.equals(Tokenizer.addition)) {
+				for (Token child : parent.nodes) {					
+					result.addAll(createSet(child));					
+				}
+				return result;
+			}
+			else {
+				for (Token child : parent.nodes) {					
+					if (result.isEmpty()) {
+						result.addAll(createSet(child));
+					}
+					else {
+						ArrayList<String> temp = new ArrayList<String>();
+						ArrayList<String> r = createSet(child);
+						for (String prefix : result) {
+							for (String postfix : r) {
+								temp.add(prefix+postfix);
+							}
+						}
+						result = temp;
+					}
+				}
+				
+				ArrayList<String> temp = new ArrayList<String>();
+				for (String prefix : result) {
+					temp.add(prefix+Tokenizer.c_marks.get(parent.layer));
+				}
+				
+				return temp;
+			}
+		}		
+		else {
+			result.add(parent.GetName());
+			return result;
+		}
+	}
 }
 
 

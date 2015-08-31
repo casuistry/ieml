@@ -437,7 +437,7 @@ public class Token {
 		
 		return result;
 	}
-	
+
 	public String GenerateSequenceForTable(boolean useParanthesis) {
 		
 		if (isInTableGenetration()) {
