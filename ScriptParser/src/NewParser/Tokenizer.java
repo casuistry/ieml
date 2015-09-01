@@ -225,10 +225,10 @@ public class Tokenizer {
 		// handle trailing empties
 		int index = c_marks.indexOf(ieml.charAt(ieml.length()-1)) - 1;
 		for (int i = index; i >= 0; i--){
-			String empties = emptyLookup.get(i).GenerateSequenceForTable(false) + c_marks.get(i+1);
+			String empties = c_marks.get(i)+emptyLookup.get(i).GenerateSequenceForTable(false) + c_marks.get(i+1);
 			//System.out.println(empties);
 			for (int j=0;j<3;j++){
-				ieml = ieml.replace(empties, c_marks.get(i+1).toString());
+				ieml = ieml.replace(empties, c_marks.get(i).toString()+c_marks.get(i+1).toString());
 			}
 		}
 		
