@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import NewParser.ParserImpl;
+import NewParser.ScriptExamples;
 import NewParser.Token;
 import NewParser.Tokenizer;
 
@@ -13,9 +14,9 @@ public class TableGenerator {
 		
 		undefined("undefined"),
 		no_table("no variables"),
-		row_mode("one variable in mode"),	
-		row_attribut("one variable in attribut"),	
 		row_substance("one variable in substance"),
+		row_attribut("one variable in attribut"),
+		row_mode("one variable in mode"),	
 		matrix_mode("two or more variables in mode"),	
 		matrix_attribut("two or more variables in attribut"),
 		matrix_substance("two or more variables in substance"),		
@@ -43,13 +44,14 @@ public class TableGenerator {
 	
 	public void generate(){
 		
-		//List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
-		ArrayList<String> db = new ArrayList<String>();
-		db.add("M:.+O:M:.- , 2, 3, 4, 5, 6");
+		List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
+		//ArrayList<String> db = new ArrayList<String>();
+		//db.add("M:.+O:M:.- , 2, 3, 4, 5, 6");
 		//db.add("(S:+B:)(S:+T:).f.- , 2, 3, 4, 5, 6");
-		//db.add("l.o.-f.o.-' , 2, 3, 4, 5, 6");
+		//db.add("S:B:.E:.S:B:.- , 2, 3, 4, 5, 6");
+		//db.add("E:F:.O:M:.- , 2, 3, 4, 5, 6");
 		
-		//E:M:.M:M:.-
+		//
 		//try {
 			
 			//BufferedWriter json = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.json"));			
@@ -64,7 +66,7 @@ public class TableGenerator {
 					continue;
 				}
 				
-				String ieml = parts[0].trim().length() > 0 ? parts[0].trim():null;
+				String ieml = parts[0].trim().length() > 0 ? parts[0].trim():null; /*ScriptExamples.UnCoteurraconteUneHistoire;*/
 				//String fr   = parts[1].trim().length() > 0 ? parts[1].trim():null;
 				//String en   = parts[2].trim().length() > 0 ? parts[2].trim():null;
 				//String pa   = parts[3].trim().length() > 0 ? parts[3].trim():null;
@@ -73,12 +75,12 @@ public class TableGenerator {
 							
 				try {				
 					Token n = parser.parse(ieml);	
-					ArrayList<Token> tables = CreateTableSet(n);
+					ArrayList<Token> tables = createTableSet(n);
 										
 					StringBuilder builder = new StringBuilder();
 					
 					for (Token table : tables) {
-						String tableDesc = GenerateTables(table);
+						String tableDesc = generateTable(table);
 						if (tableDesc != null)
 							builder.append(tableDesc);
 					}
@@ -124,67 +126,33 @@ public class TableGenerator {
 		//	e.printStackTrace();
 		//}	
 	}	
-	
-	public Token roundTrip(String toParse) {
+					
+	// generates one table
+	public String generateTable(Token start) throws Exception{
 		
-		Token n = null;
-		
-		ParserImpl parser = new ParserImpl();
-		
-		try {				
-			n = parser.parse(toParse);	
-			//System.out.println("Round trip OK: " + n.GetName());
-			return n;
-		} catch (Exception e) {
-			System.out.println("ERROR round-tripping [" + e.getMessage()+"]");
-			return n;
-		}		
-		finally {
-			parser.Reset();			
-		}
-	}
-		
-	public String GenerateTables(Token start) {	
-		
-		HashMap<Token, ArrayList<ArrayList<Token>>> result = getTableInflectionPoints(start);
-		
-		if (result.isEmpty()) {
+		if (start.opCode == null || start.layer == 0) {
 			return null;
 		}
 		
-		StringBuilder builder = new StringBuilder();
+		if (start.opCode.equals(Tokenizer.addition) ){
+			throw new Exception ("ERROR in generateTable, CreateTableSet must be run before this method");
+		}		
 		
-		for (Token t : result.keySet()) {
-			try {
-				String s = generateTable(t, result.get(t));
-				if (s != null)
-					builder.append(s);
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-			}
-		}
+		Token substance = start.nodes.get(0);
+		Token attribut = start.nodes.get(1);
+		Token mode = start.nodes.get(2);
 		
-		return builder.toString();
-	}
+		ArrayList<Token> substance_list = recursiveGetScriptVariables(substance);
+		ArrayList<Token> attribut_list = recursiveGetScriptVariables(attribut);
+		ArrayList<Token> mode_list = recursiveGetScriptVariables(mode);
+				
+		int v_substance = substance_list.size();
+		int v_attribut = attribut_list.size();
+		int v_mode = mode_list.size();
 		
-	// generates one table
-	public String generateTable(Token start, ArrayList<ArrayList<Token>> table) throws Exception{
-		
-		StringBuilder builder = new StringBuilder("  creating table for " + start.GetName() + " ");
+		JsonTable json = new JsonTable();
 		
 		TableType tableType = TableType.undefined;
-		
-		ArrayList<Token> substance = table.get(0);
-		ArrayList<Token> attribut = table.get(1);
-		ArrayList<Token> mode = table.get(2);
-		
-		builder.append("[substance=" + substance.size());
-		builder.append(" attribut=" + attribut.size());
-		builder.append(" mode=" + mode.size() + "] ");
-		
-		int v_substance = substance.size();
-		int v_attribut = attribut.size();
-		int v_mode = mode.size();
 		
 		if (v_substance < 1 && v_attribut < 1 && v_mode < 1) {
 			tableType = TableType.no_table;
@@ -192,25 +160,46 @@ public class TableGenerator {
 		else if (v_substance > 0 && v_attribut > 0 && v_mode > 0) {
 			tableType = TableType.triple;
 		}
-		else if (v_substance == 0 && v_attribut == 0 && v_mode > 0) {
+		else if (v_substance == 0 && v_attribut == 0 && v_mode > 0) {			
+			
 			if (v_mode == 1) {
 				tableType = TableType.row_mode;
+				ArrayList<String> a = expandScript(mode);
+				json.add(JsonTable.TableDef.TableHeader, start.GetName());
+				for (String s : a) {
+					String clean = Tokenizer.MakeParsable(substance.GetName()+attribut.GetName()+s+Tokenizer.c_marks.get(start.layer));
+					json.add(JsonTable.TableDef.ColHeader, clean);
+				}
 			}
 			else {
 				tableType = TableType.matrix_mode;
 			}
 		}
 		else if (v_substance == 0 && v_attribut > 0 && v_mode == 0) {
+			
 			if (v_attribut == 1) {
 				tableType = TableType.row_attribut;
+				ArrayList<String> a = expandScript(attribut);
+				json.add(JsonTable.TableDef.TableHeader, start.GetName());
+				for (String s : a) {
+					String clean = Tokenizer.MakeParsable(substance.GetName()+s+mode.GetName()+Tokenizer.c_marks.get(start.layer));
+					json.add(JsonTable.TableDef.ColHeader, clean);
+				}
 			}
 			else {
 				tableType = TableType.matrix_attribut;
 			}
 		}
 		else if (v_substance > 0 && v_attribut == 0 && v_mode == 0) {
+			
 			if (v_substance == 1) {
-				tableType = TableType.row_substance;
+				tableType = TableType.row_substance;				
+				ArrayList<String> a = expandScript(substance);
+				json.add(JsonTable.TableDef.TableHeader, start.GetName());
+				for (String s : a) {
+					String clean = Tokenizer.MakeParsable(s+attribut.GetName()+mode.GetName()+Tokenizer.c_marks.get(start.layer));
+					json.add(JsonTable.TableDef.ColHeader, clean);
+				}
 			}
 			else {
 				tableType = TableType.matrix_substance;
@@ -218,6 +207,26 @@ public class TableGenerator {
 		}
 		else if (v_substance > 0 && v_attribut > 0 && v_mode == 0) {
 			tableType = TableType.double_mode;
+			
+			json.add(JsonTable.TableDef.TableHeader, start.GetName());
+			
+			ArrayList<String> col = expandScript(substance);
+			ArrayList<String> row = expandScript(attribut);
+			
+			for (String s_col : col) {
+				String clean = Tokenizer.MakeParsable(s_col+attribut.GetName()+mode.GetName()+Tokenizer.c_marks.get(start.layer));
+				json.add(JsonTable.TableDef.ColHeader, clean);
+			}
+			for (String s_row : row) {
+				String clean = Tokenizer.MakeParsable(substance.GetName()+s_row+mode.GetName()+Tokenizer.c_marks.get(start.layer));
+				json.add(JsonTable.TableDef.RowHeader, clean);
+			}
+			for (String s_row : row) {
+				for (String s_col : col) {
+					String clean = Tokenizer.MakeParsable(s_col+s_row+mode.GetName()+Tokenizer.c_marks.get(start.layer));
+					json.add(JsonTable.TableDef.CellContent, clean);
+				}
+			}
 		}
 		else if (v_substance > 0 && v_attribut == 0 && v_mode > 0) {
 			tableType = TableType.double_attribut;
@@ -226,70 +235,22 @@ public class TableGenerator {
 			tableType = TableType.double_substance;
 		}
 		
-		builder.append("["+tableType.getFieldDescription()+"]\n");
+		StringBuilder log = new StringBuilder("  creating table for " + start.GetName() + " ");
+		log.append("[substance=" + v_substance);
+		log.append(" attribut=" + v_attribut);
+		log.append(" mode=" + v_mode + "] ");
+		log.append("["+tableType.getFieldDescription()+"]\n");
 		
-		//if (tableType == TableType.undefined) 
-		//if (tableType == TableType.no_table) 	
-		if (tableType != TableType.no_table) {
+		//if (tableType != TableType.no_table) 
+			//System.out.println(log.toString());
+		
+		if (tableType == TableType.undefined) 
+			throw new Exception("ERROR in generateTable, table type is undefined");
 			
-			//System.out.println(builder.toString());
-			
-			if (tableType == TableType.double_substance) {
-				
-				// substance is constant				
-				String s = start.nodes.get(0).GenerateCleanSequenceForTable(false);
-				
-				//attribute constant, vary mode
-				ArrayList<String> row_headers = new ArrayList<String>();
-				for (Token pivot : mode) {
-					
-					if (!pivot.opCode.equals(Tokenizer.addition))
-						throw new Exception("not good");
-					
-					
-				}
-
-				// mode constant, vary attributr
-				ArrayList<String> col_headers = new ArrayList<String>();
-				
-			}
-			
-			return builder.toString();
-		}
-		else {
-			return null;
-		}
+		return json.toString();
 	}
-	
-	public HashMap<Token, ArrayList<ArrayList<Token>>> getTableInflectionPoints(Token start) {
 		
-		HashMap<Token, ArrayList<ArrayList<Token>>> result = new HashMap<Token, ArrayList<ArrayList<Token>>>();
-		
-		if (start.opCode == null || start.layer == 0){ //theree are no semes
-			ArrayList<Token> zeroVariables = new ArrayList<Token>();
-			ArrayList<ArrayList<Token>> constantSemes = new ArrayList<ArrayList<Token>>();
-			constantSemes.add(zeroVariables);
-			constantSemes.add(zeroVariables);
-			constantSemes.add(zeroVariables);
-			result.put(start, constantSemes);
-		}
-		else {
-			if (start.opCode.equals(Tokenizer.multiplication) ){
-				ArrayList<ArrayList<Token>> r = new ArrayList<ArrayList<Token>>();
-				r.add(getSemeInflectionPoints(start.nodes.get(0)));
-				r.add(getSemeInflectionPoints(start.nodes.get(1)));
-				r.add(getSemeInflectionPoints(start.nodes.get(2)));
-				result.put(start, r);
-			}
-			else 
-				System.out.println("ERROR in getTableInflectionPoints");
-		}
-		
-		return result;
-	}
-	
-	// inflection points for a seme
-	public ArrayList<Token> getSemeInflectionPoints(Token start) {
+	public ArrayList<Token> recursiveGetScriptVariables(Token start) {
 		
 		ArrayList<Token> result = new ArrayList<Token>();
 		
@@ -297,24 +258,27 @@ public class TableGenerator {
 			if (start.opCode.equals(Tokenizer.addition)) {
                 result.add(start);
 			}
-			for (Token child : start.nodes) {
-				result.addAll(getSemeInflectionPoints(child));
+			else {
+				for (Token child : start.nodes) {
+					result.addAll(recursiveGetScriptVariables(child));
+				}
 			}
 		}
 
 		return result;
 	}
 	
-	public ArrayList<Token> CreateTableSet(Token parent) {
+	public ArrayList<Token> createTableSet(Token parent) {
 
-		ArrayList<Token> result = new ArrayList<Token>();
+		ArrayList<Token> roots = new ArrayList<Token>();
 		
-		for (String s : createSet(parent)) {
+		for (String s : recursiveCreateTableSet(parent)) {
 
 			ParserImpl parser = new ParserImpl();
 			
-			try {				
-				result.add(parser.parse(Tokenizer.MakeParsable(s)));	
+			try {			
+				String parsable = Tokenizer.MakeParsable(s);
+				roots.add(parser.parse(parsable));	
 			} catch (Exception e) {
 				System.out.println("ERROR CreateTableSet [" + e.getMessage()+"]");
 			}		
@@ -323,28 +287,28 @@ public class TableGenerator {
 			}
 		}
 		
-		return result;
+		return roots;
 	}
 	
-	public ArrayList<String> createSet(Token parent) {
+	public ArrayList<String> recursiveCreateTableSet(Token parent) {
 		
 		ArrayList<String> result = new ArrayList<String>();
 		
 		if (parent.opCode != null && parent.layer > 0) {
 			if (parent.opCode.equals(Tokenizer.addition)) {
 				for (Token child : parent.nodes) {					
-					result.addAll(createSet(child));					
+					result.addAll(recursiveCreateTableSet(child));					
 				}
 				return result;
 			}
 			else {
 				for (Token child : parent.nodes) {					
 					if (result.isEmpty()) {
-						result.addAll(createSet(child));
+						result.addAll(recursiveCreateTableSet(child));
 					}
 					else {
 						ArrayList<String> temp = new ArrayList<String>();
-						ArrayList<String> r = createSet(child);
+						ArrayList<String> r = recursiveCreateTableSet(child);
 						for (String prefix : result) {
 							for (String postfix : r) {
 								temp.add(prefix+postfix);
@@ -367,9 +331,80 @@ public class TableGenerator {
 			return result;
 		}
 	}
+	
+	public ArrayList<String> expandScript(Token token) {
+		
+		String expandable = token.GetName();
+		
+		ArrayList<String> expanded = new ArrayList<String>();
+		
+		for (int i = 0; i < expandable.length() - 1; i++) {
+			String key = expandable.substring(i, i+2);
+			if (Tokenizer.primitiveLookup.containsKey(key)) {
+				Token replacements = Tokenizer.primitiveLookup.get(key);
+				for (Token t : replacements.nodes) {
+					StringBuilder builder = new StringBuilder(expandable.substring(0, i));
+					builder.append(t.GetName());
+					builder.append(expandable.substring(i+2, expandable.length()));
+					expanded.add(builder.toString());
+				}
+			}			
+		}
+		
+		return expanded;
+	}
 }
 
+//create JSON terms: 
+//{ IEML: "S:B:T:.", FR:"qqchose", EN:"something", PARADIGM: "", LAYER: "", CLASS: ""  }
+//String j = String.format("{ieml:\"%s\",terms:[{lang:\"FR\",means:\"%s\"},{lang:\"EN\",means:\"%s\"}],paradigm:\"%s\",layer:\"%s\",class:\"%s\"}", 
+//		ieml, fr, en, pa, la, cl);
+//String j = String.format("{IEML:\"%s\",FR:\"%s\",EN:\"%s\",PARADIGM:\"%s\",LAYER:\"%s\",CLASS:\"%s\"}", ieml, fr, en, pa, la, cl);
 
+class JsonTable {
+	
+	StringBuilder json;
+	
+	public enum TableDef {
+		
+		TableHeader("TableHeader"),
+		RowHeader("RowHeader"),
+		CellContent("CellContent"),
+		ColHeader("ColHeader");
+
+	    private final String fieldDescription;
+
+	    TableDef(String descr) {
+	        this.fieldDescription = descr;
+	    }
+	    
+	    public String getFieldDescription() {
+	        return fieldDescription;
+	    }
+	}
+	
+	public JsonTable() {
+		json = new StringBuilder();
+	}
+	
+	public String toString() {
+		if (json.toString().equals("")) {
+			return null;
+		}
+		return "{" + json.toString() + "}";
+	}
+	
+	public void add(TableDef def, String value) {
+		
+		// sanity!
+		Helper.roundTrip(value);
+		
+		if (!json.toString().equals("")) {
+			json.append(",");
+		}
+		json.append(String.format("%s:\"%s\"", def.getFieldDescription(), value));
+	}
+}
 
 
 

@@ -265,4 +265,23 @@ public class Helper {
 			builder.append(" ");
 		return builder.toString();
 	}
+	
+	public static Token roundTrip(String toParse) {
+		
+		Token n = null;
+		
+		ParserImpl parser = new ParserImpl();
+		
+		try {				
+			n = parser.parse(toParse);	
+			//System.out.println("Round trip OK: " + n.GetName());
+			return n;
+		} catch (Exception e) {
+			System.out.println("ERROR round-tripping [" + e.getMessage()+"]");
+			return n;
+		}		
+		finally {
+			parser.Reset();			
+		}
+	}
 }

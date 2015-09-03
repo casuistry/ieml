@@ -145,8 +145,8 @@ public class ParserImpl extends Tokenizer {
 			throw new Exception("trailing E");
 		
 		//empties not added to this name
-		while (newNode.nodes.size() < 3)	
-			newNode.AddNode(emptyLookup.get(newNode.layer-1));			
+		while (newNode.nodes.size() < 3)
+			newNode.AddNode(emptyLookup.get(newNode.layer-1));
 		
 		newNode.ComputeTaille();	
 		

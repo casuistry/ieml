@@ -24,7 +24,7 @@ public class Tokenizer {
     public static List<Character> c_aux      = Arrays.asList(new Character[]{'E'});
     public static List<Character> c_full      = Arrays.asList(new Character[]{'F'});
     public static List<Character> c_inf      = Arrays.asList(new Character[]{'I'});
-	
+    
 	public enum GrammaticalClass {
 		
 		auxiliary(1),
@@ -189,8 +189,11 @@ public class Tokenizer {
 	public static HashMap<Integer, Token> emptyLookup = new HashMap<Integer, Token>();
 	static {
 		try {
-			for (int i = 0; i < 7; i++)
-				emptyLookup.put(i, new ParserImpl().parse(getEmptySequence(i)));
+			for (int i = 0; i < 7; i++) {
+				Token empties = new ParserImpl().parse(getEmptySequence(i));
+				empties.ReplaceName(empties.GenerateSequenceForTable(false));
+				emptyLookup.put(i, empties);
+			}
 		}catch (Exception e) {
 			System.out.println("mapping failed: " + e.getMessage());
 		}
@@ -220,6 +223,7 @@ public class Tokenizer {
 		// handle abbreviation for multiplication
 		for (String abrev : scAbbrev.keySet()) {
 			ieml = ieml.replace(abrev, scAbbrev.get(abrev));
+
 		}
 		
 		// handle trailing empties

@@ -408,36 +408,6 @@ public class Token {
 		return true;
 	}
 	
-	public String GenerateCleanSequenceForTable(boolean useParanthesis) {
-		
-		String result = GenerateSequenceForTable(useParanthesis);
-		
-		if (result == null) 
-			return null;
-		
-		// handle abbreviation for addition
-		for (String abrev : Tokenizer.primitiveAbbrev.keySet()) {
-			result = result.replace(abrev, Tokenizer.primitiveAbbrev.get(abrev));
-		}
-		
-		// handle abbreviation for multiplication
-		for (String abrev : Tokenizer.scAbbrev.keySet()) {
-			result = result.replace(abrev, Tokenizer.scAbbrev.get(abrev));
-		}
-		
-		// handle trailing empties
-		int index = Tokenizer.c_marks.indexOf(result.charAt(result.length()-1)) - 1;
-		for (int i = index; i >= 0; i--){
-			String empties = Tokenizer.emptyLookup.get(i).GenerateSequenceForTable(false) + Tokenizer.c_marks.get(i+1);
-			//System.out.println(empties);
-			for (int j=0;j<3;j++){
-				result = result.replace(empties, Tokenizer.c_marks.get(i+1).toString());
-			}
-		}
-		
-		return result;
-	}
-
 	public String GenerateSequenceForTable(boolean useParanthesis) {
 		
 		if (isInTableGenetration()) {
