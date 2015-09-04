@@ -1,6 +1,6 @@
 
 angular
-  .module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages'])
+  .module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph'])
   
 // associate controller to views through routes
   .config(function($routeProvider, $locationProvider) {
@@ -21,6 +21,10 @@ angular
 		.when('/dicEdit', {
 			controller: 'iemlDictionaryController',
 			templateUrl: '/js/partials/dictionaryEdit.html'
+		})
+		.when('/graph', {
+			controller: 'iemlDictionaryController',
+			templateUrl: '/js/partials/graph.html'
 		})
 		;
 		//.otherwise({redirectTo: '/js/partials/test3.html'});
