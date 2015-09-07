@@ -7,7 +7,7 @@ angular.module('d3graph', [])
 .directive('d3ieml', function($window, $document) {
   return {
 
-    template: 'ieml graph',
+    //template: 'ieml graph',
     link: function(scope, element, attrs) {
 
 			
@@ -127,6 +127,8 @@ angular.module('d3graph', [])
 
 var d3 = $window.d3;
    	
+   //center parent div	
+   angular.element('div[flex]').css("margin","0 auto");
 
     // Calculate total nodes, max label length
     var totalNodes = 0;
@@ -144,7 +146,7 @@ var d3 = $window.d3;
 
     // size of the diagram
 
-    var viewerWidth = $window.innerWidth;
+    var viewerWidth = angular.element(element[0]).outerWidth();//$window.innerWidth;
     var viewerHeight = $window.innerHeight;
 
     var tree = d3.layout.tree()
@@ -192,13 +194,42 @@ var d3 = $window.d3;
     // Sort the tree initially incase the JSON isn't in a sorted order.
     sortTree();
 
-    // TODO: Pan/zoom function, can be better implemented.
+ // TODO: Pan function, can be better implemented.
 
+    function pan(domNode, direction) {
+        var speed = panSpeed;
+        if (panTimer) {
+            clearTimeout(panTimer);
+            translateCoords = d3.transform(svgGroup.attr("transform"));
+            if (direction == 'left' || direction == 'right') {
+                translateX = direction == 'left' ? translateCoords.translate[0] + speed : translateCoords.translate[0] - speed;
+                translateY = translateCoords.translate[1];
+            } else if (direction == 'up' || direction == 'down') {
+                translateX = translateCoords.translate[0];
+                translateY = direction == 'up' ? translateCoords.translate[1] + speed : translateCoords.translate[1] - speed;
+            }
+            scaleX = translateCoords.scale[0];
+            scaleY = translateCoords.scale[1];
+            scale = zoomListener.scale();
+            svgGroup.transition().attr("transform", "translate(" + translateX + "," + translateY + ")scale(" + scale + ")");
+            d3.select(domNode).select('g.node').attr("transform", "translate(" + translateX + "," + translateY + ")");
+            zoomListener.scale(zoomListener.scale());
+            zoomListener.translate([translateX, translateY]);
+            panTimer = setTimeout(function() {
+                pan(domNode, speed, direction);
+            }, 50);
+        }
+    }
 
+    // Define the zoom function for the zoomable tree
+
+    function zoom() {
+        svgGroup.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    }
 
 
     // define the zoomListener which calls the zoom function on the "zoom" event constrained within the scaleExtents
-   // var zoomListener = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoom);
+    var zoomListener = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoom);
 
 
 
@@ -206,8 +237,8 @@ var d3 = $window.d3;
     var baseSvg = d3.select(element[0]).append("svg")
         .attr("width", viewerWidth)
         .attr("height", viewerHeight)
-        .attr("class", "overlay");
-       // .call(zoomListener);
+        .attr("class", "overlay")
+       .call(zoomListener);
 
 
 
