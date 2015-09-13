@@ -303,7 +303,7 @@ public class Token {
 		
 		_this.put("name", GetName());
 		_this.put("children", new JSONArray());
-		_this.put("class", GetTokenClass());
+		_this.put("op", opCode!=null?opCode:"none");
 		
 		
 	
