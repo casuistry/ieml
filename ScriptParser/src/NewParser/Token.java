@@ -3,6 +3,10 @@ package NewParser;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class Token {
 	
@@ -289,6 +293,30 @@ public class Token {
 				node.PrintNodes(prepend+"\t");
 			}
 		}	
+	}
+	
+	
+	public JSONObject buildTree (JSONObject parent) throws JSONException, Exception{
+		
+		JSONObject _this=new JSONObject();
+		
+		
+		_this.put("name", GetName());
+		_this.put("children", new JSONArray());
+		_this.put("class", GetTokenClass());
+		
+		
+	
+		if (nodes != null) {
+			for (Token node : nodes){
+				_this.optJSONArray("children").put(node.buildTree(_this));
+			}
+			return _this;
+		}	else {
+			return _this;
+		}
+		
+	
 	}
 	
 	public String Output(){
