@@ -1,6 +1,6 @@
 
 angular
-  .module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages'])
+  .module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph'])
   
 // associate controller to views through routes
   .config(function($routeProvider, $locationProvider) {
@@ -21,6 +21,10 @@ angular
 		.when('/dicEdit', {
 			controller: 'iemlDictionaryController',
 			templateUrl: '/js/partials/dictionaryEdit.html'
+		})
+		.when('/graph', {
+			controller: 'iemlDictionaryController',
+			templateUrl: '/js/partials/graph.html'
 		})
 		;
 		//.otherwise({redirectTo: '/js/partials/test3.html'});
@@ -48,7 +52,13 @@ angular
 		iemlvalid : function(input) {			
           $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
           return $http.post('http://test-ieml.rhcloud.com/ScriptParser/rest/iemlparser', 'iemltext='+encodeURIComponent(input));
-        }		
+        }, 
+
+        parsetree : function(input) {			
+          $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+          return $http.post('http://test-ieml.rhcloud.com/ScriptParser/rest/iemlparser/tree', 'iemltext='+encodeURIComponent(input));
+        }	
+
 	}
   })
   .directive('exists', function($q, $timeout, $http, crudFactory) {
@@ -522,6 +532,10 @@ angular
 	var tableTitle = "void";
 	  
   	init();
+
+  	$scope.getParseTree= function () {
+  		return crudFactory.parsetree(sharedProperties.getIemlEntry().IEML);
+  	}
 
 	function init() {
       var v = sharedProperties.getIemlEntry();
