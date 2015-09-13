@@ -11,8 +11,11 @@ angular.module('d3graph', [])
     link: function(scope, element, attrs) {
 
 			
+  var updateTree = function() {
 
-            scope.treeData = {
+    //temp dummy data for debugging
+
+            scope.treeDataOLS = {
   "name": "flare",
   "children": [
     {
@@ -127,8 +130,8 @@ angular.module('d3graph', [])
 
 var d3 = $window.d3;
    	
-   //center parent div	
-   angular.element('div[flex]').css("margin","0 auto");
+   //TODO center parent div	
+   // angular.element('div[flex]').css("margin","0 auto");
 
     // Calculate total nodes, max label length
     var totalNodes = 0;
@@ -359,7 +362,13 @@ var d3 = $window.d3;
             .attr('class', 'nodeCircle')
             .attr("r", 0)
             .style("fill", function(d) {
-                return d._children ? "lightsteelblue" : "#fff";
+               // return d._children ? "lightsteelblue" : "#fff";
+               return d._children ? "lightsteelblue" : "#fff";
+            })
+            .style("stroke", function (d) {
+                if ("none"==d.op) return "green";
+                if ("*"==d.op) return "red";
+                return  "lightsteelblue";
             });
 
         nodeEnter.append("text")
@@ -492,6 +501,25 @@ var d3 = $window.d3;
     // Layout the tree initially and center on the root node.
     update(root);
     centerNode(root);
+
+
+   
+         
+        
+
+
+
+     }; // end update function
+
+     scope.getParseTree().success(angular.bind(this, function(doUpdate, data) {
+            
+
+                scope.treeData = data.tree;
+                console.dir(data.tree);
+                doUpdate();
+
+            }, updateTree)); 
+
 		
 
      	 } // end of link ()

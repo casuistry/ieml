@@ -52,7 +52,13 @@ angular
 		iemlvalid : function(input) {			
           $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
           return $http.post('http://test-ieml.rhcloud.com/ScriptParser/rest/iemlparser', 'iemltext='+encodeURIComponent(input));
-        }		
+        }, 
+
+        parsetree : function(input) {			
+          $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+          return $http.post('http://test-ieml.rhcloud.com/ScriptParser/rest/iemlparser/tree', 'iemltext='+encodeURIComponent(input));
+        }	
+
 	}
   })
   .directive('exists', function($q, $timeout, $http, crudFactory) {
@@ -526,6 +532,10 @@ angular
 	var tableTitle = "void";
 	  
   	init();
+
+  	$scope.getParseTree= function () {
+  		return crudFactory.parsetree(sharedProperties.getIemlEntry().IEML);
+  	}
 
 	function init() {
       var v = sharedProperties.getIemlEntry();
