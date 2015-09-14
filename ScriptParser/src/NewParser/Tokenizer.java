@@ -215,6 +215,12 @@ public class Tokenizer {
 		if (ieml == null) 
 			return null;
 		
+		// index for empties
+		int index = c_marks.indexOf(ieml.charAt(ieml.length()-1)) - 1;
+		
+		if (index < 0)
+			return ieml;
+		
 		// handle abbreviation for addition
 		for (String abrev : primitiveAbbrev.keySet()) {
 			ieml = ieml.replace(abrev, primitiveAbbrev.get(abrev));
@@ -223,16 +229,21 @@ public class Tokenizer {
 		// handle abbreviation for multiplication
 		for (String abrev : scAbbrev.keySet()) {
 			ieml = ieml.replace(abrev, scAbbrev.get(abrev));
-
 		}
 		
+
+		//System.out.println("handling empties: " + index);
 		// handle trailing empties
-		int index = c_marks.indexOf(ieml.charAt(ieml.length()-1)) - 1;
 		for (int i = index; i >= 0; i--){
 			String empties = c_marks.get(i)+emptyLookup.get(i).GenerateSequenceForTable(false) + c_marks.get(i+1);
 			//System.out.println(empties);
 			for (int j=0;j<3;j++){
+				String temp = ieml;
+				//System.out.println("before: " + ieml);
 				ieml = ieml.replace(empties, c_marks.get(i).toString()+c_marks.get(i+1).toString());
+				//System.out.println("after: " + ieml);
+				if (temp.equals(ieml))
+					break;
 			}
 		}
 		

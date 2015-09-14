@@ -44,13 +44,14 @@ public class TableGenerator {
 	
 	public void generate(){
 		
-		List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
-		//ArrayList<String> db = new ArrayList<String>();
+		//List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
+		ArrayList<String> db = new ArrayList<String>();
+		db.add("S:M:.e.-S:B:T:.S:B:T:.S:B:T:.-S:B:T:.S:B:T:.S:B:T:.-' , 2, 3, 4, 5, 6");
 		//db.add("M:.+O:M:.- , 2, 3, 4, 5, 6");
 		//db.add("(S:+B:)(S:+T:).f.- , 2, 3, 4, 5, 6");
 		//db.add("S:B:.E:.S:B:.- , 2, 3, 4, 5, 6");
 		//db.add("E:F:.O:M:.- , 2, 3, 4, 5, 6");
-		
+		//db.add("S:+B: , 2, 3, 4, 5, 6");
 		//
 		//try {
 			
@@ -66,15 +67,26 @@ public class TableGenerator {
 					continue;
 				}
 				
-				String ieml = parts[0].trim().length() > 0 ? parts[0].trim():null; /*ScriptExamples.UnCoteurraconteUneHistoire;*/
+				String ieml =  /*parts[0].trim().length() > 0 ? parts[0].trim():null;*/  ScriptExamples.UnCoteurraconteUneHistoire; 
 				//String fr   = parts[1].trim().length() > 0 ? parts[1].trim():null;
 				//String en   = parts[2].trim().length() > 0 ? parts[2].trim():null;
 				//String pa   = parts[3].trim().length() > 0 ? parts[3].trim():null;
 				//String la   = parts[4].trim().length() > 0 ? parts[4].trim():null;
 				//String cl   = parts[5].trim().length() > 0 ? parts[5].trim():null;
 							
-				try {				
+				
+				
+				try {		
+					
 					Token n = parser.parse(ieml);	
+					
+					/*
+					stuff(n);
+					*/
+					
+					genJSONTables(n);
+					
+					/*
 					ArrayList<Token> tables = createTableSet(n);
 										
 					StringBuilder builder = new StringBuilder();
@@ -83,6 +95,8 @@ public class TableGenerator {
 						String tableDesc = generateTable(table);
 						if (tableDesc != null)
 							builder.append(tableDesc);
+						else 
+							builder.append(table.GetName() + " has no variables\n");
 					}
 					
 					String toPrint = builder.toString();
@@ -92,6 +106,7 @@ public class TableGenerator {
 						System.out.println(n.GetName());
 						System.out.println(toPrint);
 					}
+					*/
 					
 					//GenerateTables(n);
 					//String recreated = n.GenerateCleanSequenceForTable(false);					
@@ -128,7 +143,7 @@ public class TableGenerator {
 	}	
 					
 	// generates one table
-	public String generateTable(Token start) throws Exception{
+	/*public String generateTable(Token start) throws Exception{
 		
 		if (start.opCode == null || start.layer == 0) {
 			return null;
@@ -241,16 +256,16 @@ public class TableGenerator {
 		log.append(" mode=" + v_mode + "] ");
 		log.append("["+tableType.getFieldDescription()+"]\n");
 		
-		//if (tableType != TableType.no_table) 
-			//System.out.println(log.toString());
+		if (tableType != TableType.no_table) 
+			System.out.println(log.toString());
 		
 		if (tableType == TableType.undefined) 
 			throw new Exception("ERROR in generateTable, table type is undefined");
 			
 		return json.toString();
-	}
+	}*/
 		
-	public ArrayList<Token> recursiveGetScriptVariables(Token start) {
+	/*public ArrayList<Token> recursiveGetScriptVariables(Token start) {
 		
 		ArrayList<Token> result = new ArrayList<Token>();
 		
@@ -266,13 +281,13 @@ public class TableGenerator {
 		}
 
 		return result;
-	}
+	}*/
 	
-	public ArrayList<Token> createTableSet(Token parent) {
+	/*public ArrayList<Token> createTableSet(Token parent) {
 
 		ArrayList<Token> roots = new ArrayList<Token>();
 		
-		for (String s : recursiveCreateTableSet(parent)) {
+		for (String s : simpleCreateTableSet(parent)) {
 
 			ParserImpl parser = new ParserImpl();
 			
@@ -288,9 +303,25 @@ public class TableGenerator {
 		}
 		
 		return roots;
-	}
+	}*/
 	
-	public ArrayList<String> recursiveCreateTableSet(Token parent) {
+	/*public ArrayList<String> simpleCreateTableSet(Token parent) {
+		ArrayList<String> result = new ArrayList<String>();
+		
+		if (parent.opCode != null && parent.layer > 0) {
+			if (parent.opCode.equals(Tokenizer.addition)) {
+				for (Token child : parent.nodes) {					
+					result.add(child.GetName());					
+				}
+				return result;
+			}
+		}
+		
+		return result;
+	}*/
+	
+	// removes the "+'
+	/*public ArrayList<String> recursiveCreateTableSet(Token parent) {
 		
 		ArrayList<String> result = new ArrayList<String>();
 		
@@ -330,9 +361,10 @@ public class TableGenerator {
 			result.add(parent.GetName());
 			return result;
 		}
-	}
+	}*/
 	
-	public ArrayList<String> expandScript(Token token) {
+	// removes "I, F, O, M"
+	/*public ArrayList<String> expandScript(Token token) {
 		
 		String expandable = token.GetName();
 		
@@ -351,8 +383,208 @@ public class TableGenerator {
 			}			
 		}
 		
+		if (expanded.size() == 0)
+			expanded.add(token.GetName());
+		
 		return expanded;
 	}
+	*/
+	
+	public void genJSONTables(Token token){
+		System.out.print("analyzing script " + token.GetName());
+		
+		ArrayList<Token> tables = genTables(token);
+		if (tables == null || tables.size() == 0) {
+			System.out.println("\n\tcannot create table for " + token.GetName());
+		}
+		for (Token t : tables) {
+			System.out.println("\n\tcreating table for " + t.GetName());
+			ArrayList<String> vars;
+			Token seme;
+			seme = t.nodes.get(0);
+			System.out.println("\t\tsubstance is " + seme.GetName());
+			vars = genVariables(seme);
+			System.out.print("\t\t\tcomposed of  ");
+			for (String _vars : vars) {
+				Helper.roundTrip(_vars);
+				System.out.print(String.format("%s ", _vars));
+			}
+			System.out.println();
+			
+			seme = t.nodes.get(1);
+			System.out.println("\t\tattribut is " + seme.GetName());
+			vars = genVariables(seme);
+			System.out.print("\t\t\tcomposed of  ");
+			for (String _vars : vars) {
+				Helper.roundTrip(_vars);
+				System.out.print(String.format("%s ", _vars));
+			}
+			System.out.println();
+			
+			seme = t.nodes.get(2);
+			System.out.println("\t\tmode is " + seme.GetName());
+			vars = genVariables(seme);
+			System.out.print("\t\t\tcomposed of  ");
+			for (String _vars : vars) {
+				Helper.roundTrip(_vars);
+				System.out.print(String.format("%s ", _vars));
+			}
+			System.out.println();
+		}
+	}
+	
+	// STEP 1:
+	// If the input token has an additive relation, it needs to be
+	// split before generating a table, otherwise we are good to 
+	// generate a table. E.g.: if ABC -> generate table for ABC, 
+	// if A+B+C -> generate table for A, B and C 
+	public ArrayList<Token> genTables(Token parent) {
+		ArrayList<Token> result = new ArrayList<Token>();
+		
+		if (parent.layer < 1) {
+			return result;
+		}
+		
+		if (parent.opCode != null && parent.opCode.equals(Tokenizer.addition)) {
+			result.addAll(parent.nodes);
+			return result;
+		}
+		if (parent.opCode != null && parent.opCode.equals(Tokenizer.multiplication)) {
+			result.add(parent);
+			return result;
+		}
+		
+		return result;
+	}
+	
+	//STEP 2:
+	// Creates a set by writing out the "+" operands and replacing "I, F, O, M"
+	// by its components
+	public ArrayList<String> genVariables(Token parent) {
+		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> temp = recursiveGenVariables(parent);
+		for (String s : temp){
+			result.add(Tokenizer.MakeParsable(s));
+		}
+		return result;
+	}
+	public ArrayList<String> recursiveGenVariables(Token parent) {
+		
+		ArrayList<String> result = new ArrayList<String>();
+		
+		if (parent.opCode == null) { // primitive layer: check if we can expand, if yes, do it, otherwise use parent
+			String pName = parent.GetName();
+			if (Tokenizer.primitiveLookup.containsKey(pName)) {
+				for (Token sub : Tokenizer.primitiveLookup.get(pName).nodes){
+					result.add(sub.GetName());
+				}
+			}
+			else {
+				result.add(pName);
+			}
+		}
+		else {
+			
+			if (parent.opCode.equals(Tokenizer.addition)) { // addition
+				for (Token child : parent.nodes) {					
+					result.addAll(recursiveGenVariables(child));					
+				}
+			}
+			else { // multiplication
+				
+				if (parent.IsEmpty()) {
+					result.add(parent.GenerateSequenceForTable(false));
+				}
+				else {
+					for (Token child : parent.nodes) {	
+						if (result.isEmpty()) {
+							result.addAll(recursiveGenVariables(child));
+						}
+						else {
+							ArrayList<String> temp = new ArrayList<String>();
+							for (String prefix : result) {
+								for (String postfix : recursiveGenVariables(child)) {
+									temp.add(prefix+postfix);
+								}
+							}
+							result = temp;
+						}
+					}
+					
+					ArrayList<String> temp = new ArrayList<String>();
+					for (String prefix : result) {
+						temp.add(prefix+Tokenizer.c_marks.get(parent.layer));
+					}
+					
+					result = temp;
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	/*public void stuff(Token token) {
+		
+		ParserImpl parser = new ParserImpl();
+		
+		System.out.println("analyzing script " + token.GetName());
+		
+		for (Token t : genTables(token)) {
+
+			System.out.println("\ncreating table for " + t.GetName());
+			
+			if (t.nodes == null || t.nodes.size() == 0) {
+				System.out.println("no semes found, continuing");
+				continue;
+			}
+			
+			try {
+				
+
+				
+				for (int i = 0; i < t.nodes.size(); i++) {					
+					
+					Token seme = t.nodes.get(i);
+					
+					String semeName = "substance";					
+					if (i == 1)
+						semeName = "attribut";
+					if (i == 2)
+						semeName = "mode";
+					
+					System.out.println("analyzing seme " + semeName + " " + seme.GetName());
+					
+					ArrayList<String> res = new ArrayList<String>();
+					
+					ParserImpl internalParser = new ParserImpl();
+					for (String w : recursiveCreateTableSet(seme)) {
+						
+						try {			
+							Token withoutAddition = internalParser.parse(Tokenizer.MakeParsable(w));	
+							res.addAll(expandScript(withoutAddition));
+							
+						} catch (Exception e) {
+							System.out.println("ERROR stuff [" + e.getMessage()+"]");
+						}		
+						finally {
+							internalParser.Reset();			
+						}
+					}
+					
+					System.out.println("has operands " + res.size());
+					for (String v : res) {
+						System.out.println(v);
+					}
+				}
+			} catch (Exception e) {
+				System.out.println("ERROR stuff [" + e.getMessage()+"]");
+			}		
+			finally {
+				parser.Reset();			
+			}
+		}
+	} */
 }
 
 //create JSON terms: 
