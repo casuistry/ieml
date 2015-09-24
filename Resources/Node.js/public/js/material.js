@@ -150,7 +150,7 @@ angular
 				deferred.resolve();
 			}
             else {
-                scope.tempString=data.exception;
+                //scope.tempString=data.exception;
                 deferred.reject();
             }               
           }).
