@@ -31,7 +31,7 @@
 	</md-input-container>	
 	<md-input-container >
 	  <label for="filterInput">Search for</label>
-	  <input type="text" id="filterInput" data-ng-model="filterText" >
+	  <input type="text" id="filterInput" ng-change="triggerFiltering('TEXT')" data-ng-model="filterText" >
 	</md-input-container>  
   </div>
   

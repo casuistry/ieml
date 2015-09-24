@@ -321,11 +321,17 @@ angular
     ];
 	  
 	// set defaults
-	$scope.filterParadigm = fAllTerms; //default value
-	$scope.filterClass = fAllClasses; //default value
-	$scope.filterLayer = fAllLayers; //default value
+	$scope.filterParadigm = sharedProperties.filterParadigmSelected?sharedProperties.filterParadigmSelected:fAllTerms; //default value
+	$scope.filterClass = sharedProperties.filterClassSelected?sharedProperties.filterClassSelected:fAllClasses; //default value
+	$scope.filterLayer = sharedProperties.filterLayerSelected?sharedProperties.filterLayerSelected:fAllLayers; //default value
+	$scope.filterText = sharedProperties.filterTextSelected?sharedProperties.filterTextSelected:"";
 	
 	$scope.triggerFiltering = function (selection) {
+		//store selected filters in the service to preserve values
+		sharedProperties.filterClassSelected=$scope.filterClass;
+		sharedProperties.filterLayerSelected=$scope.filterLayer;
+		sharedProperties.filterParadigmSelected=$scope.filterParadigm;
+		sharedProperties.filterTextSelected=$scope.filterText;
       //alert(selection);
     };	
 	
