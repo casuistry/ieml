@@ -366,9 +366,9 @@ var d3 = $window.d3;
                return d._children ? "lightsteelblue" : "#fff";
             })
             .style("stroke", function (d) {
-                if ("none"==d.op) return "green";
-                if ("*"==d.op) return "red";
-                return  "lightsteelblue";
+                if ("none"==d.op) return "gold";
+                if ("*"==d.op) return "salmon";
+                return  "skyblue";
             });
 
         nodeEnter.append("text")
