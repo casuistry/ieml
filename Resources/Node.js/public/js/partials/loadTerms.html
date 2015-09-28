@@ -12,15 +12,15 @@
 	<md-input-container>
 	  <label>Display</label>
 		<md-select ng-model="filterClass" ng-change="triggerFiltering('CLASS')">
+		 <md-optgroup label="Tertiary">
+			<md-option ng-value="filterClass.name" ng-repeat="filterClass in filterClassChoices | filter: {category: 'tertiary' }">{{filterClass.name}}</md-option>
+		  </md-optgroup>	
 		  <md-optgroup label="Primary">
 			<md-option ng-value="filterClass.name" ng-repeat="filterClass in filterClassChoices | filter: {category: 'primary' }">{{filterClass.name}}</md-option>
 		  </md-optgroup>
 		  <md-optgroup label="Secondary">
 			<md-option ng-value="filterClass.name" ng-repeat="filterClass in filterClassChoices | filter: {category: 'secondary' }">{{filterClass.name}}</md-option>
 		  </md-optgroup>
-		  <md-optgroup label="Tertiary">
-			<md-option ng-value="filterClass.name" ng-repeat="filterClass in filterClassChoices | filter: {category: 'tertiary' }">{{filterClass.name}}</md-option>
-		  </md-optgroup>					  
 		</md-select>
 	</md-input-container>
 	<md-input-container>
