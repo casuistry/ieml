@@ -607,9 +607,31 @@ angular
 	};
 	
 	$scope.viewEntry = function ( index ) {
+	
 	  var earl = '/loadTerms/';
       $location.path(earl);	 	  
     };	
+
+   
+	
+  })
+  .controller('mainMenuController', function($scope, $location, sharedProperties) {
+
+
+  	
+   
+	$scope.editEntry = function ( index ) {
+		sharedProperties.setIemlEntry(null);		
+	    var earl = '/edit/new';
+        $location.path(earl);		 	  
+    };	
+
+    $scope.isShowAddNew = function () {
+
+      	return ($location.$$path.indexOf("loadTerms")>0);
+    }
+
+   
 	
   });
   

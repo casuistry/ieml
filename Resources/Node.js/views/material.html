@@ -18,42 +18,27 @@
   <body>
   
     <!-- TOP TOOLBAR -->
-  	<div>
+  	<div ng-controller="mainMenuController">
 	  <md-content>
 		<md-toolbar>
 		  <div class="md-toolbar-tools">	
 		    <div>
-             <!-- <md-menu>-->
-                <md-button class="md-icon-button" aria-label="Settings" ng-click="$mdOpenMenu( $event)">
-				  <i class="material-icons">language</i>
-	            </md-button>
-				  <!--md-menu-content width="4">
-					<md-menu-item>
-					  <md-button ng-click="viewEntry(-1)">
-						<i class="material-icons">view_list</i>
-						Edit Dictionary
-					  </md-button>
-					</md-menu-item>
-					<md-menu-item>
-					  <md-button disabled="disabled" ng-click="ctrl.checkVoicemail()">
-						<i class="material-icons">do_not_disturb</i>
-						Disabled Action
-					  </md-button>
-					</md-menu-item>
-					<md-menu-divider></md-menu-divider>
-					<md-menu-item>
-					  <md-button ng-click="ctrl.toggleNotifications()">
-						<i class="material-icons">do_not_disturb</i>
-						Action
-					  </md-button>
-					</md-menu-item>
-				  </md-menu-content-->
-			<!--  </md-menu>-->
-            </div>
+               <i class="material-icons">language</i>
+	        </div>
+       		
 			<h2>
-			  <span class="md-title">quickIEMLeditor</span>
+			  <span class="md-title" style="padding-left:1em; padding-right:2em" >quickIEMLeditor</span>
 			</h2>
+			
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" style="fill:rgba(255,255,255,0.87)"><path d="M20 6v12h2V6h-2z"></path></svg>
+				          
+			 <md-button class="md-icon-button" title="Add new IEML item" ng-show="isShowAddNew()" ng-click="editEntry(-1)">
+				  <i class="material-icons">add</i>
+	         </md-button>
+
 		  </div>
+
+		   
 		</md-toolbar>
 		
 		<br/><br/>

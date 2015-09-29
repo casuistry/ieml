@@ -41,11 +41,11 @@
 	    <div md-virtual-repeat="item in List | filter: filterText | filter:filterItemParadigm(filterParadigm) | filter:filterGrammaticalClass(filterClass) | filter:filterItemLayer(filterLayer)" class="repeated-item" flex> 
 	  
 		  <!-- md-primary for blue color, md-mini for smaller icon-->
-		  <md-button class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, List.indexOf(item))">
+		  <md-button  title="Delete this IEML" class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, List.indexOf(item))">
 		    <i class="material-icons">remove</i>
 		  </md-button>	
 		  
-		  <md-button class="md-fab md-primary md-mini" ng-click="editEntry(List.indexOf(item))">
+		  <md-button  title="Edit this IEML" class="md-fab md-primary md-mini" ng-click="editEntry(List.indexOf(item))">
 		    <i class="material-icons">settings</i>
 		  </md-button>
 		  
@@ -58,9 +58,9 @@
     </md-content>
   </div>
 			  
-  <!-- md-fab-bottom-left to position -->
+  <!-- md-fab-bottom-left to position 
   <md-button class="md-fab md-primary md-fab-bottom-right"  ng-click="editEntry(-1)">
 	<i class="material-icons">add</i>
-  </md-button>
+  </md-button> -->
 			  
 </div>	
