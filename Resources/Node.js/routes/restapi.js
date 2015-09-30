@@ -35,6 +35,29 @@ module.exports.newieml = function (req, res) {
 	);
 };
 
+module.exports.updateieml = function (req, res) {
+
+	var db = req.db;
+    console.log("before editing ieml");
+	console.log(req.body);
+	try {
+	var rec=req.body;
+	var id = require('mongoskin').ObjectID.createFromHexString(rec.ID);
+	console.log("before editing ieml "+id);
+	id = {_id: id};
+	rec.ID=undefined;
+} catch (e) {
+  
+   console.log(e);
+}
+
+	db.collection('terms').update(id, {$set:rec}, function(err, result) {
+    if (!err) {console.log('record updated'); res=result;}
+    	else console.log('error updating record ' +id._id);
+	
+	});
+};
+
 // timeouts for connections. Example: load all from db, then kill db, then make
 // a request ==> app keeps on trying for ever
 //http://blog.mongolab.com/2013/10/do-you-want-a-timeout/

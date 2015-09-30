@@ -37,6 +37,11 @@ angular
             return $http.post('../api/newieml', newData);
         },
 
+        modify : function(newData) {
+			$http.defaults.headers.post["Content-Type"] = "application/json";
+            return $http.post('../api/updateieml', newData);
+        },
+
 		get : function() {
             return $http.get('../api/allieml');
         },
@@ -177,6 +182,12 @@ angular
 	  onNewItem: function(data) {
         $rootScope.$emit('newItem', data);
       },
+      onModifyItem: function (data) {
+      	$rootScope.$emit('modifyItem', data);
+      },
+      modifyItemSubscriber:function(scope, callback) {
+        /*var handler = */$rootScope.$on('modifyItem', callback);
+      },
       getIemlEntry: function () {
         return iemlEntry;
       },
@@ -213,7 +224,8 @@ angular
 	
 	function init() {
       var v = sharedProperties.getIemlEntry();
-	  if (v == null) {
+
+      if (v == null) {
 		$scope.formTitle = 'Adding new entry';
 		$scope.doNotValidate = false;
 	  }
@@ -240,18 +252,24 @@ angular
 	// form was submitted by user
   	$scope.submitEdit = function() {
 
+	var el=sharedProperties.getIemlEntry();
+      
 		var toBeAdded = {
 			IEML:$scope.iemlValue,
 			FR:$scope.frenchValue,
 			EN:$scope.englishValue,	
 			PARADIGM:$scope.data.isParadigm ? "1" : "0",
 			LAYER:$scope.data.layer.toString(),
-			CLASS:$scope.data.gclass.toString()
+			CLASS:$scope.data.gclass.toString(),
+			ID:(el!=undefined && el._id!=undefined)?el._id:undefined
 		}		
 		
 		//$rootScope.$emit("iemlEntryUpdated", toBeAdded);
 		
 		if (sharedProperties.getDb() == true) {
+
+
+			if (toBeAdded.ID==undefined) {
 			crudFactory.create(toBeAdded).success(function(data) {
 
 			}).
@@ -261,6 +279,25 @@ angular
 				alert(status);
 			});
 		}
+		else {
+			//do update 
+
+			crudFactory.modify(toBeAdded).success(function(data, status, headers, config){ 
+
+				//no need to do anything since ilem list is being reloaded
+				debugger;
+				//TODO figure out why is not being called on success
+			}).error(function(data, status, headers, config) {
+				// called asynchronously if an error occurs
+				// or server returns response with an error status.
+				alert(status);
+			});
+
+
+			
+
+		}
+	}
 		//sharedProperties.onNewItem(toBeAdded);
 		
 		//sharedProperties.setNewIemlEntry(toBeAdded);
@@ -454,6 +491,17 @@ angular
 	sharedProperties.newItemSubscriber($scope, function somethingChanged(event, data) {
         $scope.addEntry(data);
     });
+
+    sharedProperties.modifyItemSubscriber($scope, function somethingChanged1(event, data) {
+        $scope.modifyEntry(data);
+    });
+
+
+    $scope.modifyEntry = function (changedItem) {
+    	debugger;
+    	//TODO find and modify data in the List
+    	$scope.List;
+    }
 	
 	$scope.addEntry = function(toBeAdded) {	
 
