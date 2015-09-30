@@ -52,7 +52,8 @@ module.exports.updateieml = function (req, res) {
 }
 
 	db.collection('terms').update(id, {$set:rec}, function(err, result) {
-    if (!err) {console.log('record updated'); res=result;}
+	//TODO return actual record for rhe convenience
+    if (!err) {console.log('record updated'); res.json(result);}
     	else console.log('error updating record ' +id._id);
 	
 	});
