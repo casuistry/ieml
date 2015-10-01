@@ -48,6 +48,7 @@ app.use(function(req,res,next){
 app.use('/', routes);
 app.all('/api/allieml', restapi.allieml);
 app.all('/api/newieml', restapi.newieml);
+app.all('/api/updateieml', restapi.updateieml);
 app.delete('/api/remieml/:id', restapi.remieml);
 app.all('/api/exists/ieml/:id', restapi.verifyIeml);
 app.all('/api/exists/FR/:id', restapi.verifyFr);
