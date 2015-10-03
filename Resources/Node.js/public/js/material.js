@@ -600,6 +600,11 @@ angular
 	  }
 	};
 	
+
+	$scope.indexOfTable=1;
+
+
+
 	$scope.tiles=[
 		{span:{row:1, col:4}, background:'gray', value:tableTitle, edit:false},
 		{span:{row:1, col:1}, background:'green', value:'Script sub-row 1.1', edit:false},
@@ -628,6 +633,41 @@ angular
 		{span:{row:1, col:1}, background:'blue', value:'script9', edit:true}
 	];
 	
+
+    
+	$scope.listOfLayers=[];
+
+	for (var j=1;j<4;j++) {
+
+		$scope.listOfLayers[j] = [
+		{span:{row:1, col:4}, background:'gray', value:tableTitle+j, edit:false},
+		{span:{row:1, col:1}, background:'green', value:'Script sub-row 1.1', edit:false},
+		
+		{span:{row:3, col:1}, background:'blue', value:'Script col 1', edit:false},
+		{span:{row:3, col:1}, background:'blue', value:'Script col 2', edit:false},
+		{span:{row:3, col:1}, background:'blue', value:'Script col 3', edit:false},
+
+		{span:{row:1, col:1}, background:'green', value:'Script sub-row 1.2', edit:false},
+		{span:{row:1, col:1}, background:'green', value:'Script sub-row 1.3', edit:false},
+
+		{span:{row:4, col:1}, background:'gray', value:'script row 1', edit:false},
+		
+		{span:{row:1, col:1}, background:'gray', value:'script cell 1,1', edit:false},
+		{span:{row:1, col:1}, background:'gray', value:'script cell 1,2', edit:false},
+		{span:{row:1, col:1}, background:'gray', value:'script cell 1,3', edit:false},
+
+		{span:{row:1, col:1}, background:'blue', value:'script1', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script2', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script3', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script4', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script5', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script6', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script7', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script8', edit:true},
+		{span:{row:1, col:1}, background:'blue', value:'script9', edit:true}
+	];
+
+	}
     // form was cancelled by user, we discard all entered information and just return.
   	$scope.cancelEdit = function() {
 		//do nothing, return to default (previous ?) screen
