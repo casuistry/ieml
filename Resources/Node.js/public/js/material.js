@@ -62,6 +62,11 @@ angular
         parsetree : function(input) {			
           $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
           return $http.post('http://test-ieml.rhcloud.com/ScriptParser/rest/iemlparser/tree', 'iemltext='+encodeURIComponent(input));
+        },
+
+        iemltable : function(input) {			
+          $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+          return $http.post('http://test-ieml.rhcloud.com/ScriptParser/rest/iemlparser/tables', 'iemltext='+encodeURIComponent(input));
         }	
 
 	}
@@ -598,6 +603,19 @@ angular
 	  else {
 		  tableTitle = v.IEML;
 	  }
+
+     crudFactory.iemltable(sharedProperties.getIemlEntry().IEML).success(function( data) {
+            
+
+                debugger;
+                console.dir(data.tree);
+                
+
+            }); 
+
+
+
+
 	};
 	
 
