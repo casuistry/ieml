@@ -305,19 +305,18 @@ public class TableGenerator {
 		table.addFormat(v_substance, v_attribut, v_mode);
 		
 		if (tableType == TableType.row_substance || tableType == TableType.row_attribut || tableType == TableType.row_mode) {
-					
+				
+			JsonSlice slice = new JsonSlice(0);
+			table.add(slice);
+			
 			int counter = 0;
 			for (int z = 0; z < mod.size(); z++) {
-				JsonSlice slice = new JsonSlice(z);
-				
 				for (int x = 0; x < sub.size(); x++) {
 					for (int y = 0; y < att.size(); y++) {
 						String intermediate = Tokenizer.MakeParsable(sub.get(x)+att.get(y)+mod.get(z)+Tokenizer.c_marks.get(input.layer));
 						slice.addCell(counter++, 0, intermediate);
 					}
 				}
-				
-				table.add(slice);
 			}
 		}
 		else if (tableType == TableType.double_substance || tableType == TableType.double_attribut || tableType == TableType.double_mode) {
@@ -382,7 +381,7 @@ public class TableGenerator {
 				}
 			}
 		}
-		else {
+		else { // triple
 			
 			for (int z = 0; z < mod.size(); z++) {
 				JsonSlice slice = new JsonSlice(z);
