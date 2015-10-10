@@ -148,12 +148,17 @@ req._parsedUrl.pathname.indexOf("/api/remieml")==0) {
   // decode token
   if (token) {
 
+    console.log("token value:"+token);
+
+    
     // verifies secret and checks exp
     jwt.verify(token, app.get('superSecret'), function(err, decoded) {      
       if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });    
+        console.log('token invalid!');
+        return res.json({ success: false, message: 'Authentication required.' });     //or bad token message
       } else {
         // if everything is good, save to request for use in other routes
+        console.log("decoded value:"+decoded);
         req.decoded = decoded;    
         next();
       }
@@ -165,12 +170,12 @@ req._parsedUrl.pathname.indexOf("/api/remieml")==0) {
     // return an error
     return res.status(403).send({ 
         success: false, 
-        message: 'No token provided.' 
+        message: 'Authentication required.' 
     });
     
   }
 } else {
-     
+  console.log("unsecured resourse");   
   next();
 }
 });

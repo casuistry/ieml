@@ -70,7 +70,9 @@ module.exports.remieml = function (req, res) {
     console.log("before removing ieml");
 	console.log(req.params.id);
 	
-	//res.sendStatus(200);
+
+	//res.status(500);
+	//res.sendStatus(500);
 
 	db.collection('terms').remove(
 	    {IEML:req.params.id}, 

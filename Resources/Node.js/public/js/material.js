@@ -49,7 +49,7 @@ angular
         },
 		
         remove : function(id) {
-            return $http.delete('../api/remieml/' + id);
+     		return $http.delete('../api/remieml/' + id+'?token='+sharedProperties.secToken);
         },
 		
 		exists : function(input, inputType) {
@@ -218,7 +218,7 @@ angular
       }  
     };	
   }) 
-  .controller('iemlEntryEditorController', function($scope, $location, crudFactory, sharedProperties) {
+  .controller('iemlEntryEditorController', function($scope,  $rootScope, $location, crudFactory, sharedProperties) {
 
     $scope.data = {};
     $scope.data.isParadigm = false;
@@ -272,7 +272,7 @@ angular
 		}		
 		
 
-		var success=true;
+		
 		//$rootScope.$emit("iemlEntryUpdated", toBeAdded);
 		
 		if (sharedProperties.getDb() == true) {
@@ -287,15 +287,14 @@ angular
 				}).
 				error(function(data, status, headers, config) {
 					
-	//TODO add standard look&feel dialog
-					if (data.message&&"No token provided."==data.message){
-						success=false;
-						alert("This operation requires authentication.");
-						
-					} else  {
-						alert(status); 
-						$location.path('/loadTerms/');	
-					}
+	
+					if (!data.success) 
+								$rootScope.showAlert('Create operation failed', data.message?data.message:'This operation requires authentication.');
+					else 
+								$rootScope.showAlert('Create operation failed', status);
+				
+																
+					
 				});
 		}
 		else {
@@ -308,21 +307,19 @@ angular
        				$location.path('/loadTerms/');	
 
 				
-				}).error(angular.bind(this,function(data, status, headers, config) {
+				}).error(function(data, status, headers, config) {
 					
-					if (data.message&&"No token provided."==data.message){
+						if (!data.success) 
+								$rootScope.showAlert('Modify operation failed', data.message?data.message:'This operation requires authentication.');
+						else 
+								$rootScope.showAlert('Modify operation failed', status);
+				
+					
+						//$location.path('/loadTerms/');
+											
 						
-						success=false;
-						alert("This operation requires authentication.");
-						
-					} else {
-
-						alert(status);
-						$location.path('/loadTerms/');	
 					}
-				}));
-
-
+				);
 			
 
 		}
@@ -333,7 +330,7 @@ angular
 	// temporary place-holder tempString for debug messages:
 	$scope.tempString = '';	
   })
-  .controller('loadIEMLController', function($scope, $location, $mdDialog, crudFactory, sharedProperties) {
+  .controller('loadIEMLController', function($scope,  $rootScope, $location, $mdDialog, crudFactory, sharedProperties) {
 		
     //just for safety
     $scope.loadedfromDB = false;
@@ -550,7 +547,12 @@ angular
 				
 		if ($scope.loadedfromDB == true) {
 			crudFactory.remove(toBeRemoved).success(function(data) {
-				$scope.List.splice(index, 1);
+
+				
+				if (!data.success&&data.message) 
+					$scope.showAlert('Delete operation failed', data.message?data.message:'This operation requires authentication.')
+				else
+					$scope.List.splice(index, 1);
 			}).
 			error(function(data, status, headers, config) {
 				// called asynchronously if an error occurs
@@ -558,7 +560,7 @@ angular
 				
 				// this won't work in case you cannot connect to db
 				// because of long (infinite?) time-outs
-                $scope.showAlert('Delete operation failed', status);
+				 $scope.showAlert('Delete operation failed', status);
 			});
 		}
 		else {
@@ -567,6 +569,16 @@ angular
     };
 	
     $scope.showAlert = function(title, status) {
+      $mdDialog.show(
+        $mdDialog.alert()
+          .parent(angular.element(document.body))
+          .title(title)
+          .content(status)
+          .ok('Dismiss')
+      );
+    };	
+
+    $rootScope.showAlert = function(title, status) {
       $mdDialog.show(
         $mdDialog.alert()
           .parent(angular.element(document.body))
