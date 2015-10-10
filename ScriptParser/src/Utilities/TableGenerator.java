@@ -78,7 +78,7 @@ public class TableGenerator {
 				
 				try {		
 					
-					Token n = parser.parse(ieml);	
+					Token n = parser.parse("t.i.-s.i.-'");//(ieml);	
 					String json = genJSONTables(n);
 					System.out.print(json);
 					

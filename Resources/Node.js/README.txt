@@ -1,4 +1,48 @@
-﻿git checkout
+﻿
+bower list
+
+local 
+C:\Users\Max\git\ieml\Resources\Node.js>bower list
+bower check-new     Checking for new versions of the project dependencies..
+starter-node-angular#1.0.0 C:\Users\Max\git\ieml\Resources\Node.js
+├── angular#1.4.4 (1.5.0-build.4284+sha.0df4ff8 available)
+├─┬ angular-material#0.10.1 (0.11.1 available)
+│ ├── angular#1.4.4 (1.5.0-build.4284+sha.0df4ff8 available)
+│ ├─┬ angular-animate#1.4.4 (1.5.0-build.4284+sha.0df4ff8 available)
+│ │ └── angular#1.4.4 (latest is 1.5.0-build.4284+sha.0df4ff8)
+│ └─┬ angular-aria#1.4.4 (1.5.0-build.4284+sha.0df4ff8 available)
+│   └── angular#1.4.4
+├─┬ angular-messages#1.4.4 (1.5.0-build.4284+sha.0df4ff8 available)
+│ └── angular#1.4.4
+├─┬ angular-route#1.4.4 (1.5.0-build.4284+sha.0df4ff8 available)
+│ └── angular#1.4.4
+├─┬ angular-ui-layout#1.0.5 (1.3.0 available)
+│ ├── angular#1.4.4 (1.5.0-build.4284+sha.0df4ff8 available)
+│ └── raf#e-tag:99393f802
+├── animate.css#3.4.0
+├─┬ bootstrap#3.3.5 (4.0.0-alpha available)
+│ └── jquery#2.1.4 (3.0.0-alpha1+compat available)
+└── font-awesome#4.4.0
+
+
+
+remote
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+git checkout
 npm install
 npm start
 

@@ -70,7 +70,9 @@ module.exports.remieml = function (req, res) {
     console.log("before removing ieml");
 	console.log(req.params.id);
 	
-	//res.sendStatus(200);
+
+	//res.status(500);
+	//res.sendStatus(500);
 
 	db.collection('terms').remove(
 	    {IEML:req.params.id}, 
@@ -171,4 +173,9 @@ module.exports.verifyEn = function (req, res) {
 module.exports.partials = function (req, res) {
   var name = req.params.name;
   res.render('partials/' + name);
+};
+
+module.exports.templates = function (req, res) {
+  var name = req.params.name;
+  res.render('templates/' + name);
 };
