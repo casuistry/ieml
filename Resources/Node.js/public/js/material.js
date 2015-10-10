@@ -29,16 +29,18 @@ angular
 		;
 		//.otherwise({redirectTo: '/js/partials/test3.html'});
   })  
-  .factory('crudFactory', function($http) {
+  .factory('crudFactory', function($http, sharedProperties) {
     return {
 		
         create : function(newData) {
 			$http.defaults.headers.post["Content-Type"] = "application/json";
+			newData.token=sharedProperties.secToken;
             return $http.post('../api/newieml', newData);
         },
 
         modify : function(newData) {
 			$http.defaults.headers.post["Content-Type"] = "application/json";
+			newData.token=sharedProperties.secToken;
             return $http.post('../api/updateieml', newData);
         },
 
@@ -269,46 +271,63 @@ angular
 			ID:(el!=undefined && el._id!=undefined)?el._id:undefined
 		}		
 		
+
+		var success=true;
 		//$rootScope.$emit("iemlEntryUpdated", toBeAdded);
 		
 		if (sharedProperties.getDb() == true) {
 
-
+			
 			if (toBeAdded.ID==undefined) {
-			crudFactory.create(toBeAdded).success(function(data) {
+			crudFactory.create(toBeAdded)
+				.success(function(data) {
 
-			}).
-			error(function(data, status, headers, config) {
-				// called asynchronously if an error occurs
-				// or server returns response with an error status.
-				alert(status);
-			});
+					$location.path('/loadTerms/');	
+
+				}).
+				error(function(data, status, headers, config) {
+					
+	//TODO add standard look&feel dialog
+					if (data.message&&"No token provided."==data.message){
+						success=false;
+						alert("This operation requires authentication.");
+						
+					} else  {
+						alert(status); 
+						$location.path('/loadTerms/');	
+					}
+				});
 		}
 		else {
 			//do update 
 
-			crudFactory.modify(toBeAdded).success(function(data, status, headers, config){ 
+			crudFactory.modify(toBeAdded)
+				.success(function(data, status, headers, config){ 
 
-				//no need to do anything since ilem list is being reloaded
-			
-			}).error(function(data, status, headers, config) {
-				// called asynchronously if an error occurs
-				// or server returns response with an error status.
-				alert(status);
-			});
+					
+       				$location.path('/loadTerms/');	
+
+				
+				}).error(angular.bind(this,function(data, status, headers, config) {
+					
+					if (data.message&&"No token provided."==data.message){
+						
+						success=false;
+						alert("This operation requires authentication.");
+						
+					} else {
+
+						alert(status);
+						$location.path('/loadTerms/');	
+					}
+				}));
 
 
 			
 
 		}
 	}
-		//sharedProperties.onNewItem(toBeAdded);
 		
-		//sharedProperties.setNewIemlEntry(toBeAdded);
-		//sharedProperties.iemlEntryUpdated();
-		
-		var earl = '/loadTerms/';
-        $location.path(earl);	 
 	};
 	
 	// temporary place-holder tempString for debug messages:
@@ -753,19 +772,56 @@ angular
     });
   };
 
-	function DialogController($scope, $mdDialog) {
-	  $scope.hide = function() {
-	    $mdDialog.hide();
-	  };
+
+
+	function DialogController($scope, $mdDialog, $http, sharedProperties) {
+	  $scope.error = undefined;
+
+	  $scope.dataLoading=false;
+
+	  $scope.formData = {};
+
 	  $scope.cancel = function() {
+	  	debugger;
 	    $mdDialog.cancel();
 	  };
-	  $scope.answer = function(answer) {
-	    $mdDialog.hide(answer);
-	  };
+	 
+	   $scope.login = function(form) {
+			
+			$scope.dataLoading=true;
+			
+			$http({
+					  method  : 'POST',
+					  url     : '/authenticate',
+					  data    : $.param($scope.formData),  // pass in data as strings
+					  headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+					 }).
+ 				 then(function(response) {
+
+					$scope.dataLoading=false;
+
+					if (response.data.success) {
+							sharedProperties.secToken=response.data.token;
+							$mdDialog.cancel();
+							
+					} else {
+						$scope.error = response.data.message;
+					}
+ 				 
+   
+ 				 }, function(response) {
+ 				 	debugger;
+   					//deal with excpetions i.e. network
+				  });
+
+
+
+
+
+
+		}
+
 	}
-
-
 
 
    
