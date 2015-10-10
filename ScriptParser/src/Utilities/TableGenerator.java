@@ -7,6 +7,7 @@ import NewParser.ParserImpl;
 import NewParser.ScriptExamples;
 import NewParser.Token;
 import NewParser.Tokenizer;
+import Utilities.TableGenerator.TableType;
 
 public class TableGenerator {
 
@@ -38,7 +39,7 @@ public class TableGenerator {
 		
 		tGen.generate();
 	}
-	
+		
 	public void generate(){
 		
 		//List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
@@ -48,8 +49,9 @@ public class TableGenerator {
 		//db.add("(S:+B:)(S:+T:).f.- , 2, 3, 4, 5, 6");
 		//db.add("S:B:.E:.S:B:.- , 2, 3, 4, 5, 6");
 		//db.add("E:F:.O:M:.- , 2, 3, 4, 5, 6");
-		//db.add("O:M:O:.+M:O:M:., 2, 3, 4, 5, 6");
-		db.add("S:S:M:., 2, 3, 4, 5, 6");
+		//db.add("O:M:.+M:O:., 2, 3, 4, 5, 6");
+		//db.add("t.i.-s.i.-', 2, 3, 4, 5, 6");
+		db.add("O:M:O:.+M:O:M:., 2, 3, 4, 5, 6");
 		//
 		//try {
 			
@@ -116,6 +118,8 @@ public class TableGenerator {
 		
 		JsonTables jsonTables = new JsonTables(token.GetName());
 		
+		TableCalculator calculator = new TableCalculator();
+		
 		for (Token t : tables) {
 			//System.out.println("\n\tcreating table for " + t.GetName());
 			ArrayList<String> sub, att, mod;
@@ -147,11 +151,14 @@ public class TableGenerator {
 			//}
 			//System.out.println();
 			
-			String jTable = writeOutTable(t, sub, att, mod);
+			String jTable = calculator.writeOutTable(t, sub, att, mod);
 			jsonTables.add(jTable);
+			
+			//break; // multi-tables are not handled yet
 		}
 		
-		return jsonTables.get();
+		jsonTables.setMaterialSize(calculator.getMaterialTableSize());
+		return jsonTables.getMaterial();
 	}
 	
 	// STEP 1:
@@ -255,6 +262,15 @@ public class TableGenerator {
 		
 		return result;
 	}
+};
+
+class TableCalculator {
+	
+	int materialColumnSize = -1;
+	
+	public int getMaterialTableSize() {
+		return materialColumnSize;
+	}
 	
 	// STEP 3
 	// Returns JSON string or NULL
@@ -303,6 +319,9 @@ public class TableGenerator {
 		JsonTable table = new JsonTable();
 		table.addTitle(input.GetName());
 		table.addFormat(v_substance, v_attribut, v_mode);
+		
+		if (materialColumnSize < 0)
+			materialColumnSize = table.getMaterialColumnsize();
 		
 		if (tableType == TableType.row_substance || tableType == TableType.row_attribut || tableType == TableType.row_mode) {
 				
@@ -409,9 +428,10 @@ public class TableGenerator {
 			}
 		}
 		
-		return table.get();
+		return table.getMaterial();
 	}
-};
+	
+}
 
 class JsonSlice {
 	
@@ -429,6 +449,10 @@ class JsonSlice {
 		headers.add(new JsonSliceEntry(x, y, v));
 	}
 	*/
+	
+	public ArrayList<JsonSliceEntry> getCells() {
+		return cells;
+	}
 	
 	public void addCell(int x, int y, String v){
 		cells.add(new JsonSliceEntry(x, y, v));
@@ -498,15 +522,40 @@ class JsonSliceEntry {
 class JsonTables {
 	
 	String value;
+	int materialSize = 0;
 	ArrayList<String> tables = new ArrayList<String>();
 	
 	JsonTables(String v) {
 		value = v;
 	}
 	
+	public void setMaterialSize(int s){
+		materialSize = s;
+	}
+	
 	public void add(String table) {
 		if (table != null)
 			tables.add(table);
+	}
+	
+	public String getMaterial() {
+		
+		String mSize = String.format("\"Col\":%s,", materialSize);
+		
+		StringBuilder json = new StringBuilder();
+		
+		json.append(String.format("\"%s\": [", JsonTable.TableDef.Tables));
+		String comma = null;
+		for (String entry : tables) {
+			if (comma != null)
+				json.append(comma);
+			json.append(entry);
+			if (comma == null)
+				comma = ",";
+		}
+		json.append("]");
+		
+		return "{" + mSize + json.toString() + "}";
 	}
 	
 	public String get() {
@@ -532,6 +581,11 @@ class JsonTables {
 class JsonTable {
 	
 	//https://jsonformatter.curiousconcept.com/
+	
+	// used to generate material format
+	String tableTitle = "";
+	int materialRow = 0;
+	int materialCol = 0;
 	
 	StringBuilder json;
 	ArrayList<JsonSlice> slices = new ArrayList<JsonSlice>();
@@ -568,6 +622,78 @@ class JsonTable {
 		slices.add(slice);
 	}
 	
+	public int getMaterialColumnsize() {
+	    return materialCol;	
+	}
+	
+	public String getMaterial() {
+		
+		String format = "{\"span\":{\"row\":%s, \"col\":%s}, \"background\":\"%s\", \"value\":\"%s\", \"edit\":\"false\"}";
+		StringBuilder builder = new StringBuilder();
+					
+		int rowHead = materialRow > 1 ? materialRow : 0;
+		int colHead = materialCol > 1 ? materialCol : 0;
+		int upperLeft = materialCol > 1 ? 1 : 0;
+		JsonSliceEntry[] sliceEntryArray = new JsonSliceEntry[materialRow*materialCol + rowHead + colHead + upperLeft];
+		
+		String c1 = null;
+		
+		builder.append("{\"table\":[");
+		
+		for (JsonSlice slice : slices) {
+		
+			if (c1 != null)
+				builder.append(c1);
+			
+			builder.append("{\"slice\":[");
+			
+			for (JsonSliceEntry sliceEntry : slice.getCells()) {
+				int pos = materialCol*sliceEntry.positionX + sliceEntry.positionY;
+				sliceEntryArray[pos] = sliceEntry;
+			}
+			
+			builder.append(String.format(format, 1, materialCol, "gray", tableTitle));
+			builder.append(",");
+			
+			String comma = null;
+			for (int i = 0; i < sliceEntryArray.length; i++) {
+				
+				if (comma != null)
+					builder.append(comma);
+					
+				String color = "gray";
+				
+				if (i < materialCol) 
+					color = "blue";
+				
+				if (i%materialCol == 0) 
+					color = "green";
+				
+				String v = sliceEntryArray[i] == null ? "" : sliceEntryArray[i].value;
+				
+				builder.append(String.format(format, 1, 1, color, v));
+				
+				if (comma == null)
+					comma = ",";
+			}
+			
+			builder.append("]}");
+			
+			if (c1 == null)
+				c1 = ",";
+		}
+
+		builder.append("]}");
+		
+		//{span:{row:1, col:4}, background:'gray', value:tableTitle+j, edit:false},
+		//{span:{row:1, col:1}, background:'green', value:'Script sub-row 1.1', edit:false},
+		//{span:{row:3, col:1}, background:'blue', value:'Script col 1', edit:false},
+		//{span:{row:3, col:1}, background:'blue', value:'Script col 2', edit:false},
+		//{span:{row:3, col:1}, background:'blue', value:'Script col 3', edit:false},
+		
+		return builder.toString();
+	}
+	
 	public String get() {
 		if (json.toString().equals("")) {
 			return null;
@@ -592,6 +718,9 @@ class JsonTable {
 	}
 	
 	public void addTitle(String value) {	
+		
+		tableTitle = value;
+		
 		if (!json.toString().equals("")) {
 			json.append(",");
 		}
@@ -599,6 +728,37 @@ class JsonTable {
 	}
 	
 	public void addFormat(int x, int y, int z) {
+		
+		if (x > 1 && y > 1 && z > 1) {
+			materialRow = x;
+			materialCol = y;
+		}
+		else if (x > 1) {
+			materialRow = x;
+			if (y > 1) {
+				materialCol = y;
+			}
+			else if (z > 1) {
+				materialCol = z;
+			}
+			else {
+				materialCol = 1;
+			}
+		}
+		else if (y > 1) {
+			materialRow = y;
+			if (z > 1) {
+				materialCol = z;
+			}
+			else {
+				materialCol = 1;
+			}
+		}
+		else if (z > 1) {
+			materialRow = z;
+			materialCol = 1;
+		}
+		
 		if (!json.toString().equals("")) {
 			json.append(",");
 		}

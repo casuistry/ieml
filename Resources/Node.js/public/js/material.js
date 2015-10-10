@@ -604,24 +604,20 @@ angular
 		  tableTitle = v.IEML;
 	  }
 
-     crudFactory.iemltable(sharedProperties.getIemlEntry().IEML).success(function( data) {
-            
-
-                debugger;
-                console.dir(data.tree);
-                
-
-            }); 
-
-
-
-
+      crudFactory.iemltable(sharedProperties.getIemlEntry().IEML).success(function(data) {
+		  		
+		// http://stackoverflow.com/questions/10368171/how-to-extract-a-json-object-thats-inside-a-json-object
+			
+        $scope.Tables = data.tree.Tables;		
+		
+		debugger;
+        console.dir(data.tree);
+      }); 
 	};
 	
 
+			   
 	$scope.indexOfTable=1;
-
-
 
 	$scope.tiles=[
 		{span:{row:1, col:4}, background:'gray', value:tableTitle, edit:false},
@@ -691,8 +687,7 @@ angular
 		//do nothing, return to default (previous ?) screen
 		var earl = '/loadTerms/';
         $location.path(earl);	 
-	};	
-	
+	};		
   })
   .controller('welcomeController', function($scope, $location) {
 
