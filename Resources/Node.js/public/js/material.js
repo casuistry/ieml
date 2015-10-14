@@ -639,10 +639,23 @@ angular
 		  		
 		// http://stackoverflow.com/questions/10368171/how-to-extract-a-json-object-thats-inside-a-json-object
 			
-        $scope.Tables = data.tree.Tables;		
+		
+        $scope.fakeReply = data.tree; //{"Col":4,"Tables": [{"table":[{"slice":[{"span":{"row":1, "col":4}, "background":"gray", "value":"O:M:O:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"green", "value":"null", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:S:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:B:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"green", "value":"O:T:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:M:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:S:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"green", "value":"U:B:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:T:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:M:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"green", "value":"A:S:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:B:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:T:U:.", "edit":"false"}]},{"slice":[{"span":{"row":1, "col":4}, "background":"gray", "value":"O:M:O:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"green", "value":"null", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:S:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:B:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"green", "value":"O:T:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:M:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:S:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"green", "value":"U:B:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:T:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:M:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"green", "value":"A:S:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:B:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:T:A:.", "edit":"false"}]}]}]};
+		debugger;
+		$scope.materialTableColSize = $scope.fakeReply.Col; //4;
+		$scope.materialTables = $scope.fakeReply.Tables;
+		$scope.newlistOfLayers=[]; //= $scope.listOfLayers;
+		
+		$scope.newlistOfLayers.push([{span:{row:1, col:4}, background:'gray', value:tableTitle+j, edit:false}]); //why 1-based array?
+		for (var j=0;j<$scope.materialTables[0].table.length;j++) {
+			$scope.newlistOfLayers.push($scope.materialTables[0].table[j].slice);
+		}
+		$scope.sliceCount = $scope.newlistOfLayers.length;
 		
 		debugger;
-        console.dir(data.tree);
+		
+        //$scope.Tables = data.tree.Tables;		
+        //console.dir(data.tree);
       }); 
 	};
 	
@@ -713,7 +726,10 @@ angular
 	];
 
 	}
-    // form was cancelled by user, we discard all entered information and just return.
+    
+	
+	
+	// form was cancelled by user, we discard all entered information and just return.
   	$scope.cancelEdit = function() {
 		//do nothing, return to default (previous ?) screen
 		var earl = '/loadTerms/';
