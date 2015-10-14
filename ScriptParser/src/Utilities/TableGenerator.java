@@ -51,7 +51,8 @@ public class TableGenerator {
 		//db.add("E:F:.O:M:.- , 2, 3, 4, 5, 6");
 		//db.add("O:M:.+M:O:., 2, 3, 4, 5, 6");
 		//db.add("t.i.-s.i.-', 2, 3, 4, 5, 6");
-		db.add("O:M:O:.+M:O:M:., 2, 3, 4, 5, 6");
+		//db.add("O:M:O:.+M:O:M:., 2, 3, 4, 5, 6");
+		db.add("O:M:O:., 2, 3, 4, 5, 6");
 		//
 		//try {
 			
@@ -78,7 +79,7 @@ public class TableGenerator {
 				
 				try {		
 					
-					Token n = parser.parse("t.i.-s.i.-'");//(ieml);	
+					Token n = parser.parse(ieml);//(ieml);	
 					String json = genJSONTables(n);
 					System.out.print(json);
 					
@@ -586,6 +587,7 @@ class JsonTable {
 	String tableTitle = "";
 	int materialRow = 0;
 	int materialCol = 0;
+	int upperLeft = 0;
 	
 	StringBuilder json;
 	ArrayList<JsonSlice> slices = new ArrayList<JsonSlice>();
@@ -623,7 +625,7 @@ class JsonTable {
 	}
 	
 	public int getMaterialColumnsize() {
-	    return materialCol;	
+	    return materialCol + upperLeft;	
 	}
 	
 	public String getMaterial() {
@@ -633,7 +635,7 @@ class JsonTable {
 					
 		int rowHead = materialRow > 1 ? materialRow : 0;
 		int colHead = materialCol > 1 ? materialCol : 0;
-		int upperLeft = materialCol > 1 ? 1 : 0;
+		//upperLeft = materialCol > 1 ? 1 : 0;
 		JsonSliceEntry[] sliceEntryArray = new JsonSliceEntry[materialRow*materialCol + rowHead + colHead + upperLeft];
 		
 		String c1 = null;
@@ -647,12 +649,16 @@ class JsonTable {
 			
 			builder.append("{\"slice\":[");
 			
+			if (upperLeft > 0)
+			{
+				sliceEntryArray[0] = new JsonSliceEntry(0,0,null);
+			}
 			for (JsonSliceEntry sliceEntry : slice.getCells()) {
-				int pos = materialCol*sliceEntry.positionX + sliceEntry.positionY;
+				int pos = (materialCol+upperLeft)*sliceEntry.positionX + sliceEntry.positionY + upperLeft - 1 /*zero-based array*/;
 				sliceEntryArray[pos] = sliceEntry;
 			}
 			
-			builder.append(String.format(format, 1, materialCol, "gray", tableTitle));
+			builder.append(String.format(format, 1, getMaterialColumnsize(), "gray", tableTitle));
 			builder.append(",");
 			
 			String comma = null;
@@ -732,14 +738,17 @@ class JsonTable {
 		if (x > 1 && y > 1 && z > 1) {
 			materialRow = x;
 			materialCol = y;
+			upperLeft = 1;
 		}
 		else if (x > 1) {
 			materialRow = x;
 			if (y > 1) {
 				materialCol = y;
+				upperLeft = 1;
 			}
 			else if (z > 1) {
 				materialCol = z;
+				upperLeft = 1;
 			}
 			else {
 				materialCol = 1;
@@ -749,6 +758,7 @@ class JsonTable {
 			materialRow = y;
 			if (z > 1) {
 				materialCol = z;
+				upperLeft = 1;
 			}
 			else {
 				materialCol = 1;
