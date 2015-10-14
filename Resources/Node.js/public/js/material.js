@@ -548,10 +548,7 @@ angular
 		if ($scope.loadedfromDB == true) {
 			crudFactory.remove(toBeRemoved).success(function(data) {
 
-				
-				if (!data.success&&data.message) 
-					$scope.showAlert('Delete operation failed', data.message?data.message:'This operation requires authentication.')
-				else
+		
 					$scope.List.splice(index, 1);
 			}).
 			error(function(data, status, headers, config) {
@@ -560,6 +557,9 @@ angular
 				
 				// this won't work in case you cannot connect to db
 				// because of long (infinite?) time-outs
+				if (!data.success&&data.message) 
+					$scope.showAlert('Delete operation failed', data.message?data.message:'This operation requires authentication.')
+				else
 				 $scope.showAlert('Delete operation failed', status);
 			});
 		}
