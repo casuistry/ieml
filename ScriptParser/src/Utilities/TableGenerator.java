@@ -51,8 +51,8 @@ public class TableGenerator {
 		//db.add("E:F:.O:M:.- , 2, 3, 4, 5, 6");
 		//db.add("O:M:.+M:O:., 2, 3, 4, 5, 6");
 		//db.add("t.i.-s.i.-', 2, 3, 4, 5, 6");
-		//db.add("O:M:O:.+M:O:M:., 2, 3, 4, 5, 6");
-		db.add("O:M:O:., 2, 3, 4, 5, 6");
+		db.add("O:M:O:.+M:O:M:., 2, 3, 4, 5, 6");
+		//db.add("O:M:M:., 2, 3, 4, 5, 6");
 		//
 		//try {
 			
@@ -635,8 +635,15 @@ class JsonTable {
 					
 		int rowHead = materialRow > 1 ? materialRow : 0;
 		int colHead = materialCol > 1 ? materialCol : 0;
-		//upperLeft = materialCol > 1 ? 1 : 0;
-		JsonSliceEntry[] sliceEntryArray = new JsonSliceEntry[materialRow*materialCol + rowHead + colHead + upperLeft];
+
+		JsonSliceEntry[] sliceEntryArray;
+		if (rowHead > 1 && colHead > 1) {
+			sliceEntryArray = new JsonSliceEntry[(rowHead+1)*(colHead+1)];
+			sliceEntryArray[0] = new JsonSliceEntry(0,0,"");
+		}
+		else {
+			sliceEntryArray = new JsonSliceEntry[rowHead];
+		}
 		
 		String c1 = null;
 		
@@ -649,16 +656,18 @@ class JsonTable {
 			
 			builder.append("{\"slice\":[");
 			
-			if (upperLeft > 0)
-			{
-				sliceEntryArray[0] = new JsonSliceEntry(0,0,null);
-			}
 			for (JsonSliceEntry sliceEntry : slice.getCells()) {
-				int pos = (materialCol+upperLeft)*sliceEntry.positionX + sliceEntry.positionY + upperLeft - 1 /*zero-based array*/;
-				sliceEntryArray[pos] = sliceEntry;
+				
+				if (rowHead > 1 && colHead > 1) {
+					sliceEntryArray[sliceEntry.positionX*(colHead+1)+sliceEntry.positionY] = sliceEntry;
+				}
+				else {
+					sliceEntryArray[sliceEntry.positionX] = sliceEntry;
+				}
 			}
 			
-			builder.append(String.format(format, 1, getMaterialColumnsize(), "gray", tableTitle));
+			// title
+			builder.append(String.format(format, 1, (rowHead > 1 && colHead > 1)?colHead+1:1, "green", tableTitle));
 			builder.append(",");
 			
 			String comma = null;
@@ -669,14 +678,16 @@ class JsonTable {
 					
 				String color = "gray";
 				
-				if (i < materialCol) 
-					color = "blue";
-				
-				if (i%materialCol == 0) 
-					color = "green";
+				if (rowHead > 1 && colHead > 1) {
+					if (i == 0) {
+						color = "gray";
+					}
+					else if ((i > 0 && i < colHead+1) || i%(colHead+1) == 0) {
+						color = "blue";
+					}
+				}
 				
 				String v = sliceEntryArray[i] == null ? "" : sliceEntryArray[i].value;
-				
 				builder.append(String.format(format, 1, 1, color, v));
 				
 				if (comma == null)

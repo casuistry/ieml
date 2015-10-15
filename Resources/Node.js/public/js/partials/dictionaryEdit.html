@@ -10,30 +10,34 @@
         <!--div ng-repeat="materialTable in materialTables"  ng-show="$index==indexOfTable"--> 		
 		 
         <!--TABLEs -->
-        <md-slider flex="" class="md-primary" md-discrete="" ng-model="indexOfTable" step="1" min="1" max={{sliceCount}} aria-label="depth"></md-slider>
+        <div class="gridListDynamicTiles" ng-show="showTables">
 
-        <div class="gridListDynamicTiles">
+		  <md-slider flex="" class="md-primary" md-discrete="" ng-model="indexOfTable" step="1" min="1" max={{sliceCount}} aria-label="depth"></md-slider>
+          
+		  <div ng-repeat="slice in newlistOfLayers"  ng-show="$index==indexOfTable"> 
 
-          <div ng-repeat="slice in newlistOfLayers"  ng-show="$index==indexOfTable"> 
-
-          <!-- another ng-repeat on slider var and list of tables, each div has ng-show to display one where ind=slider var-->
-          <md-grid-list md-cols={{materialTableColSize}} md-row-height="40px" md-gutter="0px">
-            <md-grid-tile ng-repeat="tile in slice" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}" style=" border-style: solid;
+            <!-- another ng-repeat on slider var and list of tables, each div has ng-show to display one where ind=slider var-->
+            <md-grid-list md-cols={{materialTableColSize}} md-row-height="40px" md-gutter="0px">
+              <md-grid-tile ng-repeat="tile in slice" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}" style=" border-style: solid;
                 border-width: 1px; border-color: black;" ng-class="tile.background">  
                 <input ng-model="tile.value" ng-show="tile.edit">
                 <h3 ng-show="!tile.edit">{{tile.value}}</h3>
-            </md-grid-tile>
-          </md-grid-list>
+              </md-grid-tile>
+            </md-grid-list>
 
-        <div>
+		  </div>
+		
+		</div>
+		
+		<div ng-show="!showTables">
+		<h2>{{tableError}}</h2>
+		</div>
+		
+		<div>
           <br/><br/>
           <md-button class="md-raised" ng-click="submitEdit()" disabled="disabled"> Submit </md-button> 
           <md-button class="md-raised" ng-click="cancelEdit()"> Cancel </md-button>
         </div>
-		
-		</div>
-		
-		</div>
 		
 		<!--/div-->
 		
