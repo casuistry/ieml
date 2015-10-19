@@ -38,22 +38,41 @@
   <div>
     <md-content>  
 	  <md-virtual-repeat-container id="vertical-container">
-	    <div md-virtual-repeat="item in List | filter: filterText | filter:filterItemParadigm(filterParadigm) | filter:filterGrammaticalClass(filterClass) | filter:filterItemLayer(filterLayer)" class="repeated-item" flex> 
+
+
+
+	<md-list class="fixedRows">
+
+	    <md-list-item md-virtual-repeat="item in List | filter: filterText | filter:filterItemParadigm(filterParadigm) | filter:filterGrammaticalClass(filterClass) | filter:filterItemLayer(filterLayer)" class="repeated-item" flex> 
 	  
 		  <!-- md-primary for blue color, md-mini for smaller icon-->
-		  <md-button  title="Delete this IEML" class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, List.indexOf(item))">
+		  <md-button  title="xDelete this IEML" class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, List.indexOf(item))">
 		    <i class="material-icons">remove</i>
 		  </md-button>	
 		  
 		  <md-button  title="Edit this IEML" class="md-fab md-primary md-mini" ng-click="editEntry(List.indexOf(item))">
 		    <i class="material-icons">settings</i>
 		  </md-button>
-		  
+
+		 
 		  <md-button class="md-raised" style="text-transform: none;" ng-click="showDicEdit(List.indexOf(item))">
 		   {{item.IEML}} 
 		  </md-button>	
+		 
+		
+		        <md-list-item class="md-2-line">
+      
+        		<div class="md-list-item-text ">
+         		 <p>{{item.EN}}</p>
+         		 <p>{{item.FR}}</p>
+        		</div>
+    		  </md-list-item>
 		  
-	    </div>
+		  
+	    </md-list-item >
+	</md-list>
+
+
 	  </md-virtual-repeat-container>
     </md-content>
   </div>
