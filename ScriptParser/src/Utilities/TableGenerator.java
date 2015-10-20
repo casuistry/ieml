@@ -404,7 +404,7 @@ class TableCalculator {
 		else { // triple
 			
 			for (int z = 0; z < mod.size(); z++) {
-				JsonSlice slice = new JsonSlice(z);
+				JsonSlice slice = new JsonSlice(z, Tokenizer.MakeParsable(mod.get(z)));
 				
 				for (int x = 0; x < sub.size(); x++) {
 					
@@ -437,9 +437,16 @@ class TableCalculator {
 class JsonSlice {
 	
 	int positionZ;
+	String sTitle = "";
 	
 	JsonSlice(int z) {
 		positionZ = z;
+		sTitle = "";
+	}
+	
+	JsonSlice(int z, String sliceTitle) {
+		positionZ = z;
+		sTitle = sliceTitle;
 	}
 	
 	//ArrayList<JsonSliceEntry> headers = new ArrayList<JsonSliceEntry>();
@@ -450,6 +457,10 @@ class JsonSlice {
 		headers.add(new JsonSliceEntry(x, y, v));
 	}
 	*/
+	
+	public String getSliceTitle() {
+		return sTitle;
+	}
 	
 	public ArrayList<JsonSliceEntry> getCells() {
 		return cells;
@@ -654,7 +665,9 @@ class JsonTable {
 			if (c1 != null)
 				builder.append(c1);
 			
-			builder.append("{\"slice\":[");
+			builder.append(String.format("{\"tabTitle\":\"%s\",\"slice\":[", slice.getSliceTitle()));
+			
+			//builder.append("{\"slice\":[");
 			
 			for (JsonSliceEntry sliceEntry : slice.getCells()) {
 				
