@@ -656,19 +656,23 @@ angular
 			$scope.tableError = data.exception;
 		} 
 		else {
-		    debugger;
+		    //debugger;
 		
 		    $scope.materialTableColSize = $scope.fakeReply.Col; //4;
 		    $scope.materialTables = $scope.fakeReply.Tables;
-		    $scope.newlistOfLayers=[]; //= $scope.listOfLayers;
-		
-		    $scope.newlistOfLayers.push([{span:{row:1, col:1}, background:'gray', value:tableTitle+j, edit:false}]); //why 1-based array?
-			for (var j=0;j<$scope.materialTables[0].table.length;j++) {
-				$scope.newlistOfLayers.push($scope.materialTables[0].table[j].slice);
+
+		    $scope.sliceCount = $scope.materialTables[0].table.length;  //TODO verify it can vary across tables in Tables
+		/*   // $scope.newlistOfLayers=[]; //= $scope.listOfLayers;
+
+            for (var i=0;i<$scope.materialTables.length;i++) {
+				    var newlistOfLayers = [];
+				    //newlistOfLayers.push([{span:{row:1, col:1}, background:'gray', value:tableTitle+j, edit:false}]); //why 1-based array?
+					for (var j=0;j<$scope.materialTables[i].table.length;j++) {
+						newlistOfLayers.push($scope.materialTables[i].table[j].slice);
+					}
+					$scope.sliceCount = newlistOfLayers.length;  //TODO verify it can vary across tables in Tables
 			}
-			$scope.sliceCount = $scope.newlistOfLayers.length;
-			
-			//debugger;
+			//debugger; */
 		}
         //$scope.Tables = data.tree.Tables;		
         //console.dir(data.tree);
