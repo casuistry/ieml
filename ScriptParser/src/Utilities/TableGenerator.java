@@ -51,8 +51,12 @@ public class TableGenerator {
 		//db.add("E:F:.O:M:.- , 2, 3, 4, 5, 6");
 		//db.add("O:M:.+M:O:., 2, 3, 4, 5, 6");
 		//db.add("t.i.-s.i.-', 2, 3, 4, 5, 6");
-		db.add("O:M:O:.+M:O:M:., 2, 3, 4, 5, 6");
-		//db.add("O:M:M:., 2, 3, 4, 5, 6");
+		//db.add("O:. + O:O:O:. + M:O:M:., 2, 3, 4, 5, 6");
+		//db.add("O:O:.-, 2, 3, 4, 5, 6");
+		//db.add("O:M:O:., 2, 3, 4, 5, 6");
+		//db.add("M:M:.e.-, 2, 3, 4, 5, 6");
+		db.add("M:M:.e.-+O:M:O:.-, 2, 3, 4, 5, 6");
+		
 		//
 		//try {
 			
@@ -103,76 +107,92 @@ public class TableGenerator {
 					
 	
 	// STEP 0:
-	// Call STEP 1 and STEP 2
-	// For all table(s), we get an array of strings that will make the multiplication
-	// use it to create a json table representation
-
 	public String genJSONTables(Token token) throws Exception {
 			
-		//System.out.print("analyzing script " + token.GetName() + "\n");
-		
-		ArrayList<Token> tables = genTables(token);
-		if (tables == null || tables.size() == 0) {
-			//System.out.println("\tcannot create table for " + token.GetName());
-			throw new Exception("not enough semes to generate table");
-		}
-		
 		JsonTables jsonTables = new JsonTables(token.GetName());
-		
-		TableCalculator calculator = new TableCalculator();
-		
-		for (Token t : tables) {
-			//System.out.println("\n\tcreating table for " + t.GetName());
+			
+		for (Token root : genTables(token)) {
+
 			ArrayList<String> sub, att, mod;
-			Token seme;
-			seme = t.nodes.get(0);
-			//System.out.println("\t\tsubstance is " + seme.GetName());
-			sub = genVariables(seme);
-			//System.out.print("\t\t\tcomposed of  ");
-			//for (String _vars : sub) {
-				//System.out.print(String.format("%s ", _vars));
-			//}
-			//System.out.println();
 			
-			seme = t.nodes.get(1);
-			//System.out.println("\t\tattribut is " + seme.GetName());
-			att = genVariables(seme);
-			//System.out.print("\t\t\tcomposed of  ");
-			//for (String _vars : att) {
-				//System.out.print(String.format("%s ", _vars));
-			//}
-			//System.out.println();
+			sub = genVariables(root.nodes.get(0));
+			att = genVariables(root.nodes.get(1));
+			mod = genVariables(root.nodes.get(2));
 			
-			seme = t.nodes.get(2);
-			//System.out.println("\t\tmode is " + seme.GetName());
-			mod = genVariables(seme);
-			//System.out.print("\t\t\tcomposed of  ");
-			//for (String _vars : mod) {
-				//System.out.print(String.format("%s ", _vars));
-			//}
-			//System.out.println();
+			String prefix = "";
+			String postfix = "";
+			Token rootToken = root;
 			
-			String jTable = calculator.writeOutTable(t, sub, att, mod);
-			jsonTables.add(jTable);
+			TableType t_type = getTableType(sub, att, mod);
+			AlgoDef a_type = getAlgoType( t_type, root.nodes.get(0), root.nodes.get(1), root.nodes.get(2), sub, att, mod);
 			
-			//break; // multi-tables are not handled yet
+			TableType useType = t_type;
+			
+			if (a_type == AlgoDef.Layer) {
+				
+				if (t_type == TableType.row_substance) {
+					rootToken = root.nodes.get(0);
+					prefix = "";
+					postfix = root.nodes.get(1).GetName() + root.nodes.get(2).GetName() + Tokenizer.c_marks.get(root.layer);					
+					sub = genVariables(rootToken.nodes.get(0));
+					att = genVariables(rootToken.nodes.get(1));
+					mod = genVariables(rootToken.nodes.get(2));
+					useType = getTableType(sub, att, mod);
+				}
+				
+				if (t_type == TableType.row_attribut) {
+					rootToken = root.nodes.get(1);
+					prefix = root.nodes.get(1).GetName();
+					postfix = root.nodes.get(2).GetName() + Tokenizer.c_marks.get(root.layer);
+					sub = genVariables(rootToken.nodes.get(0));
+					att = genVariables(rootToken.nodes.get(1));
+					mod = genVariables(rootToken.nodes.get(2));
+					useType = getTableType(sub, att, mod);
+				}
+				
+				if (t_type == TableType.row_mode) {
+					rootToken = root.nodes.get(2);
+					prefix = root.nodes.get(1).GetName() + root.nodes.get(2).GetName();
+					postfix = Tokenizer.c_marks.get(root.layer).toString();
+					sub = genVariables(rootToken.nodes.get(0));
+					att = genVariables(rootToken.nodes.get(1));
+					mod = genVariables(rootToken.nodes.get(2));
+					useType = getTableType(sub, att, mod);
+				}
+			}
+			
+			JsonTable table = writeTable(rootToken, useType, sub, att, mod);
+			
+			if (a_type == AlgoDef.Layer) {
+				
+				if (t_type == TableType.row_substance) {
+                    table.fixEntry(prefix, postfix);
+				}
+				
+				if (t_type == TableType.row_attribut) {
+					table.fixEntry(prefix, postfix);
+				}
+				
+				if (t_type == TableType.row_mode) {
+					table.fixEntry(prefix, postfix);
+				}
+			}
+			
+			jsonTables.add(table);
 		}
 		
-		jsonTables.setMaterialSize(calculator.getMaterialTableSize());
 		return jsonTables.getMaterial();
 	}
+	
 	
 	// STEP 1:
 	// If the input token has an additive relation, it needs to be
 	// split before generating a table, otherwise we are good to 
 	// generate a table. E.g.: if ABC -> generate table for ABC, 
 	// if A+B+C -> generate table for A, B and C 
-	public ArrayList<Token> genTables(Token parent) {
-		ArrayList<Token> result = new ArrayList<Token>();
+	private ArrayList<Token> genTables(Token parent) throws Exception {
 		
-		if (parent.layer < 1) {
-			return result;
-		}
+		ArrayList<Token> result = new ArrayList<Token>();
 		
 		if (parent.opCode != null && parent.opCode.equals(Tokenizer.addition)) {
 			result.addAll(parent.nodes);
@@ -183,13 +203,13 @@ public class TableGenerator {
 			return result;
 		}
 		
-		return result;
+		throw new Exception("not enough semes to generate table");
 	}
 	
 	//STEP 2:
 	// Creates a set by writing out the "+" operands and replacing "I, F, O, M"
 	// by its components
-	public ArrayList<String> genVariables(Token parent) {
+	private ArrayList<String> genVariables(Token parent) {
 		ArrayList<String> result = new ArrayList<String>();
 		ArrayList<String> temp = recursiveGenVariables(parent);
 		for (String s : temp){
@@ -208,7 +228,7 @@ public class TableGenerator {
 		}
 		return result;
 	}
-	public ArrayList<String> recursiveGenVariables(Token parent) {
+	private ArrayList<String> recursiveGenVariables(Token parent) {
 		
 		ArrayList<String> result = new ArrayList<String>();
 		
@@ -263,69 +283,16 @@ public class TableGenerator {
 		
 		return result;
 	}
-};
 
-class TableCalculator {
-	
-	int materialColumnSize = -1;
-	
-	public int getMaterialTableSize() {
-		return materialColumnSize;
-	}
-	
 	// STEP 3
 	// Returns JSON string or NULL
-	public String writeOutTable(Token input, ArrayList<String> sub, ArrayList<String> att, ArrayList<String> mod) throws Exception {
-			
-		int v_substance = sub.size();
-		int v_attribut = att.size();
-		int v_mode = mod.size();
+	private JsonTable writeTable(Token input, TableType tableType, ArrayList<String> sub, ArrayList<String> att, ArrayList<String> mod) throws Exception {
 		
-		TableType tableType = TableType.undefined;
-		
-		if (v_substance > 1 && v_attribut > 1 && v_mode > 1) {
-			tableType = TableType.triple;
-		}
-		else if (v_substance > 1) {
-			if (v_attribut > 1) {
-				tableType = TableType.double_mode;
-			}
-			else if (v_mode > 1) {
-				tableType = TableType.double_attribut;
-			}
-			else {
-				tableType = TableType.row_substance;
-			}
-		}
-		else if (v_attribut > 1) {
-			if (v_mode > 1) {
-				tableType = TableType.double_substance;
-			}
-			else {
-				tableType = TableType.row_attribut;
-			}
-		}
-		else if (v_mode > 1) {
-			tableType = TableType.row_mode;
-		}
-		else {
-			tableType = TableType.no_table;
-			throw new Exception("not enough variables to generate table");
-		}
-		
-		if (tableType == TableType.undefined) 
-			throw new Exception("ERROR in generateTable, table type is undefined");
-		
-		
-		JsonTable table = new JsonTable();
-		table.addTitle(input.GetName());
-		table.addFormat(v_substance, v_attribut, v_mode);
-		
-		if (materialColumnSize < 0)
-			materialColumnSize = table.getMaterialColumnsize();
-		
-		if (tableType == TableType.row_substance || tableType == TableType.row_attribut || tableType == TableType.row_mode) {
+		JsonTable table = new JsonTable(input.GetName());
+		table.addFormat(sub.size(), att.size(), mod.size());
 				
+		if (tableType == TableType.row_substance || tableType == TableType.row_attribut || tableType == TableType.row_mode) {
+							
 			JsonSlice slice = new JsonSlice(0);
 			table.add(slice);
 			
@@ -409,14 +376,12 @@ class TableCalculator {
 				for (int x = 0; x < sub.size(); x++) {
 					
 					String rowh = Tokenizer.MakeParsable(sub.get(x)+input.nodes.get(1).GetName()+mod.get(z)+Tokenizer.c_marks.get(input.layer));
-					//slice.addHeader(x+1, 0, rowh);
 					slice.addCell(x+1, 0, rowh);
 					
 					for (int y = 0; y < att.size(); y++) {
 						
 						if (x == 0) {
 							String colh = Tokenizer.MakeParsable(input.nodes.get(0).GetName()+att.get(y)+mod.get(z)+Tokenizer.c_marks.get(input.layer));
-							//slice.addHeader(0, y+1, colh);
 							slice.addCell(0, y+1, colh);
 						}
 						
@@ -429,179 +394,81 @@ class TableCalculator {
 			}
 		}
 		
-		return table.getMaterial();
+		return table;
 	}
 	
-}
-
-class JsonSlice {
-	
-	int positionZ;
-	String sTitle = "";
-	
-	JsonSlice(int z) {
-		positionZ = z;
-		sTitle = "";
-	}
-	
-	JsonSlice(int z, String sliceTitle) {
-		positionZ = z;
-		sTitle = sliceTitle;
-	}
-	
-	//ArrayList<JsonSliceEntry> headers = new ArrayList<JsonSliceEntry>();
-	ArrayList<JsonSliceEntry> cells = new ArrayList<JsonSliceEntry>();
-	
-	/*
-	public void addHeader(int x, int y, String v){
-		headers.add(new JsonSliceEntry(x, y, v));
-	}
-	*/
-	
-	public String getSliceTitle() {
-		return sTitle;
-	}
-	
-	public ArrayList<JsonSliceEntry> getCells() {
-		return cells;
-	}
-	
-	public void addCell(int x, int y, String v){
-		cells.add(new JsonSliceEntry(x, y, v));
-	}
-	
-	public String get() {
+	private TableType getTableType(ArrayList<String> sub, ArrayList<String> att, ArrayList<String> mod) throws Exception {
 		
-		StringBuilder json = new StringBuilder("{");
-
-		json.append(String.format("\"%s\":%s,", JsonTable.TableDef.Z, positionZ));
-		String comma = null;
+		int v_substance = sub.size();
+		int v_attribut = att.size();
+		int v_mode = mod.size();
 		
-		/*
-		json.append(String.format("\"%s\": [", JsonTable.TableDef.TableHeader));
-		comma = null;
-		for (JsonSliceEntry entry : headers) {
-			if (comma != null)
-				json.append(comma);
-			json.append(entry.get());
-			if (comma == null)
-				comma = ",";
+		if (v_substance > 1 && v_attribut > 1 && v_mode > 1) {
+			return TableType.triple;
 		}
-		json.append("],");
-		*/
-		
-		json.append(String.format("\"%s\": [", JsonTable.TableDef.CellContent));
-		comma = null;
-		for (JsonSliceEntry entry : cells) {
-			if (comma != null)
-				json.append(comma);
-			json.append(entry.get());
-			if (comma == null)
-				comma = ",";
+		else if (v_substance > 1) {
+			if (v_attribut > 1) {
+				return TableType.double_mode;
+			}
+			else if (v_mode > 1) {
+				return TableType.double_attribut;
+			}
+			else {
+				return TableType.row_substance;
+			}
 		}
-		json.append("]");
-		
-		json.append("}");
-		return json.toString();
-	}
-};
-
-class JsonSliceEntry {
-	
-	int positionX, positionY;
-	String value;
-	
-	JsonSliceEntry(int x, int y, String v) {
-		positionX = x;
-		positionY = y;
-		value = v;
-	}
-	
-	public String get() {
-		
-		StringBuilder json = new StringBuilder();
-		
-		json.append("{");
-		json.append(String.format("\"%s\":%s,", JsonTable.TableDef.X, positionX));
-		json.append(String.format("\"%s\":%s,", JsonTable.TableDef.Y, positionY));
-		json.append(String.format("\"%s\":\"%s\"", JsonTable.TableDef.V, value));
-		json.append("}");
-		
-		return json.toString();
-	}
-}
-
-class JsonTables {
-	
-	String value;
-	int materialSize = 0;
-	ArrayList<String> tables = new ArrayList<String>();
-	
-	JsonTables(String v) {
-		value = v;
-	}
-	
-	public void setMaterialSize(int s){
-		materialSize = s;
-	}
-	
-	public void add(String table) {
-		if (table != null)
-			tables.add(table);
-	}
-	
-	public String getMaterial() {
-		
-		String mSize = String.format("\"Col\":%s,", materialSize);
-		
-		StringBuilder json = new StringBuilder();
-		
-		json.append(String.format("\"%s\": [", JsonTable.TableDef.Tables));
-		String comma = null;
-		for (String entry : tables) {
-			if (comma != null)
-				json.append(comma);
-			json.append(entry);
-			if (comma == null)
-				comma = ",";
+		else if (v_attribut > 1) {
+			if (v_mode > 1) {
+				return TableType.double_substance;
+			}
+			else {
+				return TableType.row_attribut;
+			}
 		}
-		json.append("]");
-		
-		return "{" + mSize + json.toString() + "}";
-	}
-	
-	public String get() {
-		
-		StringBuilder json = new StringBuilder();
-		
-		json.append(String.format("\"%s\":\"%s\",", JsonTable.TableDef.TableScript, value));
-		json.append(String.format("\"%s\": [", JsonTable.TableDef.Tables));
-		String comma = null;
-		for (String entry : tables) {
-			if (comma != null)
-				json.append(comma);
-			json.append(entry);
-			if (comma == null)
-				comma = ",";
+		else if (v_mode > 1) {
+			return TableType.row_mode;
 		}
-		json.append("]");
-		
-		return "{" + json.toString() + "}";
+		else {
+			throw new Exception("not enough variables to generate table");
+		}
 	}
-}
+	
+	private AlgoDef getAlgoType(TableType tableType, Token a, Token b, Token c, ArrayList<String> sub, ArrayList<String> att, ArrayList<String> mod) {
+		
+		if (a.layer < 1)
+			return AlgoDef.Normal;
+		
+		int vars = sub.size()*att.size()*mod.size();
+		
+		if (tableType == TableType.row_substance && vars >= 4 && !a.GetName().contains("+"))  {
+			return AlgoDef.Layer;
+		}
+		else if (tableType == TableType.row_attribut && vars >= 4 && !b.GetName().contains("+"))  {
+			return AlgoDef.Layer;
+		}
+		else if (tableType == TableType.row_mode && vars >= 4 && !c.GetName().contains("+"))  {
+			return AlgoDef.Layer;
+		}	
+		else {
+			return AlgoDef.Normal;
+		}
+	}
+	
+	public enum AlgoDef {
+		
+		Normal("Normal"),
+		Layer("Layer");
 
-class JsonTable {
-	
-	//https://jsonformatter.curiousconcept.com/
-	
-	// used to generate material format
-	String tableTitle = "";
-	int materialRow = 0;
-	int materialCol = 0;
-	int upperLeft = 0;
-	
-	StringBuilder json;
-	ArrayList<JsonSlice> slices = new ArrayList<JsonSlice>();
+	    private final String fieldDescription;
+
+	    AlgoDef(String descr) {
+	        this.fieldDescription = descr;
+	    }
+	    
+	    public String getFieldDescription() {
+	        return fieldDescription;
+	    }
+	}
 	
 	public enum TableDef {
 		
@@ -627,180 +494,348 @@ class JsonTable {
 	    }
 	}
 	
-	public JsonTable() {
-		json = new StringBuilder();
-	}
 	
-	public void add(JsonSlice slice) {
-		slices.add(slice);
-	}
-	
-	public int getMaterialColumnsize() {
-	    return materialCol + upperLeft;	
-	}
-	
-	public String getMaterial() {
+	class JsonTables {
 		
-		String format = "{\"span\":{\"row\":%s, \"col\":%s}, \"background\":\"%s\", \"value\":\"%s\", \"edit\":\"false\"}";
-		StringBuilder builder = new StringBuilder();
+		String value;
+		ArrayList<JsonTable> tables = new ArrayList<JsonTable>();
+		
+		JsonTables(String v) {
+			value = v;
+		}
+		
+		public void add(JsonTable table) {
+			if (table != null)
+				tables.add(table);
+		}
+		
+		public String getMaterial() throws Exception {
 					
-		int rowHead = materialRow > 1 ? materialRow : 0;
-		int colHead = materialCol > 1 ? materialCol : 0;
-
-		JsonSliceEntry[] sliceEntryArray;
-		if (rowHead > 1 && colHead > 1) {
-			sliceEntryArray = new JsonSliceEntry[(rowHead+1)*(colHead+1)];
-			sliceEntryArray[0] = new JsonSliceEntry(0,0,"");
-		}
-		else {
-			sliceEntryArray = new JsonSliceEntry[rowHead];
-		}
-		
-		String c1 = null;
-		
-		builder.append("{\"table\":[");
-		
-		for (JsonSlice slice : slices) {
-		
-			if (c1 != null)
-				builder.append(c1);
-			
-			builder.append(String.format("{\"tabTitle\":\"%s\",\"slice\":[", slice.getSliceTitle()));
-			
-			//builder.append("{\"slice\":[");
-			
-			for (JsonSliceEntry sliceEntry : slice.getCells()) {
-				
-				if (rowHead > 1 && colHead > 1) {
-					sliceEntryArray[sliceEntry.positionX*(colHead+1)+sliceEntry.positionY] = sliceEntry;
-				}
-				else {
-					sliceEntryArray[sliceEntry.positionX] = sliceEntry;
-				}
+			if (tables.isEmpty()) {
+				throw new Exception("Could not generate tables");
 			}
 			
-			// title
-			builder.append(String.format(format, 1, (rowHead > 1 && colHead > 1)?colHead+1:1, "green", tableTitle));
-			builder.append(",");
+			StringBuilder json = new StringBuilder();
 			
+			json.append(String.format("\"input\":\"%s\",\"%s\": [", value, TableDef.Tables));
 			String comma = null;
-			for (int i = 0; i < sliceEntryArray.length; i++) {
+			for (JsonTable entry : tables) {
 				
 				if (comma != null)
-					builder.append(comma);
-					
-				String color = "gray";
+					json.append(comma);
 				
-				if (rowHead > 1 && colHead > 1) {
-					if (i == 0) {
-						color = "gray";
-					}
-					else if ((i > 0 && i < colHead+1) || i%(colHead+1) == 0) {
-						color = "blue";
-					}
-				}
-				
-				String v = sliceEntryArray[i] == null ? "" : sliceEntryArray[i].value;
-				builder.append(String.format(format, 1, 1, color, v));
+				json.append(entry.getMaterial());
 				
 				if (comma == null)
 					comma = ",";
 			}
+			json.append("]");
 			
-			builder.append("]}");
-			
-			if (c1 == null)
-				c1 = ",";
+			return "{" + json.toString() + "}";
 		}
+		
+		public String get() {
+			
+			StringBuilder json = new StringBuilder();
+			
+			json.append(String.format("\"%s\":\"%s\",", TableDef.TableScript, value));
+			json.append(String.format("\"%s\": [", TableDef.Tables));
+			String comma = null;
+			for (JsonTable entry : tables) {
+				if (comma != null)
+					json.append(comma);
+				json.append(entry.get());
+				if (comma == null)
+					comma = ",";
+			}
+			json.append("]");
+			
+			return "{" + json.toString() + "}";
+		}
+	}
 
-		builder.append("]}");
-		
-		//{span:{row:1, col:4}, background:'gray', value:tableTitle+j, edit:false},
-		//{span:{row:1, col:1}, background:'green', value:'Script sub-row 1.1', edit:false},
-		//{span:{row:3, col:1}, background:'blue', value:'Script col 1', edit:false},
-		//{span:{row:3, col:1}, background:'blue', value:'Script col 2', edit:false},
-		//{span:{row:3, col:1}, background:'blue', value:'Script col 3', edit:false},
-		
-		return builder.toString();
-	}
 	
-	public String get() {
-		if (json.toString().equals("")) {
-			return null;
+	class JsonTable {
+		
+		//https://jsonformatter.curiousconcept.com/
+		
+		// used to generate material format
+		String tableTitle = "";
+		int materialRow = 0;
+		int materialCol = 0;
+		
+		ArrayList<JsonSlice> slices = new ArrayList<JsonSlice>();
+
+		public JsonTable(String value) {
+			tableTitle = value;
 		}
 		
-		if (!json.toString().equals("")) {
-			json.append(",");
+		public void add(JsonSlice slice) {
+			slices.add(slice);
 		}
 		
-		json.append(String.format("\"%s\": [", JsonTable.TableDef.TableSlice));
-		String comma = null;
-		for (JsonSlice entry : slices) {
-			if (comma != null)
-				json.append(comma);
-			json.append(entry.get());
-			if (comma == null)
-				comma = ",";
+		public void fixEntry(String prefix, String postfix){
+			
+			for (JsonSlice slice : slices) {
+				for (JsonSliceEntry sliceEntry : slice.getCells()) {
+					sliceEntry.fixEntry(prefix, postfix);
+				}
+			}
+			
+			tableTitle = Helper.fixEntry(tableTitle, prefix, postfix);
 		}
-		json.append("]");
 		
-		return "{" + json.toString() + "}";
-	}
-	
-	public void addTitle(String value) {	
-		
-		tableTitle = value;
-		
-		if (!json.toString().equals("")) {
-			json.append(",");
+		public String getMaterial() {
+			
+			String format = "{\"span\":{\"row\":%s, \"col\":%s}, \"background\":\"%s\", \"value\":\"%s\", \"edit\":\"false\"}";
+			StringBuilder builder = new StringBuilder();
+						
+			int rowHead = materialRow > 1 ? materialRow : 0;
+			int colHead = materialCol > 1 ? materialCol : 0;
+					
+			JsonSliceEntry[] sliceEntryArray;
+			if (rowHead > 1 && colHead > 1) {
+				sliceEntryArray = new JsonSliceEntry[(rowHead+1)*(colHead+1)];
+				sliceEntryArray[0] = new JsonSliceEntry(0,0,"");
+			}
+			else {
+				sliceEntryArray = new JsonSliceEntry[rowHead];
+			}
+			
+			String c1 = null;
+			
+			builder.append(String.format("{\"Col\":\"%s\",\"table\":[", colHead+1));
+			
+			for (JsonSlice slice : slices) {
+			
+				if (c1 != null)
+					builder.append(c1);
+				
+				builder.append(String.format("{\"tabTitle\":\"%s\",\"slice\":[", slice.getSliceTitle()));
+				
+				for (JsonSliceEntry sliceEntry : slice.getCells()) {
+					
+					if (rowHead > 1 && colHead > 1) {
+						sliceEntryArray[sliceEntry.positionX*(colHead+1)+sliceEntry.positionY] = sliceEntry;
+					}
+					else {
+						sliceEntryArray[sliceEntry.positionX] = sliceEntry;
+					}
+				}
+				
+				// title
+				builder.append(String.format(format, 1, (rowHead > 1 && colHead > 1)?colHead+1:1, "green", tableTitle));
+				builder.append(",");
+				
+				String comma = null;
+				for (int i = 0; i < sliceEntryArray.length; i++) {
+					
+					if (comma != null)
+						builder.append(comma);
+						
+					String color = "gray";
+					
+					if (rowHead > 1 && colHead > 1) {
+						if (i == 0) {
+							color = "gray";
+						}
+						else if ((i > 0 && i < colHead+1) || i%(colHead+1) == 0) {
+							color = "blue";
+						}
+					}
+					
+					String v = sliceEntryArray[i] == null ? "" : sliceEntryArray[i].value;
+					builder.append(String.format(format, 1, 1, color, v));
+					
+					if (comma == null)
+						comma = ",";
+				}
+				
+				builder.append("]}");
+				
+				if (c1 == null)
+					c1 = ",";
+			}
+
+			builder.append("]}");
+
+			return builder.toString();
 		}
-		json.append(String.format("\"%s\":\"%s\"", TableDef.TableTitle, value));
-	}
-	
-	public void addFormat(int x, int y, int z) {
 		
-		if (x > 1 && y > 1 && z > 1) {
-			materialRow = x;
-			materialCol = y;
-			upperLeft = 1;
+		public String get() {
+
+			StringBuilder json = new StringBuilder();
+			
+			json.append(String.format("\"%s\": [", TableDef.TableSlice));
+			String comma = null;
+			for (JsonSlice entry : slices) {
+				if (comma != null)
+					json.append(comma);
+				json.append(entry.get());
+				if (comma == null)
+					comma = ",";
+			}
+			json.append("]");
+			
+			//if (!json.toString().equals("")) {
+			//	json.append(",");
+			//}
+			//json.append(String.format("\"%s\":%s,", TableDef.X, x));
+			//json.append(String.format("\"%s\":%s,", TableDef.Y, y));
+			//json.append(String.format("\"%s\":%s", TableDef.Z, z));
+			
+			//if (!json.toString().equals("")) {
+			//	json.append(",");
+			//}
+			//json.append(String.format("\"%s\":\"%s\"", TableDef.TableTitle, value));
+			
+			return "{" + json.toString() + "}";
 		}
-		else if (x > 1) {
-			materialRow = x;
-			if (y > 1) {
+		
+		public void addFormat(int x, int y, int z) {
+			
+			if (x > 1 && y > 1 && z > 1) {
+				materialRow = x;
 				materialCol = y;
-				upperLeft = 1;
+			}
+			else if (x > 1) {
+				materialRow = x;
+				if (y > 1) {
+					materialCol = y;
+				}
+				else if (z > 1) {
+					materialCol = z;
+				}
+				else {
+					materialCol = 1;
+				}
+			}
+			else if (y > 1) {
+				materialRow = y;
+				if (z > 1) {
+					materialCol = z;
+				}
+				else {
+					materialCol = 1;
+				}
 			}
 			else if (z > 1) {
-				materialCol = z;
-				upperLeft = 1;
-			}
-			else {
+				materialRow = z;
 				materialCol = 1;
 			}
 		}
-		else if (y > 1) {
-			materialRow = y;
-			if (z > 1) {
-				materialCol = z;
-				upperLeft = 1;
-			}
-			else {
-				materialCol = 1;
-			}
-		}
-		else if (z > 1) {
-			materialRow = z;
-			materialCol = 1;
+	}
+
+	
+	class JsonSlice {
+		
+		int positionZ;
+		String sTitle = "";
+		
+		JsonSlice(int z) {
+			positionZ = z;
+			sTitle = "";
 		}
 		
-		if (!json.toString().equals("")) {
-			json.append(",");
+		JsonSlice(int z, String sliceTitle) {
+			positionZ = z;
+			sTitle = sliceTitle;
 		}
-		json.append(String.format("\"%s\":%s,", TableDef.X, x));
-		json.append(String.format("\"%s\":%s,", TableDef.Y, y));
-		json.append(String.format("\"%s\":%s", TableDef.Z, z));
+		
+		//ArrayList<JsonSliceEntry> headers = new ArrayList<JsonSliceEntry>();
+		ArrayList<JsonSliceEntry> cells = new ArrayList<JsonSliceEntry>();
+		
+		/*
+		public void addHeader(int x, int y, String v){
+			headers.add(new JsonSliceEntry(x, y, v));
+		}
+		*/
+		
+		public String getSliceTitle() {
+			return sTitle;
+		}
+		
+		public ArrayList<JsonSliceEntry> getCells() {
+			return cells;
+		}
+		
+		public void addCell(int x, int y, String v){
+			cells.add(new JsonSliceEntry(x, y, v));
+		}
+		
+		public String get() {
+			
+			StringBuilder json = new StringBuilder("{");
+
+			json.append(String.format("\"%s\":%s,", TableDef.Z, positionZ));
+			String comma = null;
+			
+			/*
+			json.append(String.format("\"%s\": [", JsonTable.TableDef.TableHeader));
+			comma = null;
+			for (JsonSliceEntry entry : headers) {
+				if (comma != null)
+					json.append(comma);
+				json.append(entry.get());
+				if (comma == null)
+					comma = ",";
+			}
+			json.append("],");
+			*/
+			
+			json.append(String.format("\"%s\": [", TableDef.CellContent));
+			comma = null;
+			for (JsonSliceEntry entry : cells) {
+				if (comma != null)
+					json.append(comma);
+				json.append(entry.get());
+				if (comma == null)
+					comma = ",";
+			}
+			json.append("]");
+			
+			json.append("}");
+			return json.toString();
+		}
 	}
-}
+	
+	
+	class JsonSliceEntry {
+		
+		int positionX, positionY;
+		String value;
+		
+		JsonSliceEntry(int x, int y, String v) {
+			positionX = x;
+			positionY = y;
+			value = v;
+		}
+		
+		public void fixEntry(String prefix, String postfix){
+			value = Helper.fixEntry(value, prefix, postfix);
+		}
+		
+		public String get() {
+			
+			StringBuilder json = new StringBuilder();
+			
+			json.append("{");
+			json.append(String.format("\"%s\":%s,", TableDef.X, positionX));
+			json.append(String.format("\"%s\":%s,", TableDef.Y, positionY));
+			json.append(String.format("\"%s\":\"%s\"", TableDef.V, value));
+			json.append("}");
+			
+			return json.toString();
+		}
+	}
+	
+};
+
+
+
+
+
+
 
 
 

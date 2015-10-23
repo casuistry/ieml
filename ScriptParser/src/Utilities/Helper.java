@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import NewParser.ParserImpl;
 import NewParser.Token;
+import NewParser.Tokenizer;
 
 public class Helper {
 
@@ -284,4 +285,10 @@ public class Helper {
 			parser.Reset();			
 		}
 	}
+	
+	public static String fixEntry(String value, String prefix, String postfix){
+		String temp = Helper.roundTrip(value).GenerateSequenceForTable(false);
+		return Tokenizer.MakeParsable(prefix + temp + postfix);
+	}
+	
 }

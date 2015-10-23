@@ -10,33 +10,21 @@
         <!--div ng-repeat="materialTable in materialTables"  ng-show="$index==indexOfTable"--> 		
 		 
         <!--TABLEs -->
-      <div class="gridListDynamicTiles" ng-show="showTables" >
-
-
-       <md-tabs md-dynamic-height="" md-border-bottom="" ng-repeat="maintable in materialTables">
-
-           <md-tab label="{{subtable.tabTitle}}" ng-repeat="subtable in maintable.table" >
-                  <md-content class="md-padding">
-
-
-		  <!--<md-slider flex="" class="md-primary" md-discrete="" ng-model="indexOfTable" step="1" min="1" max={{sliceCount}} aria-label="depth"></md-slider> -->
-          
-              		  
-                          <md-grid-list md-cols="{{materialTableColSize}}" md-row-height="40px" md-gutter="0px">
-                            <md-grid-tile ng-repeat="tile in subtable.slice" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}" style=" border-style: solid;
-                              border-width: 1px; border-color: black;" ng-class="tile.background">  
-                              <input ng-model="tile.value" ng-show="tile.edit">
-                              <h3 ng-show="!tile.edit">{{tile.value}}</h3>
-                            </md-grid-tile>
-                          </md-grid-list>
-              	
-
-               </md-content> 
-
+        <div class="gridListDynamicTiles" ng-show="showTables" >
+          <md-tabs md-dynamic-height="" md-border-bottom="" ng-repeat="maintable in materialTables">
+            <md-tab label="{{subtable.tabTitle}}" ng-repeat="subtable in maintable.table" >
+              <md-content class="md-padding">
+		      <!--<md-slider flex="" class="md-primary" md-discrete="" ng-model="indexOfTable" step="1" min="1" max={{sliceCount}} aria-label="depth"></md-slider> -->
+                <md-grid-list md-cols="{{maintable.Col}}" md-row-height="40px" md-gutter="0px">
+                  <md-grid-tile ng-repeat="tile in subtable.slice" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}" style=" border-style: solid;
+                    border-width: 1px; border-color: black;" ng-class="tile.background">  
+                    <input ng-model="tile.value" ng-show="tile.edit">
+                    <h3 ng-show="!tile.edit">{{tile.value}}</h3>
+                  </md-grid-tile>
+                </md-grid-list>
+              </md-content> 
             </md-tab>
-        </md-tabs>
-
-		
+          </md-tabs>
 		</div>
 		
 		<div ng-show="!showTables">
