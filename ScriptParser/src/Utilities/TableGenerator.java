@@ -55,8 +55,9 @@ public class TableGenerator {
 		//db.add("O:O:.-, 2, 3, 4, 5, 6");
 		//db.add("O:M:O:., 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-, 2, 3, 4, 5, 6");
-		db.add("M:M:.e.-+O:M:O:.-, 2, 3, 4, 5, 6");
-		
+		//db.add("M:M:.e.-+O:M:O:.-, 2, 3, 4, 5, 6");
+		db.add("M:M:M:.o.-O:.-M:O:.M:O:.-', 2, 3, 4, 5, 6");
+		//db.add("U:+B:, 2, 3, 4, 5, 6");
 		//
 		//try {
 			
@@ -162,6 +163,8 @@ public class TableGenerator {
 			}
 			
 			JsonTable table = writeTable(rootToken, useType, sub, att, mod);
+			
+			table.ensureMaterialSize();
 			
 			if (a_type == AlgoDef.Layer) {
 				
@@ -583,6 +586,19 @@ public class TableGenerator {
 			}
 			
 			tableTitle = Helper.fixEntry(tableTitle, prefix, postfix);
+		}
+		
+		public void ensureMaterialSize() throws Exception {
+			if (materialRow > 12)
+				throw new Exception("too many rows");
+			if (materialCol > 12)
+				throw new Exception("too many columns");
+			if (slices.size() > 12)
+				throw new Exception("too many slices");
+			if ( materialRow*materialCol > 144)
+				throw new Exception("too many 2D cells");
+			if ( materialRow*materialCol*slices.size() > 360)
+				throw new Exception("too many 3D cells");
 		}
 		
 		public String getMaterial() {
