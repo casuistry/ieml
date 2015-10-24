@@ -1,6 +1,15 @@
 <md-toast style="opacity:0.4; background: blue;">
-  <span flex>{{tableTile.value}}</span>
-  <md-button ng-click="closeToast()">
-    Close
-  </md-button>
+
+ <md-list-item class="md-3-line">
+      
+        		<div class="md-list-item-text ">
+         		 <p> en:{{tableTile.means.en}}</p>
+         		 <p> fr:{{tableTile.means.fr}}</p>
+				  <md-button ng-click="closeToast()">Close</md-button>
+        		</div>
+  </md-list-item>
+
+ 
+ 
+
 </md-toast>

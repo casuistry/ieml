@@ -630,6 +630,7 @@ angular
 
  	function init(){
 
+ 		debugger;
  	 	$scope.tableTile = sharedProperties.tableTile;
 
  	 };
@@ -638,7 +639,7 @@ angular
   }
 
   )
-  .controller('iemlDictionaryController', function($scope, $location, $mdToast, $document, crudFactory, sharedProperties) {
+  .controller('iemlDictionaryController', function($scope, $location, $mdToast, $document, $filter, crudFactory, sharedProperties) {
 
 	  
 	var tableTitle = "void";
