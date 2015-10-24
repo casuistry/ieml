@@ -615,8 +615,25 @@ angular
 	  }	
     }; 	
 	
-  })
-  .controller('iemlDictionaryController', function($scope, $location, crudFactory, sharedProperties) {
+  }).controller ('toastControler',function($scope, $mdToast, sharedProperties){
+
+  	$scope.closeToast = function() {
+    	$mdToast.hide();
+ 	 };
+
+    init();
+
+ 	function init(){
+
+ 	 	$scope.tableTile = sharedProperties.tableTile;
+
+ 	 };
+
+
+  }
+
+  )
+  .controller('iemlDictionaryController', function($scope, $location, $mdToast, $document, crudFactory, sharedProperties) {
 	  
 	var tableTitle = "void";
 	  
@@ -627,6 +644,8 @@ angular
   	}
 
 	function init() {
+
+
       var v = sharedProperties.getIemlEntry();
 	  if (v == null) {
         // to be refactored
@@ -637,14 +656,11 @@ angular
 
       crudFactory.iemltable(sharedProperties.getIemlEntry().IEML).success(function(data) {
 		  		
-		// http://stackoverflow.com/questions/10368171/how-to-extract-a-json-object-thats-inside-a-json-object
+	
 			
 		
         $scope.fakeReply = data.tree;
-		//{"input":"M:M:.e.-+O:M:O:.-","Tables": [{"Col":"4","table":[{"tabTitle":"","slice":[{"span":{"row":1, "col":4}, "background":"green", "value":"M:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:S:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:B:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:T:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"S:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"s.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"b.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"t.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"B:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"k.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"m.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"n.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"T:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"d.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"f.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"l.e.-", "edit":"false"}]}]},{"Col":"4","table":[{"tabTitle":"U:","slice":[{"span":{"row":1, "col":4}, "background":"green", "value":"O:M:O:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:S:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:B:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:T:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"U:M:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:S:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:B:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:T:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"A:M:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:S:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:B:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:T:U:.-", "edit":"false"}]},{"tabTitle":"A:","slice":[{"span":{"row":1, "col":4}, "background":"green", "value":"O:M:O:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:S:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:B:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:T:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"U:M:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:S:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:B:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:T:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"A:M:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:S:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:B:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:T:A:.-", "edit":"false"}]}]}]};
-		//{"input":"M:M:.e.-","Tables": [{"Col":"4","table":[{"tabTitle":"","slice":[{"span":{"row":1, "col":4}, "background":"green", "value":"M:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:S:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:B:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:T:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"S:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"s.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"b.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"t.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"B:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"k.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"m.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"n.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"T:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"d.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"f.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"l.e.-", "edit":"false"}]}]}]};
-		//{"input":"O:O:.-","Tables": [{"Col":"3","table":[{"tabTitle":"","slice":[{"span":{"row":1, "col":3}, "background":"green", "value":"O:O:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"U:O:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"wo.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"wa.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"A:O:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"wu.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"we.-", "edit":"false"}]}]}]};
-		//	
+			
 		$scope.showTables = true;
 		
 		if (data.success == false) {
@@ -652,30 +668,30 @@ angular
 			$scope.tableError = data.exception;
 		} 
 		else {
-		    //debugger;
-		
-		    //$scope.materialTableColSize = $scope.fakeReply.Col;
+		    
 		    $scope.materialTables = $scope.fakeReply.Tables;
-		    //$scope.sliceCount = $scope.materialTables[0].table.length;  
-			
-		/*   // $scope.newlistOfLayers=[]; //= $scope.listOfLayers;
 
-            for (var i=0;i<$scope.materialTables.length;i++) {
-				    var newlistOfLayers = [];
-				    //newlistOfLayers.push([{span:{row:1, col:1}, background:'gray', value:tableTitle+j, edit:false}]); //why 1-based array?
-					for (var j=0;j<$scope.materialTables[i].table.length;j++) {
-						newlistOfLayers.push($scope.materialTables[i].table[j].slice);
-					}
-					$scope.sliceCount = newlistOfLayers.length;  //TODO verify it can vary across tables in Tables
-			}
-			//debugger; */
+		   
 		}
-        //$scope.Tables = data.tree.Tables;		
-        //console.dir(data.tree);
+        
       }); 
 	};
 	
+    $scope.showLables = function (tableTile) {
 
+    	sharedProperties.tableTile=tableTile;
+
+    	 $mdToast.show({
+     	 controller: 'toastControler',
+     	 templateUrl: '/js/templates/toast1.tmpl.html',
+      	 parent : $document[0].querySelector('#toastBounds'),
+     	 hideDelay: 10000,
+      	position: 'top right'
+    });
+
+    };
+
+    
 			   
 	$scope.indexOfTable=1;
 
