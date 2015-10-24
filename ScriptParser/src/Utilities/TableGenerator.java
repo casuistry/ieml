@@ -56,8 +56,8 @@ public class TableGenerator {
 		//db.add("O:M:O:., 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-+O:M:O:.-, 2, 3, 4, 5, 6");
-		db.add("M:M:M:.o.-O:.-M:O:.M:O:.-', 2, 3, 4, 5, 6");
-		//db.add("U:+B:, 2, 3, 4, 5, 6");
+		//db.add("M:M:M:.o.-O:.-M:O:.M:O:.-', 2, 3, 4, 5, 6");
+		db.add("U:, 2, 3, 4, 5, 6");
 		//
 		//try {
 			
@@ -114,6 +114,14 @@ public class TableGenerator {
 			
 		for (Token root : genTables(token)) {
 
+			// handle special case of O, M, F, I
+			if (root.layer == 0 && Tokenizer.primitiveLookup.containsKey(root.GetName())) {
+				//JsonTable table = writeTable(root);
+				//jsonTables.add(table);
+				//continue;
+				throw new Exception("table for " + root.GetName() + " not implemented yet");
+			}
+			
 			ArrayList<String> sub, att, mod;
 			
 			sub = genVariables(root.nodes.get(0));
@@ -197,16 +205,33 @@ public class TableGenerator {
 		
 		ArrayList<Token> result = new ArrayList<Token>();
 		
-		if (parent.opCode != null && parent.opCode.equals(Tokenizer.addition)) {
-			result.addAll(parent.nodes);
-			return result;
-		}
-		if (parent.opCode != null && parent.opCode.equals(Tokenizer.multiplication)) {
+		// allow O, M, F, I
+		if (parent.layer == 0 && Tokenizer.primitiveLookup.containsKey(parent.GetName())) {
 			result.add(parent);
 			return result;
 		}
 		
-		throw new Exception("not enough semes to generate table");
+		if (parent.opCode != null && parent.opCode.equals(Tokenizer.addition)) {
+			result.addAll(parent.nodes);
+		}
+		
+		if (parent.opCode != null && parent.opCode.equals(Tokenizer.multiplication)) {
+			result.add(parent);
+		}
+		
+		if (result.size() == 0) {
+			throw new Exception("not enough semes to generate table");
+		}
+		
+		for (Token t : result) {
+			if (t.layer == 0) {
+				if (!Tokenizer.primitiveLookup.containsKey(t.GetName())) {
+					throw new Exception("not enough semes to generate table");
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 	//STEP 2:
