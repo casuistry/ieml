@@ -1,7 +1,7 @@
 <!-- http://codepen.io/salalaslam/pen/wajGMx -->
 
 
-
+    <h2>{{tableTitle}}</h2> 
 
     <md-tabs  md-dynamic-height="" md-border-bottom="" >
       <md-tab label="TABLE">
@@ -18,8 +18,17 @@
                 <md-grid-list md-cols="{{maintable.Col}}" md-row-height="40px" md-gutter="0px">
                   <md-grid-tile ng-click="showLables(tile)" ng-repeat="tile in subtable.slice" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}" style=" border-style: solid;
                     border-width: 1px; border-color: black;" ng-class="tile.background">  
+					
                     <!--input ng-model="tile.value" ng-show="tile.edit"-->
-                    <p ng-show="tile.edit">{{tile.value}}</p>
+                    <!--p ng-show="tile.edit">{{tile.value}}</p-->
+					
+		            <md-list-item class="md-2-line">
+        		      <div class="md-list-item-text ">
+         		        <p align="center">{{tile.means.en}}</p>
+         		        <p align="center">{{tile.means.fr}}</p>					
+        		      </div>
+    		        </md-list-item>					
+					
                   </md-grid-tile>
                 </md-grid-list>
               </md-content> 

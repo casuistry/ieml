@@ -53,11 +53,11 @@ public class TableGenerator {
 		//db.add("t.i.-s.i.-', 2, 3, 4, 5, 6");
 		//db.add("O:. + O:O:O:. + M:O:M:., 2, 3, 4, 5, 6");
 		//db.add("O:O:.-, 2, 3, 4, 5, 6");
-		//db.add("O:M:O:., 2, 3, 4, 5, 6");
+		db.add("O:M:O:., 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-+O:M:O:.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:M:.o.-O:.-M:O:.M:O:.-', 2, 3, 4, 5, 6");
-		db.add("U:, 2, 3, 4, 5, 6");
+		//db.add("E:, 2, 3, 4, 5, 6");
 		//
 		//try {
 			
@@ -628,7 +628,7 @@ public class TableGenerator {
 		
 		public String getMaterial() {
 			
-			String format = "{\"span\":{\"row\":%s, \"col\":%s}, \"background\":\"%s\", \"value\":\"%s\", \"edit\":\"false\"}";
+			String format = "{\"span\":{\"row\":%s, \"col\":%s}, \"means\":{\"fr\":\"\", \"en\":\"\"}, \"background\":\"%s\", \"value\":\"%s\", \"edit\":\"false\"}";
 			StringBuilder builder = new StringBuilder();
 						
 			int rowHead = materialRow > 1 ? materialRow : 0;

@@ -180,6 +180,7 @@ angular
     var iemlEntry;
 	var newIemlEntry;
     var isDB = false; // default
+	var allItems;
     
 	return {
 	  newItemSubscriber: function(scope, callback) {
@@ -215,7 +216,13 @@ angular
       },
       setDb: function(value) {
         isDB = value;
-      }  
+      },
+	  getAllItems: function () {
+        return allItems;
+      },
+      setAllItems: function(value) {
+        allItems = value;
+      } 
     };	
   }) 
   .controller('iemlEntryEditorController', function($scope,  $rootScope, $location, crudFactory, sharedProperties) {
@@ -454,15 +461,13 @@ angular
 			$scope.List = data;
 			$scope.loadedfromDB = true;
 			sharedProperties.setDb(true);
+			sharedProperties.setAllItems(data);
 		});
 	};
 	
 	function initDev() {		
 		var dev =
 		[
-			//{ieml:"t.e.-m.u.-'",terms:[{lang:"FR",means:"représentation dramatique"},{lang:"EN",means:"dramatic representation"}],paradigm:"0",layer:"3",class:"2"},
-			//{ieml:"t.i.-s.i.-'",terms:[{lang:"FR",means:"véhicule"},{lang:"EN",means:"vehicle"}],paradigm:"0",layer:"3",class:"2"},
-			//{ieml:"o.wa.-",terms:[{lang:"FR",means:"utiliser le droit administratif | utiliser le droit commercial"},{lang:"EN",means:"to use administrative law | to use commercial law"}],paradigm:"0",layer:"2",class:"1"}
 			{IEML:"t.e.-m.u.-'",FR:"représentation dramatique",EN:"dramatic representation",PARADIGM:"0",LAYER:"3",CLASS:"2"},
 			{IEML:"t.i.-s.i.-'",FR:"véhicule",EN:"vehicle",PARADIGM:"0",LAYER:"3",CLASS:"2"},
 			{IEML:"o.wa.-",FR:"utiliser le droit administratif | utiliser le droit commercial",EN:"to use administrative law | to use commercial law",PARADIGM:"0",LAYER:"2",CLASS:"1"}
@@ -614,7 +619,7 @@ angular
         $location.path(earl);		  
 	  }	
     }; 	
-	
+
   }).controller ('toastControler',function($scope, $mdToast, sharedProperties){
 
   	$scope.closeToast = function() {
@@ -634,6 +639,7 @@ angular
 
   )
   .controller('iemlDictionaryController', function($scope, $location, $mdToast, $document, crudFactory, sharedProperties) {
+
 	  
 	var tableTitle = "void";
 	  
@@ -643,6 +649,12 @@ angular
   		return crudFactory.parsetree(sharedProperties.getIemlEntry().IEML);
   	}
 
+	$scope.crossCheck = function( input) {
+		var lst = sharedProperties.getAllItems();
+        var newTemp = $filter("filter")(lst, {IEML:input});  
+		return newTemp;
+    };
+	
 	function init() {
 
 
@@ -660,7 +672,7 @@ angular
 			
 		
         $scope.fakeReply = data.tree;
-			
+
 		$scope.showTables = true;
 		
 		if (data.success == false) {
@@ -668,8 +680,53 @@ angular
 			$scope.tableError = data.exception;
 		} 
 		else {
-		    
+
+		
+		    var i=0, leni=$scope.fakeReply.Tables.length;
+            for (; i<leni; i++) {
+
+				var j=0, lenj=$scope.fakeReply.Tables[i].table.length;
+                for (; j<lenj; j++) {
+
+				    var k=0, lenk=$scope.fakeReply.Tables[i].table[j].slice.length;
+                    for (; k<lenk; k++) {
+						
+						var input = $scope.fakeReply.Tables[i].table[j].slice[k].value;
+						if (input != "") 
+						{
+			                var means = $scope.crossCheck(input);
+			                if (means.length > 0) 
+			                {
+			                    //{ieml:"b.u.-",terms:[{lang:"FR",means:"parole"},{lang:"EN",means:"speech"}],paradigm:"0",layer:"2",class:"2"}
+							    var f = means[0].FR;
+							    var e = means[0].EN;
+							
+							    var cf = $scope.fakeReply.Tables[i].table[j].slice[k].means.fr;
+							    var ce = $scope.fakeReply.Tables[i].table[j].slice[k].means.en;
+							
+				                $scope.fakeReply.Tables[i].table[j].slice[k].means.fr = f;
+							    $scope.fakeReply.Tables[i].table[j].slice[k].means.en = e;
+				                debugger;
+			                }
+							else 
+							{
+								$scope.fakeReply.Tables[i].table[j].slice[k].means.en = $scope.fakeReply.Tables[i].table[j].slice[k].value;
+							}	
+						}
+										                        
+                    }				
+				
+                }
+			  debugger;
+            }
+			
+			debugger;
+			
+		    //$scope.materialTableColSize = $scope.fakeReply.Col;
+			$scope.tableTitle = $scope.fakeReply.input;
+
 		    $scope.materialTables = $scope.fakeReply.Tables;
+
 
 		   
 		}

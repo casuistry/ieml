@@ -74,7 +74,20 @@
   background: #ffff8d; }
 .gridListDynamicTiles .blue {
   background: #84ffff; }
-
+.gridListDynamicTiles .darkBlue {
+  background: #80d8ff; }
+.gridListDynamicTiles .deepBlue {
+  background: #448aff; }
+.gridListDynamicTiles .purple {
+  background: #b388ff; }
+.gridListDynamicTiles .lightPurple {
+  background: #8c9eff; }
+.gridListDynamicTiles .red {
+  background: #ff8a80; }
+.gridListDynamicTiles .pink {
+  background: #ff80ab; }  
+  
+  
 /* styles needed to aling main menu icons with lables*/
 i.material-icons {
     vertical-align: middle;
