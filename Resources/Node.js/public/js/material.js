@@ -180,6 +180,7 @@ angular
     var iemlEntry;
 	var newIemlEntry;
     var isDB = false; // default
+	var allItems;
     
 	return {
 	  newItemSubscriber: function(scope, callback) {
@@ -215,7 +216,13 @@ angular
       },
       setDb: function(value) {
         isDB = value;
-      }  
+      },
+	  getAllItems: function () {
+        return allItems;
+      },
+      setAllItems: function(value) {
+        allItems = value;
+      } 
     };	
   }) 
   .controller('iemlEntryEditorController', function($scope,  $rootScope, $location, crudFactory, sharedProperties) {
@@ -454,15 +461,13 @@ angular
 			$scope.List = data;
 			$scope.loadedfromDB = true;
 			sharedProperties.setDb(true);
+			sharedProperties.setAllItems(data);
 		});
 	};
 	
 	function initDev() {		
 		var dev =
 		[
-			//{ieml:"t.e.-m.u.-'",terms:[{lang:"FR",means:"représentation dramatique"},{lang:"EN",means:"dramatic representation"}],paradigm:"0",layer:"3",class:"2"},
-			//{ieml:"t.i.-s.i.-'",terms:[{lang:"FR",means:"véhicule"},{lang:"EN",means:"vehicle"}],paradigm:"0",layer:"3",class:"2"},
-			//{ieml:"o.wa.-",terms:[{lang:"FR",means:"utiliser le droit administratif | utiliser le droit commercial"},{lang:"EN",means:"to use administrative law | to use commercial law"}],paradigm:"0",layer:"2",class:"1"}
 			{IEML:"t.e.-m.u.-'",FR:"représentation dramatique",EN:"dramatic representation",PARADIGM:"0",LAYER:"3",CLASS:"2"},
 			{IEML:"t.i.-s.i.-'",FR:"véhicule",EN:"vehicle",PARADIGM:"0",LAYER:"3",CLASS:"2"},
 			{IEML:"o.wa.-",FR:"utiliser le droit administratif | utiliser le droit commercial",EN:"to use administrative law | to use commercial law",PARADIGM:"0",LAYER:"2",CLASS:"1"}
@@ -616,7 +621,7 @@ angular
     }; 	
 	
   })
-  .controller('iemlDictionaryController', function($scope, $location, crudFactory, sharedProperties) {
+  .controller('iemlDictionaryController', function($scope, $location, $filter, crudFactory, sharedProperties) {
 	  
 	var tableTitle = "void";
 	  
@@ -626,6 +631,12 @@ angular
   		return crudFactory.parsetree(sharedProperties.getIemlEntry().IEML);
   	}
 
+	$scope.crossCheck = function( input) {
+		var lst = sharedProperties.getAllItems();
+        var newTemp = $filter("filter")(lst, {IEML:input});  
+		return newTemp;
+    };
+	
 	function init() {
       var v = sharedProperties.getIemlEntry();
 	  if (v == null) {
@@ -641,10 +652,8 @@ angular
 			
 		
         $scope.fakeReply = data.tree;
-		//{"input":"M:M:.e.-+O:M:O:.-","Tables": [{"Col":"4","table":[{"tabTitle":"","slice":[{"span":{"row":1, "col":4}, "background":"green", "value":"M:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:S:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:B:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:T:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"S:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"s.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"b.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"t.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"B:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"k.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"m.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"n.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"T:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"d.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"f.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"l.e.-", "edit":"false"}]}]},{"Col":"4","table":[{"tabTitle":"U:","slice":[{"span":{"row":1, "col":4}, "background":"green", "value":"O:M:O:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:S:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:B:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:T:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"U:M:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:S:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:B:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:T:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"A:M:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:S:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:B:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:T:U:.-", "edit":"false"}]},{"tabTitle":"A:","slice":[{"span":{"row":1, "col":4}, "background":"green", "value":"O:M:O:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:S:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:B:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:T:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"U:M:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:S:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:B:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"U:T:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"A:M:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:S:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:B:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"A:T:A:.-", "edit":"false"}]}]}]};
-		//{"input":"M:M:.e.-","Tables": [{"Col":"4","table":[{"tabTitle":"","slice":[{"span":{"row":1, "col":4}, "background":"green", "value":"M:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:S:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:B:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"M:T:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"S:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"s.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"b.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"t.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"B:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"k.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"m.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"n.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"T:M:.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"d.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"f.e.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"l.e.-", "edit":"false"}]}]}]};
-		//{"input":"O:O:.-","Tables": [{"Col":"3","table":[{"tabTitle":"","slice":[{"span":{"row":1, "col":3}, "background":"green", "value":"O:O:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:U:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"O:A:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"U:O:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"wo.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"wa.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"blue", "value":"A:O:.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"wu.-", "edit":"false"},{"span":{"row":1, "col":1}, "background":"gray", "value":"we.-", "edit":"false"}]}]}]};
-		//	
+		//{"input":"O:M:O:.","Tables": [{"Col":"4","table":[{"tabTitle":"U:","slice":[{"span":{"row":1, "col":4}, "means":{"fr":"", "en":""}, "background":"green", "value":"O:M:O:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:S:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:B:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:T:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"U:M:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:S:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:B:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:T:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"A:M:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:S:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:B:U:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:T:U:.", "edit":"false"}]},{"tabTitle":"A:","slice":[{"span":{"row":1, "col":4}, "means":{"fr":"", "en":""}, "background":"green", "value":"O:M:O:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:S:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:B:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:T:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"U:M:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:S:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:B:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:T:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"A:M:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:S:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:B:A:.", "edit":"false"},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:T:A:.", "edit":"false"}]}]}]};
+	
 		$scope.showTables = true;
 		
 		if (data.success == false) {
@@ -652,10 +661,53 @@ angular
 			$scope.tableError = data.exception;
 		} 
 		else {
-		    //debugger;
 		
+		    var i=0, leni=$scope.fakeReply.Tables.length;
+            for (; i<leni; i++) {
+
+				var j=0, lenj=$scope.fakeReply.Tables[i].table.length;
+                for (; j<lenj; j++) {
+
+				    var k=0, lenk=$scope.fakeReply.Tables[i].table[j].slice.length;
+                    for (; k<lenk; k++) {
+						
+						var input = $scope.fakeReply.Tables[i].table[j].slice[k].value;
+						if (input != "") 
+						{
+			                var means = $scope.crossCheck(input);
+			                if (means.length > 0) 
+			                {
+			                    //{ieml:"b.u.-",terms:[{lang:"FR",means:"parole"},{lang:"EN",means:"speech"}],paradigm:"0",layer:"2",class:"2"}
+							    var f = means[0].FR;
+							    var e = means[0].EN;
+							
+							    var cf = $scope.fakeReply.Tables[i].table[j].slice[k].means.fr;
+							    var ce = $scope.fakeReply.Tables[i].table[j].slice[k].means.en;
+							
+				                $scope.fakeReply.Tables[i].table[j].slice[k].means.fr = f;
+							    $scope.fakeReply.Tables[i].table[j].slice[k].means.en = e;
+				                debugger;
+			                }
+							else 
+							{
+								$scope.fakeReply.Tables[i].table[j].slice[k].means.en = $scope.fakeReply.Tables[i].table[j].slice[k].value;
+							}	
+						}
+										                        
+                    }				
+				
+                }
+			  debugger;
+            }
+			
+			debugger;
+			
 		    //$scope.materialTableColSize = $scope.fakeReply.Col;
+			$scope.tableTitle = $scope.fakeReply.input;
 		    $scope.materialTables = $scope.fakeReply.Tables;
+			//$scope.materialTables[0].table[0].slice[0].background = "red";
+			
+			
 		    //$scope.sliceCount = $scope.materialTables[0].table.length;  
 			
 		/*   // $scope.newlistOfLayers=[]; //= $scope.listOfLayers;
