@@ -53,11 +53,11 @@ public class TableGenerator {
 		//db.add("t.i.-s.i.-', 2, 3, 4, 5, 6");
 		//db.add("O:. + O:O:O:. + M:O:M:., 2, 3, 4, 5, 6");
 		//db.add("O:O:.-, 2, 3, 4, 5, 6");
-		//db.add("O:M:O:., 2, 3, 4, 5, 6");
+		db.add("O:M:O:., 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-+O:M:O:.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:M:.o.-O:.-M:O:.M:O:.-', 2, 3, 4, 5, 6");
-		db.add("S:M:., 2, 3, 4, 5, 6");
+		//db.add("S:M:., 2, 3, 4, 5, 6");
 		//
 		//try {
 			
@@ -628,7 +628,7 @@ public class TableGenerator {
 		
 		public String getMaterial() {
 			
-			String format = "{\"span\":{\"row\":%s, \"col\":%s}, \"means\":{\"fr\":\"\", \"en\":\"\"}, \"background\":\"%s\", \"value\":\"%s\", \"edit\":\"false\"}";
+			String format = "{\"span\":{\"row\":%s, \"col\":%s}, \"means\":{\"fr\":\"\", \"en\":\"\"}, \"background\":\"%s\", \"value\":\"%s\", \"editable\":%s, \"creatable\":false}";
 			StringBuilder builder = new StringBuilder();
 						
 			int rowHead = materialRow > 1 ? materialRow : 0;
@@ -637,6 +637,7 @@ public class TableGenerator {
 			JsonSliceEntry[] sliceEntryArray;
 			if (rowHead > 1 && colHead > 1) {
 				sliceEntryArray = new JsonSliceEntry[(rowHead+1)*(colHead+1)];
+				// in 2D case, add the 'empty' cell
 				sliceEntryArray[0] = new JsonSliceEntry(0,0,"");
 			}
 			else {
@@ -665,7 +666,7 @@ public class TableGenerator {
 				}
 				
 				// title
-				builder.append(String.format(format, 1, (rowHead > 1 && colHead > 1)?colHead+1:1, "green", tableTitle));
+				builder.append(String.format(format, 1, (rowHead > 1 && colHead > 1)?colHead+1:1, "green", tableTitle, "true"));
 				builder.append(",");
 				
 				String comma = null;
@@ -684,9 +685,9 @@ public class TableGenerator {
 							color = "blue";
 						}
 					}
-					
-					String v = sliceEntryArray[i] == null ? "" : sliceEntryArray[i].value;
-					builder.append(String.format(format, 1, 1, color, v));
+									
+					String editable = sliceEntryArray[i].value == "" ? "false" : "true";					
+					builder.append(String.format(format, 1, 1, color, sliceEntryArray[i].value, editable));
 					
 					if (comma == null)
 						comma = ",";

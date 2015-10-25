@@ -673,6 +673,7 @@ angular
 			
 		
         $scope.fakeReply = data.tree;
+		//{"input":"O:M:O:.","Tables": [{"Col":"4","table":[{"tabTitle":"U:","slice":[{"span":{"row":1, "col":4}, "means":{"fr":"", "en":""}, "background":"green", "value":"O:M:O:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"", "editable":false, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:T:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"U:M:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:T:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"A:M:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:T:U:.", "editable":true, "creatable":false}]},{"tabTitle":"A:","slice":[{"span":{"row":1, "col":4}, "means":{"fr":"", "en":""}, "background":"green", "value":"O:M:O:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"", "editable":false, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:T:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"U:M:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:T:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"A:M:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:T:A:.", "editable":true, "creatable":false}]}]}]};
 
 		$scope.showTables = true;
 		
@@ -711,7 +712,10 @@ angular
 			                }
 							else 
 							{
+								// there is no FR or EN, instead of showing blank, show some ieml
 								$scope.fakeReply.Tables[i].table[j].slice[k].means.en = $scope.fakeReply.Tables[i].table[j].slice[k].value;
+								// on click, we have the option to create ieml in DB
+								$scope.fakeReply.Tables[i].table[j].slice[k].creatable = true;
 							}	
 						}
 										                        
@@ -723,13 +727,8 @@ angular
 			
 			debugger;
 			
-		    //$scope.materialTableColSize = $scope.fakeReply.Col;
 			$scope.tableTitle = $scope.fakeReply.input;
-
 		    $scope.materialTables = $scope.fakeReply.Tables;
-
-
-		   
 		}
         
       }); 
@@ -737,19 +736,20 @@ angular
 	
     $scope.showLables = function (tableTile) {
 
-    	sharedProperties.tableTile=tableTile;
-
-    	 $mdToast.show({
-     	 controller: 'toastControler',
-     	 templateUrl: '/js/templates/toast1.tmpl.html',
-      	 parent : $document[0].querySelector('#toastBounds'),
-     	 hideDelay: 10000,
-      	position: 'top right'
-    });
-
-    };
-
-    
+      sharedProperties.tableTile=tableTile;
+debugger;
+	  if (tableTile.editable) {
+		  
+		  $mdToast.show({
+			 controller: 'toastControler',
+			 templateUrl: '/js/templates/toast1.tmpl.html',
+			 parent : $document[0].querySelector('#toastBounds'),
+			 hideDelay: 10000,
+			position: 'top right'
+		  });
+	  
+	  }
+    }; 
 			   
 	$scope.indexOfTable=1;
 
