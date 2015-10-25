@@ -295,7 +295,8 @@ angular
   	$scope.submitEdit = function() {
 
 	var el=sharedProperties.getIemlEntry();
-      
+
+
 		var toBeAdded = {
 			IEML:$scope.iemlValue,
 			FR:$scope.frenchValue,
@@ -631,6 +632,9 @@ angular
     };	
 		
 	$scope.editEntry = function ( index ) {
+
+	  sharedProperties.returnLastRoute();
+      
 	  
 	  if (index === -1) {
 		sharedProperties.setIemlEntry(null);		
@@ -927,6 +931,9 @@ debugger;
   	
    
 	$scope.editEntry = function ( index ) {
+
+		sharedProperties.returnLastRoute();
+      
 		sharedProperties.setIemlEntry(null);		
 	    var earl = '/edit/new';
         $location.path(earl);		 	  
