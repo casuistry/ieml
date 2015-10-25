@@ -53,11 +53,11 @@ public class TableGenerator {
 		//db.add("t.i.-s.i.-', 2, 3, 4, 5, 6");
 		//db.add("O:. + O:O:O:. + M:O:M:., 2, 3, 4, 5, 6");
 		//db.add("O:O:.-, 2, 3, 4, 5, 6");
-		db.add("O:M:O:., 2, 3, 4, 5, 6");
+		//db.add("O:M:O:., 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-+O:M:O:.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:M:.o.-O:.-M:O:.M:O:.-', 2, 3, 4, 5, 6");
-		//db.add("E:, 2, 3, 4, 5, 6");
+		db.add("S:M:., 2, 3, 4, 5, 6");
 		//
 		//try {
 			

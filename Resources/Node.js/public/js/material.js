@@ -652,7 +652,7 @@ angular
 
 	$scope.crossCheck = function( input) {
 		var lst = sharedProperties.getAllItems();
-        var newTemp = $filter("filter")(lst, {IEML:input});  
+        var newTemp = $filter("filter")(lst, {IEML:input}, true);  
 		return newTemp;
     };
 	
