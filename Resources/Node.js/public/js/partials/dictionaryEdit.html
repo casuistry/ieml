@@ -15,7 +15,7 @@
             <md-tab label="{{subtable.tabTitle}}" ng-repeat="subtable in maintable.table" >
               <md-content class="md-padding">
 		      <!--<md-slider flex="" class="md-primary" md-discrete="" ng-model="indexOfTable" step="1" min="1" max={{sliceCount}} aria-label="depth"></md-slider> -->
-                <md-grid-list md-cols="{{maintable.Col}}" md-row-height="40px" md-gutter="0px">
+                <md-grid-list md-cols="{{maintable.Col}}" md-row-height="75px" md-gutter="5px">
                   <md-grid-tile ng-click="showLables(tile)" ng-repeat="tile in subtable.slice" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}" style=" border-style: solid;
                     border-width: 1px; border-color: black;" ng-class="tile.background">  
 					
