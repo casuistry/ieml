@@ -181,8 +181,29 @@ angular
 	var newIemlEntry;
     var isDB = false; // default
 	var allItems;
+
+	var lastEditedIEML;
+	var hasLastAction = false;
+	var returnRoute;
     
 	return {
+
+	  remeberLastAction:function (_returnRoute) {
+	  	  returnRoute = _returnRoute;
+	  	  lastEditedIEML = iemlEntry;
+	  	  hasLastAction = true;
+	  },
+
+	  hasLastAction:function () {
+	  	  return hasLastAction;
+	  },
+
+	  returnLastRoute: function () {
+	  	haslastAction = false;
+	  	iemlEntry = lastEditedIEML;
+	  	return returnRoute;
+	  },
+
 	  newItemSubscriber: function(scope, callback) {
         /*var handler = */$rootScope.$on('newItem', callback);
         //scope.$on('$destroy', handler);
@@ -240,6 +261,8 @@ angular
       var v = sharedProperties.getIemlEntry();
 
       if (v == null) {
+      	//this is coming from table tile 
+      	if (sharedProperties.tileIEML) $scope.iemlValue = sharedProperties.tileIEML;
 		$scope.formTitle = 'Adding new entry';
 		$scope.doNotValidate = false;
 	  }
@@ -259,8 +282,13 @@ angular
     // form was cancelled by user, we discard all entered information and just return.
   	$scope.cancelEdit = function() {
 		//do nothing, return to default (previous ?) screen
+
+		if (sharedProperties.hasLastAction()) {
+			$location.path(sharedProperties.returnLastRoute());
+		} else {
 		var earl = '/loadTerms/';
-        $location.path(earl);	 
+        $location.path(earl);	
+        } 
 	};	
 	
 	// form was submitted by user
@@ -289,7 +317,12 @@ angular
 			crudFactory.create(toBeAdded)
 				.success(function(data) {
 
-					$location.path('/loadTerms/');	
+					if (sharedProperties.hasLastAction()) {
+						$location.path(sharedProperties.returnLastRoute());
+					} else {
+						$location.path('/loadTerms/');	
+       				} 
+				
 
 				}).
 				error(function(data, status, headers, config) {
@@ -311,7 +344,11 @@ angular
 				.success(function(data, status, headers, config){ 
 
 					
-       				$location.path('/loadTerms/');	
+       				if (sharedProperties.hasLastAction()) {
+						$location.path(sharedProperties.returnLastRoute());
+					} else {
+						$location.path('/loadTerms/');	
+       				 } 
 
 				
 				}).error(function(data, status, headers, config) {
@@ -620,7 +657,7 @@ angular
 	  }	
     }; 	
 
-  }).controller ('toastControler',function($scope, $mdToast, sharedProperties){
+  }).controller ('toastControler',function($scope, $mdToast, $location, sharedProperties){
 
   	$scope.closeToast = function() {
     	$mdToast.hide();
@@ -630,10 +667,39 @@ angular
 
  	function init(){
 
- 		debugger;
- 	 	$scope.tableTile = sharedProperties.tableTile;
+ 		$scope.tableTile = sharedProperties.tableTile;
 
  	 };
+
+ 	 $scope.editTile = function (tableTile) {
+ 	 	
+
+ 	 	sharedProperties.remeberLastAction("/dicEdit");
+
+ 	 	var lst = sharedProperties.getAllItems();
+		for (var i=0;i<lst.length; i++) {
+			if (lst[i].IEML == tableTile.value) {
+				sharedProperties.setIemlEntry(lst[i]);
+				var earl = '/edit/' + i;	
+       			 $location.path(earl);
+       			 return;	
+        
+			}
+		}
+ 	 	    
+
+ 	 }
+
+ 	 $scope.createIEMLfromTile = function (tableTile) {
+
+		sharedProperties.remeberLastAction("/dicEdit");
+
+ 	 	sharedProperties.setIemlEntry(null);
+ 	 	sharedProperties.tileIEML = tableTile.value;		
+	    var earl = '/edit/new';
+        $location.path(earl);
+
+ 	 }
 
 
   }
@@ -708,6 +774,8 @@ angular
 							
 				                $scope.fakeReply.Tables[i].table[j].slice[k].means.fr = f;
 							    $scope.fakeReply.Tables[i].table[j].slice[k].means.en = e;
+							    $scope.fakeReply.Tables[i].table[j].slice[k].creatable = false;
+								$scope.fakeReply.Tables[i].table[j].slice[k].editable = true;
 				                debugger;
 			                }
 							else 
@@ -716,6 +784,7 @@ angular
 								$scope.fakeReply.Tables[i].table[j].slice[k].means.en = $scope.fakeReply.Tables[i].table[j].slice[k].value;
 								// on click, we have the option to create ieml in DB
 								$scope.fakeReply.Tables[i].table[j].slice[k].creatable = true;
+								$scope.fakeReply.Tables[i].table[j].slice[k].editable = false;
 							}	
 						}
 										                        
@@ -738,7 +807,7 @@ angular
 
       sharedProperties.tableTile=tableTile;
 debugger;
-	  if (tableTile.editable) {
+	  if (tableTile.editable||tableTile.creatable) {
 		  
 		  $mdToast.show({
 			 controller: 'toastControler',

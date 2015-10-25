@@ -1,13 +1,20 @@
-<md-toast style="opacity:0.4; background: blue;">
+<md-toast style="opacity:0.4; background: blue;overflow:auto;">
 
- <md-list-item class="md-3-line">
+ <md-list>
       
-        		<div class="md-list-item-text ">
-         		 <p> en:{{tableTile.means.en}}</p>
-         		 <p> fr:{{tableTile.means.fr}}</p>
-				  <md-button ng-click="closeToast()">Close</md-button>
-        		</div>
-  </md-list-item>
+        		<md-list-item>
+         		 <span class="md-list-item-text "> en:{{tableTile.means.en}}</span> 
+				  </md-list-item>
+         		 <md-list-item> <span "md-list-item-text "> fr:{{tableTile.means.fr}}</span> </md-list-item>
+				 <md-list-item>
+				  
+				  <md-button class="md-primary" ng-click="editTile(tableTile)" ng-show="tableTile.editable"> Edit </md-button>
+				  <md-button class="md-primary" ng-click="createIEMLfromTile(tableTile)" ng-show="tableTile.creatable"> Create </md-button>
+				  <md-button class="md-primary" ng-click="closeToast()">Close</md-button>
+				  
+				 </md-list-item>
+        		
+  </md-list>
 
  
  

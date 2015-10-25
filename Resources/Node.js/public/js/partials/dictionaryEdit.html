@@ -11,7 +11,7 @@
 		 
         <!--TABLEs -->
         <div class="gridListDynamicTiles" ng-show="showTables" >
-          <md-tabs id = "toastBounds" md-dynamic-height="" md-border-bottom="" ng-repeat="maintable in materialTables">
+          <md-tabs md-dynamic-height="" md-border-bottom="" ng-repeat="maintable in materialTables">
             <md-tab label="{{subtable.tabTitle}}" ng-repeat="subtable in maintable.table" >
               <md-content class="md-padding">
 		      <!--<md-slider flex="" class="md-primary" md-discrete="" ng-model="indexOfTable" step="1" min="1" max={{sliceCount}} aria-label="depth"></md-slider> -->
@@ -54,7 +54,7 @@
     <md-tab label="GRAPH">
       <md-content class="md-padding">
 
-          <div d3ieml style="width=100%; height=100%"> </div>
+    <div d3ieml style="width=100%; height=100%"> </div>
        
       </md-content>
     </md-tab>
