@@ -53,11 +53,14 @@ public class TableGenerator {
 		//db.add("t.i.-s.i.-', 2, 3, 4, 5, 6");
 		//db.add("O:. + O:O:O:. + M:O:M:., 2, 3, 4, 5, 6");
 		//db.add("O:O:.-, 2, 3, 4, 5, 6");
-		db.add("O:M:O:., 2, 3, 4, 5, 6");
+		//db.add("O:M:O:., 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-+O:M:O:.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:M:.o.-O:.-M:O:.M:O:.-', 2, 3, 4, 5, 6");
 		//db.add("S:M:., 2, 3, 4, 5, 6");
+		db.add("we.O:M:.-, 2, 3, 4, 5, 6");
+		
+		
 		//
 		//try {
 			
@@ -151,7 +154,7 @@ public class TableGenerator {
 				
 				if (t_type == TableType.row_attribut) {
 					rootToken = root.nodes.get(1);
-					prefix = root.nodes.get(1).GetName();
+					prefix = root.nodes.get(0).GetName();
 					postfix = root.nodes.get(2).GetName() + Tokenizer.c_marks.get(root.layer);
 					sub = genVariables(rootToken.nodes.get(0));
 					att = genVariables(rootToken.nodes.get(1));
@@ -161,7 +164,7 @@ public class TableGenerator {
 				
 				if (t_type == TableType.row_mode) {
 					rootToken = root.nodes.get(2);
-					prefix = root.nodes.get(1).GetName() + root.nodes.get(2).GetName();
+					prefix = root.nodes.get(0).GetName() + root.nodes.get(1).GetName();
 					postfix = Tokenizer.c_marks.get(root.layer).toString();
 					sub = genVariables(rootToken.nodes.get(0));
 					att = genVariables(rootToken.nodes.get(1));

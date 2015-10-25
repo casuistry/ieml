@@ -87,7 +87,12 @@
 .gridListDynamicTiles .pink {
   background: #ff80ab; }  
   
-  
+/* if the text is too long in the table's cells ...*/ 
+.gridListDynamicTiles .md-list-item-text p {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden; }
+	  
 /* styles needed to aling main menu icons with lables*/
 i.material-icons {
     vertical-align: middle;

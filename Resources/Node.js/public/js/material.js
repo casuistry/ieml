@@ -773,8 +773,7 @@ angular
 							    var f = means[0].FR;
 							    var e = means[0].EN;
 							
-							    var cf = $scope.fakeReply.Tables[i].table[j].slice[k].means.fr;
-							    var ce = $scope.fakeReply.Tables[i].table[j].slice[k].means.en;
+							    // https://github.com/angular/material/issues/2583
 							
 				                $scope.fakeReply.Tables[i].table[j].slice[k].means.fr = f;
 							    $scope.fakeReply.Tables[i].table[j].slice[k].means.en = e;
