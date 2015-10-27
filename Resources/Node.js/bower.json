@@ -2,16 +2,16 @@
   "name": "starter-node-angular",
   "version": "1.0.0",
   "dependencies": {
-    "bootstrap": "latest",
-    "font-awesome": "latest",
-    "animate.css": "latest",
-    "angular": "latest",
-    "angular-route": "latest",
-    "angular-ui-layout": "latest",
-    "angular-material": "latest",
-    "angular-messages": "latest"
+    "bootstrap": "3.3.5",
+    "font-awesome": "4.4.0",
+    "animate.css": "3.4.0",
+    "angular": "1.4.6",
+    "angular-route": "1.4.6",
+    "angular-ui-layout": "1.3.0",
+    "angular-material": "0.11.1",
+    "angular-messages": "1.4.6"
   },
   "resolutions": {
-    "angular": "1.4.4"
+    "angular": "1.4.6"
   }
 }

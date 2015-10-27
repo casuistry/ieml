@@ -661,7 +661,7 @@ angular
 	  }	
     }; 	
 
-  }).controller ('toastControler',function($scope, $mdToast, $location, sharedProperties){
+  }).controller ('toastControler',function($scope, $mdToast, $mdDialog, $location, sharedProperties){
 
   	$scope.closeToast = function() {
     	$mdToast.hide();
@@ -677,6 +677,7 @@ angular
 
  	 $scope.editTile = function (tableTile) {
  	 	
+ 	 	$mdDialog.hide();
 
  	 	sharedProperties.remeberLastAction("/dicEdit");
 
@@ -696,6 +697,8 @@ angular
 
  	 $scope.createIEMLfromTile = function (tableTile) {
 
+ 	 	$mdDialog.hide();
+
 		sharedProperties.remeberLastAction("/dicEdit");
 
  	 	sharedProperties.setIemlEntry(null);
@@ -709,7 +712,7 @@ angular
   }
 
   )
-  .controller('iemlDictionaryController', function($scope, $location, $mdToast, $document, $filter, crudFactory, sharedProperties) {
+  .controller('iemlDictionaryController', function($scope, $location, $mdToast,  $mdDialog, $document, $filter, crudFactory, sharedProperties) {
 
 	  
 	var tableTitle = "void";
@@ -812,13 +815,20 @@ angular
 debugger;
 	  if (tableTile.editable||tableTile.creatable) {
 		  
-		  $mdToast.show({
+		 /* $mdToast.show({
 			 controller: 'toastControler',
 			 templateUrl: '/js/templates/toast1.tmpl.html',
 			 parent : $document[0].querySelector('#toastBounds'),
 			 hideDelay: 10000,
-			position: 'top right'
-		  });
+			position: 'bottom right'
+		  });*/
+		 $mdDialog.show({
+		      controller:'toastControler',
+		      templateUrl: '/js/templates/toast1.tmpl.html',
+		      parent: angular.element(document.body),
+		      //targetEvent: ev,
+		      clickOutsideToClose:true
+		    });
 	  
 	  }
     }; 

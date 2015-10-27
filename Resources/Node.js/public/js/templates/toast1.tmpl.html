@@ -1,5 +1,5 @@
-<md-toast style="opacity:0.4; background: blue; max-width:800px; overflow:auto;">
-
+<md-dialog style="opacity:0.9; background: blue; max-width:800px; overflow:auto;">
+  <md-dialog-content  class="help-block" style="max-width:800px;max-height:810px; ">
        <div flex ng-show="tableTile.editable">
 		   <span>
 			{{tableTile.means.fr}} / {{tableTile.means.en}}
@@ -13,5 +13,5 @@
 		   </span>	   
 		   <md-button flex ng-click="createIEMLfromTile(tableTile)"> Create </md-button>
 	   </div>
-
-</md-toast>
+    </md-dialog-content>
+</md-dialog>
