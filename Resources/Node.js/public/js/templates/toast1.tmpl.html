@@ -1,17 +1,17 @@
-<md-dialog style="opacity:0.9; background: blue; max-width:800px; overflow:auto;">
+<md-dialog style="opacity:0.9; background: white; max-width:800px; overflow:auto;">
   <md-dialog-content  class="help-block" style="max-width:800px;max-height:810px; ">
        <div flex ng-show="tableTile.editable">
-		   <span>
+		   <span style="color: blue;">
 			{{tableTile.means.fr}} / {{tableTile.means.en}}
 		   </span>
 		   <md-button ng-click="editTile(tableTile)"> Edit </md-button>
 	   </div>
 	   
 	   <div flex ng-show="tableTile.creatable">
-		   <span>
+		   <span style="color: blue;">
 			{{tableTile.value}}
 		   </span>	   
-		   <md-button flex ng-click="createIEMLfromTile(tableTile)"> Create </md-button>
+		   <md-button ng-click="createIEMLfromTile(tableTile)"> Create </md-button>
 	   </div>
     </md-dialog-content>
 </md-dialog>
