@@ -22,12 +22,18 @@
                     <!--input ng-model="tile.value" ng-show="tile.edit"-->
                     <!--p ng-show="tile.edit">{{tile.value}}</p-->
 					
-		            <md-list-item class="md-2-line">
+		            <md-list-item class="md-2-line" ng-show="tile.editable">
         		      <div class="md-list-item-text ">
          		        <p align="center">{{tile.means.en}}</p>
          		        <p align="center">{{tile.means.fr}}</p>					
         		      </div>
     		        </md-list-item>					
+
+		            <md-list-item ng-show="tile.creatable">
+        		      <div flex class="md-list-item-text ">
+         		        {{tile.value}}			
+        		      </div>
+    		        </md-list-item>		
 					
                   </md-grid-tile>
                 </md-grid-list>

@@ -1,22 +1,17 @@
-<md-toast style="opacity:0.4; background: blue;overflow:auto; max-width:800px;">
+<md-toast style="opacity:0.4; background: blue; max-width:800px; overflow:auto;">
 
- <md-list>
-      
-        		<md-list-item>
-         		 <span class="md-list-item-text "> en:{{tableTile.means.en}}</span> 
-				  </md-list-item>
-         		 <md-list-item> <span "md-list-item-text "> fr:{{tableTile.means.fr}}</span> </md-list-item>
-				 <md-list-item>
-				  
-				  <md-button class="md-primary" ng-click="editTile(tableTile)" ng-show="tableTile.editable"> Edit </md-button>
-				  <md-button class="md-primary" ng-click="createIEMLfromTile(tableTile)" ng-show="tableTile.creatable"> Create </md-button>
-				  <md-button class="md-primary" ng-click="closeToast()">Close</md-button>
-				  
-				 </md-list-item>
-        		
-  </md-list>
-
- 
- 
+       <div flex ng-show="tableTile.editable">
+		   <span>
+			{{tableTile.means.fr}} / {{tableTile.means.en}}
+		   </span>
+		   <md-button ng-click="editTile(tableTile)"> Edit </md-button>
+	   </div>
+	   
+	   <div flex ng-show="tableTile.creatable">
+		   <span>
+			{{tableTile.value}}
+		   </span>	   
+		   <md-button flex ng-click="createIEMLfromTile(tableTile)"> Create </md-button>
+	   </div>
 
 </md-toast>
