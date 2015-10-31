@@ -193,6 +193,9 @@ angular
 	  	  lastEditedIEML = iemlEntry;
 	  	  hasLastAction = true;
 	  },
+	  addToIEMLLIST:function (toBeAdded) {
+	  	allItems.push(toBeAdded);
+	  },
 	  updateIEMLLIST:function(toBeAdded) {
  
  		debugger;
@@ -339,6 +342,13 @@ angular
 			crudFactory.create(toBeAdded)
 				.success(function(data) {
 
+// insert into all ieml tabe
+
+					delete data[0].token;
+					sharedProperties.addToIEMLLIST(data[0]);
+					debugger;
+
+
 					if (sharedProperties.hasLastAction()) {
 						$location.path(sharedProperties.returnLastRoute());
 					} else {
@@ -349,7 +359,7 @@ angular
 				}).
 				error(function(data, status, headers, config) {
 					
-	
+ 	
 					if (!data.success) 
 								$rootScope.showAlert('Create operation failed', data.message?data.message:'This operation requires authentication.');
 					else 
