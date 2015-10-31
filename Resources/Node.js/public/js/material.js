@@ -220,7 +220,7 @@ angular
 	  },
 
 	  returnLastRoute: function () {
-	  	haslastAction = false;
+	  	hasLastAction = false;
 	  	iemlEntry = lastEditedIEML;
 	  	return returnRoute;
 	  },
