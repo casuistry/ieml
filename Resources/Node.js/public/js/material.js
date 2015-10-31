@@ -193,6 +193,27 @@ angular
 	  	  lastEditedIEML = iemlEntry;
 	  	  hasLastAction = true;
 	  },
+	  updateIEMLLIST:function(toBeAdded) {
+ 
+ 		debugger;
+ 		var item;
+
+      	for (var i =0; i<allItems.length; i++) {
+            item=allItems[i];
+            if (item._id==toBeAdded.ID) {
+
+            	allItems[i].IEML=toBeAdded.IEML;
+
+            	allItems[i].CLASS=toBeAdded.CLASS;
+            	allItems[i].EN=toBeAdded.EN;
+            	allItems[i].FR=toBeAdded.FR;
+            	allItems[i].LAYER=toBeAdded.LAYER;
+            	allItems[i].PARADIGM=toBeAdded.PARADIGM;
+
+            }
+      	}
+
+      },
 
 	  hasLastAction:function () {
 	  	  return hasLastAction;
@@ -344,7 +365,8 @@ angular
 			crudFactory.modify(toBeAdded)
 				.success(function(data, status, headers, config){ 
 
-					
+					sharedProperties.updateIEMLLIST(toBeAdded);
+
        				if (sharedProperties.hasLastAction()) {
 						$location.path(sharedProperties.returnLastRoute());
 					} else {
