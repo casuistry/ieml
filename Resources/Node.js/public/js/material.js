@@ -460,6 +460,9 @@ angular
 	  fFrench,
       fEnglish		  
     ];
+
+    //preserve selection navigating
+    $scope.filterLanguage = sharedProperties.filterLanguageSelected?sharedProperties.filterLanguageSelected:fFrench;
 	
 	// set defaults
 	$scope.filterParadigm = sharedProperties.filterParadigmSelected?sharedProperties.filterParadigmSelected:fAllTerms; //default value
@@ -765,7 +768,8 @@ angular
 	
 	function init() {
 
-
+      $scope.filterLanguage = sharedProperties.filterLanguageSelected;
+      
       var v = sharedProperties.getIemlEntry();
 	  if (v == null) {
         // to be refactored

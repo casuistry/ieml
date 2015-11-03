@@ -63,8 +63,8 @@
 		 
 		  <md-list-item class="md-2-line">
         	<div class="md-list-item-text">
-         		 <p>{{item.EN}}</p>
-         		 <p>{{item.FR}}</p>
+         		 <p  ng-show="filterLanguage=='English'">{{item.EN}}</p>
+         		 <p ng-show="filterLanguage!='English'">{{item.FR}}</p>
         	</div>
     	  </md-list-item>
 		  
