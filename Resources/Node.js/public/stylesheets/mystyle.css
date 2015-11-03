@@ -91,7 +91,8 @@
 .gridListDynamicTiles .md-list-item-text p {
       text-overflow: ellipsis;
       white-space: nowrap;
-      overflow: hidden; }
+      overflow: hidden; 
+	  font-size: 10px;}
 	  
 /* styles needed to aling main menu icons with lables*/
 i.material-icons {

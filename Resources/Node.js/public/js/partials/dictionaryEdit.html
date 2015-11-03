@@ -1,29 +1,26 @@
 <!-- http://codepen.io/salalaslam/pen/wajGMx -->
 
+<div style="width: 1200px;">
 
-    <h2>{{tableTitle}}</h2> 
+    <h2 align="center">{{tableTitle}}</h2> 
 
-    <md-tabs  md-dynamic-height="" md-border-bottom="" >
+    <md-tabs md-stretch-tabs="always" md-dynamic-height="" md-border-bottom="">
       <md-tab label="TABLE">
         <md-content class="md-padding">
         
         <!--div ng-repeat="materialTable in materialTables"  ng-show="$index==indexOfTable"--> 		
 		 
         <!--TABLEs -->
-        <div class="gridListDynamicTiles" ng-show="showTables" >
+        <div flex class="gridListDynamicTiles" ng-show="showTables" >
           <md-tabs md-dynamic-height="" md-border-bottom="" ng-repeat="maintable in materialTables">
             <md-tab label="{{subtable.tabTitle}}" ng-repeat="subtable in maintable.table" >
               <md-content class="md-padding">
-		      <!--<md-slider flex="" class="md-primary" md-discrete="" ng-model="indexOfTable" step="1" min="1" max={{sliceCount}} aria-label="depth"></md-slider> -->
-                <md-grid-list md-cols="{{maintable.Col}}" md-row-height="55px" md-gutter="3px">
+                <md-grid-list md-cols="{{maintable.Col}}" md-row-height="75px" md-gutter="3px">
                   <md-grid-tile ng-click="showLables(tile)" ng-repeat="tile in subtable.slice" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}" style=" border-style: solid;
                     border-width: 1px; border-color: black;" ng-class="tile.background">  
-					
-                    <!--input ng-model="tile.value" ng-show="tile.edit"-->
-                    <!--p ng-show="tile.edit">{{tile.value}}</p-->
-					
-		            <md-list-item class="md-2-line" ng-show="tile.editable">
-        		      <div class="md-list-item-text ">
+										
+		            <md-list-item ng-show="tile.editable">
+        		      <div flex class="md-list-item-text">
          		        <p align="center">{{tile.means.en}}</p>
          		        <p align="center">{{tile.means.fr}}</p>					
         		      </div>
@@ -31,7 +28,7 @@
 
 		            <md-list-item ng-show="tile.creatable">
         		      <div flex class="md-list-item-text ">
-         		        <p>{{tile.value}}</p>			
+         		        <p align="center">{{tile.value}}</p>			
         		      </div>
     		        </md-list-item>		
 					
@@ -48,8 +45,8 @@
 		
 		<div>
           <br/><br/>
-          <md-button class="md-raised" ng-click="submitEdit()" disabled="disabled"> Submit </md-button> 
-          <md-button class="md-raised" ng-click="cancelEdit()"> Cancel </md-button>
+          <!--md-button class="md-raised" ng-click="submitEdit()" disabled="disabled"> Submit </md-button--> 
+          <md-button class="md-raised" ng-click="cancelEdit()"> Back </md-button>
         </div>
 		
 		<!--/div-->
@@ -67,6 +64,6 @@
      
   </md-tabs>
 
-
+</div>
 
 

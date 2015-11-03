@@ -28,6 +28,12 @@
 		<md-select ng-model="filterLayer" ng-change="triggerFiltering('LAYER')">
 		  <md-option ng-repeat="filterLayer in filterLayerChoices" value="{{filterLayer}}">{{filterLayer}}</md-option>
 		</md-select>
+	</md-input-container>
+	<md-input-container>
+	<label>Display</label>
+		<md-select ng-model="filterLanguage" ng-change="triggerFiltering('LANGUAGE')">
+		  <md-option ng-repeat="filterLanguage in filterLanguageChoices" value="{{filterLanguage}}">{{filterLanguage}}</md-option>
+		</md-select>
 	</md-input-container>	
 	<md-input-container >
 	  <label for="filterInput">Search for</label>
@@ -35,14 +41,11 @@
 	</md-input-container>  
   </div>
   
-  <div>
+  <div >
     <md-content>  
 	  <md-virtual-repeat-container id="vertical-container">
 
-
-
-	<md-list class="fixedRows">
-
+	  <md-list class="fixedRows">
 	    <md-list-item md-virtual-repeat="item in List | filter: filterText | filter:filterItemParadigm(filterParadigm) | filter:filterGrammaticalClass(filterClass) | filter:filterItemLayer(filterLayer)" class="repeated-item" flex> 
 	  
 		  <!-- md-primary for blue color, md-mini for smaller icon-->
@@ -53,25 +56,20 @@
 		  <md-button  title="Edit this IEML" class="md-fab md-primary md-mini" ng-click="editEntry(List.indexOf(item))">
 		    <i class="material-icons">settings</i>
 		  </md-button>
-
 		 
 		  <md-button class="md-raised" style="text-transform: none;" ng-click="showDicEdit(List.indexOf(item))">
 		   {{item.IEML}} 
 		  </md-button>	
 		 
-		
-		        <md-list-item class="md-2-line">
-      
-        		<div class="md-list-item-text ">
+		  <md-list-item class="md-2-line">
+        	<div class="md-list-item-text">
          		 <p>{{item.EN}}</p>
          		 <p>{{item.FR}}</p>
-        		</div>
-    		  </md-list-item>
-		  
+        	</div>
+    	  </md-list-item>
 		  
 	    </md-list-item >
-	</md-list>
-
+	  </md-list>
 
 	  </md-virtual-repeat-container>
     </md-content>

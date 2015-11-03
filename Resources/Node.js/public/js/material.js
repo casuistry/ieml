@@ -453,11 +453,19 @@ angular
       fLayer5,
       fLayer6		  
     ];
-	  
+	
+	var fFrench = "Français";
+	var fEnglish = "English";
+	$scope.filterLanguageChoices = [
+	  fFrench,
+      fEnglish		  
+    ];
+	
 	// set defaults
 	$scope.filterParadigm = sharedProperties.filterParadigmSelected?sharedProperties.filterParadigmSelected:fAllTerms; //default value
 	$scope.filterClass = sharedProperties.filterClassSelected?sharedProperties.filterClassSelected:fAllClasses; //default value
 	$scope.filterLayer = sharedProperties.filterLayerSelected?sharedProperties.filterLayerSelected:fAllLayers; //default value
+	$scope.filterLanguage = sharedProperties.filterLanguageSelected?sharedProperties.filterLanguageSelected:fFrench; //default value
 	$scope.filterText = sharedProperties.filterTextSelected?sharedProperties.filterTextSelected:"";
 	
 	$scope.triggerFiltering = function (selection) {
@@ -465,6 +473,7 @@ angular
 		sharedProperties.filterClassSelected=$scope.filterClass;
 		sharedProperties.filterLayerSelected=$scope.filterLayer;
 		sharedProperties.filterParadigmSelected=$scope.filterParadigm;
+		sharedProperties.filterLanguageSelected=$scope.filterLanguage;
 		sharedProperties.filterTextSelected=$scope.filterText;
       //alert(selection);
     };	
@@ -693,7 +702,8 @@ angular
 	  }	
     }; 	
 
-  }).controller ('toastControler',function($scope, $mdToast, $mdDialog, $location, sharedProperties){
+  })
+  .controller ('toastControler',function($scope, $mdToast, $mdDialog, $location, sharedProperties){
 
   	$scope.closeToast = function() {
     	$mdToast.hide();
@@ -702,9 +712,7 @@ angular
     init();
 
  	function init(){
-
  		$scope.tableTile = sharedProperties.tableTile;
-
  	 };
 
  	 $scope.editTile = function (tableTile) {
@@ -723,8 +731,6 @@ angular
         
 			}
 		}
- 	 	    
-
  	 }
 
  	 $scope.createIEMLfromTile = function (tableTile) {
@@ -739,11 +745,7 @@ angular
         $location.path(earl);
 
  	 }
-
-
-  }
-
-  )
+  })
   .controller('iemlDictionaryController', function($scope, $location, $mdToast,  $mdDialog, $document, $filter, crudFactory, sharedProperties) {
 
 	  
@@ -773,12 +775,8 @@ angular
 	  }
 
       crudFactory.iemltable(sharedProperties.getIemlEntry().IEML).success(function(data) {
-		  		
-	
-			
-		
-        $scope.fakeReply = data.tree;
-		//{"input":"O:M:O:.","Tables": [{"Col":"4","table":[{"tabTitle":"U:","slice":[{"span":{"row":1, "col":4}, "means":{"fr":"", "en":""}, "background":"green", "value":"O:M:O:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"", "editable":false, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:T:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"U:M:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:T:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"A:M:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:T:U:.", "editable":true, "creatable":false}]},{"tabTitle":"A:","slice":[{"span":{"row":1, "col":4}, "means":{"fr":"", "en":""}, "background":"green", "value":"O:M:O:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"", "editable":false, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:T:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"U:M:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:T:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"A:M:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:T:A:.", "editable":true, "creatable":false}]}]}]};
+      $scope.fakeReply = data.tree;
+      //{"input":"O:M:O:.","Tables": [{"Col":"4","table":[{"tabTitle":"U:","slice":[{"span":{"row":1, "col":4}, "means":{"fr":"", "en":""}, "background":"green", "value":"O:M:O:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"", "editable":false, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:T:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"U:M:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:T:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"A:M:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:T:U:.", "editable":true, "creatable":false}]},{"tabTitle":"A:","slice":[{"span":{"row":1, "col":4}, "means":{"fr":"", "en":""}, "background":"green", "value":"O:M:O:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"", "editable":false, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:T:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"U:M:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:T:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"A:M:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:T:A:.", "editable":true, "creatable":false}]}]}]};
 
 		$scope.showTables = true;
 		
@@ -864,7 +862,8 @@ debugger;
 	  
 	  }
     }; 
-			   
+		
+/*		
 	$scope.indexOfTable=1;
 
 	$scope.tiles=[
@@ -931,7 +930,7 @@ debugger;
 
 	}
     
-	
+	*/
 	
 	// form was cancelled by user, we discard all entered information and just return.
   	$scope.cancelEdit = function() {
