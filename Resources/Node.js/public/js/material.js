@@ -759,7 +759,7 @@ angular
   .controller('iemlDictionaryController', function($scope, $location, $mdToast,  $routeParams, $mdDialog, $document, $filter, crudFactory, sharedProperties) {
 
 	  
-	var tableTitle = "void";
+	var tableTitle =  decodeURIComponent($routeParams.IEML);
 	  
   	init();
 
