@@ -189,6 +189,7 @@ angular
 	return {
 
 	  remeberLastAction:function (_returnRoute) {
+		  debugger;
 	  	  returnRoute = _returnRoute;
 	  	  lastEditedIEML = iemlEntry;
 	  	  hasLastAction = true;
@@ -308,10 +309,11 @@ angular
 	
     // form was cancelled by user, we discard all entered information and just return.
   	$scope.cancelEdit = function() {
+		debugger;
 		//do nothing, return to default (previous ?) screen
-
 		if (sharedProperties.hasLastAction()) {
-			$location.path(sharedProperties.returnLastRoute());
+			var earl = sharedProperties.returnLastRoute();
+			$location.path(earl);
 		} else {
 		var earl = '/loadTerms/';
         $location.path(earl);	
@@ -724,8 +726,12 @@ angular
  	 $scope.editTile = function (tableTile) {
  	 	
  	 	$mdDialog.hide();
+		debugger;
 
- 	 	sharedProperties.remeberLastAction("/dicEdit");
+		var toBeEdited = sharedProperties.getIemlEntry();
+        var earl = '/dicEdit/IEML/'+encodeURIComponent(toBeEdited);
+		
+ 	 	sharedProperties.remeberLastAction(earl);
 
  	 	sharedProperties["readOnly"] = true;
 
@@ -744,10 +750,13 @@ angular
  	 $scope.createIEMLfromTile = function (tableTile) {
 
  	 	$mdDialog.hide();
+		debugger;
 
-		sharedProperties.remeberLastAction("/dicEdit");
+		var toBeEdited = sharedProperties.getIemlEntry();
+        var earl = '/dicEdit/IEML/'+encodeURIComponent(toBeEdited);
+ 	 	sharedProperties.remeberLastAction(earl);
+		
 		sharedProperties["readOnly"] = true;
-
 
  	 	sharedProperties.setIemlEntry(null);
  	 	sharedProperties.tileIEML = tableTile.value;		
@@ -902,6 +911,7 @@ debugger;
 			
 	// form was cancelled by user, we discard all entered information and just return.
   	$scope.cancelEdit = function() {
+		debugger;
 		//do nothing, return to default (previous ?) screen
 		var earl = '/loadTerms/';
         $location.path(earl);	 
