@@ -18,7 +18,7 @@ angular
 			controller: 'iemlEntryEditorController',
 			templateUrl: '/js/partials/editIeml.html'
 		})
-		.when('/dicEdit', {
+		.when('/dicEdit/IEML/:IEML', {
 			controller: 'iemlDictionaryController',
 			templateUrl: '/js/partials/dictionaryEdit.html'
 		})
@@ -703,7 +703,7 @@ angular
 	  else {
 		var toBeEdited = $scope.List[index];
 	    sharedProperties.setIemlEntry(toBeEdited);
-        var earl = '/dicEdit/';
+        var earl = '/dicEdit/IEML/'+encodeURIComponent(toBeEdited.IEML);
         $location.path(earl);		  
 	  }	
     }; 	
@@ -756,7 +756,7 @@ angular
 
  	 }
   })
-  .controller('iemlDictionaryController', function($scope, $location, $mdToast,  $mdDialog, $document, $filter, crudFactory, sharedProperties) {
+  .controller('iemlDictionaryController', function($scope, $location, $mdToast,  $routeParams, $mdDialog, $document, $filter, crudFactory, sharedProperties) {
 
 	  
 	var tableTitle = "void";
@@ -764,7 +764,8 @@ angular
   	init();
 
   	$scope.getParseTree= function () {
-  		return crudFactory.parsetree(sharedProperties.getIemlEntry().IEML);
+
+  		return crudFactory.parsetree(tableTitle);
   	}
 
 	$scope.crossCheck = function( input) {
@@ -772,6 +773,24 @@ angular
         var newTemp = $filter("filter")(lst, {IEML:input}, true);  
 		return newTemp;
     };
+
+   
+
+//TODO  can be redesigned to always load before any view
+
+	function init_0() {
+
+		debugger;
+		crudFactory.get().success(function(data) {
+			$scope.List = data;
+			$scope.loadedfromDB = true;
+			sharedProperties.setDb(true);
+			sharedProperties.setAllItems(data);
+			sharedProperties["loadedfromDB"] = true;
+
+			init();
+		});
+	};
 	
 	function init() {
 
@@ -779,13 +798,20 @@ angular
 
       var v = sharedProperties.getIemlEntry();
 	  if (v == null) {
-        // to be refactored
+        //  the view is opened by bookmark try to get it from the URL
+        if (!sharedProperties.loadedfromDB){
+        	init_0();
+        	return;
+        }
+        tableTitle = decodeURIComponent($routeParams.IEML);
+
 	  }
 	  else {
 		  tableTitle = v.IEML;
 	  }
 
-      crudFactory.iemltable(sharedProperties.getIemlEntry().IEML).success(function(data) {
+     // crudFactory.iemltable(sharedProperties.getIemlEntry().IEML).success(function(data) {
+      crudFactory.iemltable(tableTitle).success(function(data) {
       $scope.fakeReply = data.tree;
       //{"input":"O:M:O:.","Tables": [{"Col":"4","table":[{"tabTitle":"U:","slice":[{"span":{"row":1, "col":4}, "means":{"fr":"", "en":""}, "background":"green", "value":"O:M:O:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"", "editable":false, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:T:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"U:M:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:T:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"A:M:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:S:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:B:U:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:T:U:.", "editable":true, "creatable":false}]},{"tabTitle":"A:","slice":[{"span":{"row":1, "col":4}, "means":{"fr":"", "en":""}, "background":"green", "value":"O:M:O:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"", "editable":false, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"O:T:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"U:M:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"U:T:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"blue", "value":"A:M:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:S:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:B:A:.", "editable":true, "creatable":false},{"span":{"row":1, "col":1}, "means":{"fr":"", "en":""}, "background":"gray", "value":"A:T:A:.", "editable":true, "creatable":false}]}]}]};
 
