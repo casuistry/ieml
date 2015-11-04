@@ -284,6 +284,9 @@ angular
 	function init() {
       var v = sharedProperties.getIemlEntry();
 
+    $scope.readOnly = sharedProperties.readOnly;
+    sharedProperties.readOnly = false;
+   
       if (v == null) {
       	//this is coming from table tile 
       	if (sharedProperties.tileIEML) $scope.iemlValue = sharedProperties.tileIEML;
@@ -724,6 +727,8 @@ angular
 
  	 	sharedProperties.remeberLastAction("/dicEdit");
 
+ 	 	sharedProperties["readOnly"] = true;
+
  	 	var lst = sharedProperties.getAllItems();
 		for (var i=0;i<lst.length; i++) {
 			if (lst[i].IEML == tableTile.value) {
@@ -741,6 +746,8 @@ angular
  	 	$mdDialog.hide();
 
 		sharedProperties.remeberLastAction("/dicEdit");
+		sharedProperties["readOnly"] = true;
+
 
  	 	sharedProperties.setIemlEntry(null);
  	 	sharedProperties.tileIEML = tableTile.value;		
@@ -769,7 +776,7 @@ angular
 	function init() {
 
       $scope.filterLanguage = sharedProperties.filterLanguageSelected;
-      
+
       var v = sharedProperties.getIemlEntry();
 	  if (v == null) {
         // to be refactored
