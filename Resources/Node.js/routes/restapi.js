@@ -1,9 +1,73 @@
 //REST IEML api
+module.exports.getannotations = function (req, res) {
+
+	var db = req.db;
+    console.log("before getting annotations "+req.body.ieml);
+   	db.collection('annotations').find({ieml:req.body.ieml}).toArray(
+	    function(err, result) {
+			if (err) {
+				console.log("ERROR"+err);
+				throw err;
+			}
+			if (result) {
+				console.log('found annotations');
+				console.dir(result);
+				res.json(result);
+			}
+		}
+	);
+};
+
+module.exports.setannotations = function (req, res) {
+
+	var db = req.db;
+     //DELETE all annotations for IEML
+ 
+
+     db.collection('annotations').remove(
+	    {ieml:req.body.ieml}, 
+		function(err, result) {
+			if (err) {
+				console.log("ERROR"+err);
+				throw err;
+			}
+			if (result) {
+				console.log(result);
+		
+			}
+		}
+	);
+     //ADD all annotations for IEML
+	
+    console.log("before setting annotations");
+
+   
+      for (var i=0; i<req.body.annotations.length; i++) {
+    	db.collection('annotations').insert(
+		{"ieml":req.body.ieml, "label":req.body.annotations[i].label}, 
+		function(err, result) {
+			if (err) {
+				console.log("SET ANNOTATIONS ERROR"+err);
+				//throw err;
+			}
+			if (result) {
+				console.log('Added!');
+				//will throw an error since nothing is listening on the clinet for th eresponse at the moment res.json(result);
+			}
+		}
+		);
+     }
+};
+
+
+
 
 module.exports.allieml = function (req, res) {
 
 	var db = req.db;
     console.log("before loading ieml");
+
+
     db.collection('terms').find().toArray(function(err, result) {
 		if (err) {
 			console.log("ERROR"+err);
@@ -11,6 +75,8 @@ module.exports.allieml = function (req, res) {
 		}
 		res.json(result);
 	});
+
+
 };
 
 //http://www.hacksparrow.com/mongoskin-tutorial-with-examples.html
@@ -66,6 +132,8 @@ module.exports.updateieml = function (req, res) {
 //http://www.hacksparrow.com/mongoskin-tutorial-with-examples.html
 module.exports.remieml = function (req, res) {
 
+
+
 	var db = req.db;
     console.log("before removing ieml");
 	console.log(req.params.id);
@@ -84,6 +152,22 @@ module.exports.remieml = function (req, res) {
 			if (result) {
 				console.log(result);
 				res.json(result);
+			}
+		}
+	);
+
+
+	//remove annotations assotiated with the IEML string
+	db.collection('annotations').remove(
+	    {ieml:req.params.id}, 
+		function(err, result) {
+			if (err) {
+				console.log("ERROR"+err);
+				throw err;
+			}
+			if (result) {
+				console.log(result);
+		
 			}
 		}
 	);
