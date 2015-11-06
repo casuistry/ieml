@@ -1,12 +1,8 @@
 
  
   angular
-  .module('materialApp_Ann',[])
-  .config(function($sceProvider) {
-  // Completely disable SCE.  For demonstration purposes only!
-  // Do not use in new projects.
-  $sceProvider.enabled(false);  //danger - opens possibility for XSS attacks, figure out how to disable on per-case basis
-  })
+  .module('materialApp_Ann',['ngSanitize'])
+  
   .controller('AnnotiationsController', 
 
   function ($q, $sce, annotationsFactory) {
@@ -31,7 +27,7 @@
             self.annotations = data;
 
             for (var i=0;i<self.annotations.length;i++) {
-              self.annotations[i].formatted =  self.getFormatted(self.annotations[i].label);
+              self.annotations[i].formatted = self.getFormatted(self.annotations[i].label);
             
             }
 
@@ -87,7 +83,7 @@
       var regex = new RegExp(expression);
 
       return label.replace(regex, function(substr){
-          return '<a target=_blank href="'+substr+'">'+substr+'</a>';
+          return  $sce.trustAsHtml('<a target=_blank href="'+substr+'">'+substr+'</a>');
       });
 
 

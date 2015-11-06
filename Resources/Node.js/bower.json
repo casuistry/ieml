@@ -10,6 +10,7 @@
     "angular-ui-layout": "1.3.0",
     "angular-material": "0.11.1",
     "angular-messages": "1.4.6"
+	"angular-sanitize":"1.4.7"
   },
   "resolutions": {
     "angular": "1.4.6"
