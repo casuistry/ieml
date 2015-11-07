@@ -1,6 +1,6 @@
 
 angular
-  .module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph'])
+  .module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph','materialApp_Ann'])
   
 // associate controller to views through routes
   .config(function($routeProvider, $locationProvider) {
@@ -189,7 +189,7 @@ angular
 	return {
 
 	  remeberLastAction:function (_returnRoute) {
-		  debugger;
+		 
 	  	  returnRoute = _returnRoute;
 	  	  lastEditedIEML = iemlEntry;
 	  	  hasLastAction = true;
@@ -199,7 +199,6 @@ angular
 	  },
 	  updateIEMLLIST:function(toBeAdded) {
  
- 		debugger;
  		var item;
 
       	for (var i =0; i<allItems.length; i++) {
@@ -309,7 +308,7 @@ angular
 	
     // form was cancelled by user, we discard all entered information and just return.
   	$scope.cancelEdit = function() {
-		debugger;
+		
 		//do nothing, return to default (previous ?) screen
 		if (sharedProperties.hasLastAction()) {
 			var earl = sharedProperties.returnLastRoute();
@@ -351,7 +350,7 @@ angular
 
 					delete data[0].token;
 					sharedProperties.addToIEMLLIST(data[0]);
-					debugger;
+					
 
 
 					if (sharedProperties.hasLastAction()) {
@@ -610,7 +609,7 @@ angular
 
 
     $scope.modifyEntry = function (changedItem) {
-    	debugger;
+    	
     	//TODO find and modify data in the List
     	$scope.List;
     }
@@ -726,7 +725,7 @@ angular
  	 $scope.editTile = function (tableTile) {
  	 	
  	 	$mdDialog.hide();
-		debugger;
+		
 
 		var toBeEdited = sharedProperties.getIemlEntry();
         var earl = '/dicEdit/IEML/'+encodeURIComponent(toBeEdited);
@@ -750,7 +749,7 @@ angular
  	 $scope.createIEMLfromTile = function (tableTile) {
 
  	 	$mdDialog.hide();
-		debugger;
+		
 
 		var toBeEdited = sharedProperties.getIemlEntry();
         var earl = '/dicEdit/IEML/'+encodeURIComponent(toBeEdited);
@@ -789,7 +788,6 @@ angular
 
 	function init_0() {
 
-		debugger;
 		crudFactory.get().success(function(data) {
 			$scope.List = data;
 			$scope.loadedfromDB = true;
@@ -858,7 +856,7 @@ angular
 							    $scope.fakeReply.Tables[i].table[j].slice[k].means.en = e;
 							    $scope.fakeReply.Tables[i].table[j].slice[k].creatable = false;
 								$scope.fakeReply.Tables[i].table[j].slice[k].editable = true;
-				                debugger;
+				                
 			                }
 							else 
 							{
@@ -873,10 +871,10 @@ angular
                     }				
 				
                 }
-			  debugger;
+			 
             }
 			
-			debugger;
+			
 			
 			$scope.tableTitle = $scope.fakeReply.input;
 		    $scope.materialTables = $scope.fakeReply.Tables;
@@ -888,7 +886,7 @@ angular
     $scope.showLables = function (tableTile) {
 
       sharedProperties.tableTile=tableTile;
-debugger;
+
 	  if (tableTile.editable||tableTile.creatable) {
 		  
 		 /* $mdToast.show({
@@ -911,7 +909,7 @@ debugger;
 			
 	// form was cancelled by user, we discard all entered information and just return.
   	$scope.cancelEdit = function() {
-		debugger;
+		
 		//do nothing, return to default (previous ?) screen
 		var earl = '/loadTerms/';
         $location.path(earl);	 
@@ -989,7 +987,7 @@ debugger;
 	  $scope.formData = {};
 
 	  $scope.cancel = function() {
-	  	debugger;
+	  	
 	    $mdDialog.cancel();
 	  };
 	 
@@ -1017,7 +1015,7 @@ debugger;
  				 
    
  				 }, function(response) {
- 				 	debugger;
+ 				 	
    					//deal with excpetions i.e. network
 				  });
 

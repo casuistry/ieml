@@ -8,9 +8,7 @@
       <md-tab label="TABLE">
         <md-content class="md-padding">
         
-        <!--div ng-repeat="materialTable in materialTables"  ng-show="$index==indexOfTable"--> 		
-		 
-        <!--TABLEs -->
+       
         <div flex class="gridListDynamicTiles" ng-show="showTables" >
           <md-tabs md-dynamic-height="" md-border-bottom="" ng-repeat="maintable in materialTables">
             <md-tab label="{{subtable.tabTitle}}" ng-repeat="subtable in maintable.table" >
@@ -39,6 +37,8 @@
             </md-tab>
           </md-tabs>
 		</div>
+
+  
 		
 		<div ng-show="!showTables">
 		<h2>{{tableError}}</h2>
@@ -58,11 +58,35 @@
     <md-tab label="GRAPH">
       <md-content class="md-padding">
 
-    <div d3ieml style="width=100%; height=100%"> </div>
+     <div d3ieml style="width=100%; height=100%"> </div>
        
       </md-content>
     </md-tab>
-     
+<div ng-controller="AnnotiationsController as contrl2">
+     <md-tab label="TAGS" md-on-deselect="contrl2.onTabClose()">
+      <md-content class="md-padding">
+ 
+    <md-chips class="custom-chips" ng-model="contrl2.annotations" readonly="contrl2.readonly" secondary-placeholder="+Tag"  placeholder="Enter a tag" 
+      md-on-append="contrl2.newAnnotation($chip)"  md-on-remove="contrl2.onRemove($chip)">
+      <md-chip-template>
+        <span>
+          <!--<strong>{{$chip.formatted}}</strong> -->
+          <span ng-bind-html="$chip.formatted"></span>
+         
+         <!-- <a target=_blank href="http://www.w3schools.com">Visit W3Schools.com!</a> -->
+        </span>
+      </md-chip-template>
+      <button md-chip-remove="" class="md-primary vegetablechip">
+        <md-icon md-svg-icon="md-close"></md-icon>
+      </button>
+    </md-chips>
+   
+
+
+       
+      </md-content>
+    </md-tab>
+</div>   
   </md-tabs>
 
 </div>
