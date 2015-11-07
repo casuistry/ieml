@@ -18,33 +18,42 @@ module.exports.getannotations = function (req, res) {
 	);
 };
 
-module.exports.setannotations = function (req, res) {
+
+module.exports.removeannotation = function (req, res) {
 
 	var db = req.db;
      //DELETE all annotations for IEML
- 
+    var id = require('mongoskin').ObjectID.createFromHexString(req.body._id);
 
      db.collection('annotations').remove(
-	    {ieml:req.body.ieml}, 
+	    {_id:id}, 
 		function(err, result) {
 			if (err) {
 				console.log("ERROR"+err);
 				throw err;
 			}
 			if (result) {
-				console.log(result);
+				console.log("REMOVED: "+result);
+				res.json(result);
 		
 			}
 		}
 	);
-     //ADD all annotations for IEML
-	
-    console.log("before setting annotations");
+};
 
+module.exports.addannotation = function (req, res) {
+
+	var db = req.db;
+     //DELETE all annotations for IEML
+ 
+
+     
+	
+    console.log("before adding annotation");
    
-      for (var i=0; i<req.body.annotations.length; i++) {
+    
     	db.collection('annotations').insert(
-		{"ieml":req.body.ieml, "label":req.body.annotations[i].label}, 
+		{"ieml":req.body.ieml, "label":req.body.annotation}, 
 		function(err, result) {
 			if (err) {
 				console.log("SET ANNOTATIONS ERROR"+err);
@@ -52,11 +61,12 @@ module.exports.setannotations = function (req, res) {
 			}
 			if (result) {
 				console.log('Added!');
+				res.json(result);
 				//will throw an error since nothing is listening on the clinet for th eresponse at the moment res.json(result);
 			}
 		}
 		);
-     }
+     
 };
 
 

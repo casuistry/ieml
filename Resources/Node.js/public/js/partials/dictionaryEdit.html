@@ -9,7 +9,7 @@
         <md-content class="md-padding">
         
        
-        <div flex class="gridListDynamicTiles" ng-show="showTables" >
+       <div flex class="gridListDynamicTiles" ng-show="showTables" >
           <md-tabs md-dynamic-height="" md-border-bottom="" ng-repeat="maintable in materialTables">
             <md-tab label="{{subtable.tabTitle}}" ng-repeat="subtable in maintable.table" >
               <md-content class="md-padding">
@@ -58,12 +58,12 @@
     <md-tab label="GRAPH">
       <md-content class="md-padding">
 
-     <div d3ieml style="width=100%; height=100%"> </div>
+    <div d3ieml style="width=100%; height=100%"> </div> 
        
       </md-content>
     </md-tab>
 <div ng-controller="AnnotiationsController as contrl2">
-     <md-tab label="TAGS" md-on-deselect="contrl2.onTabClose()">
+     <md-tab label="TAGS"><!-- md-on-deselect="contrl2.onTabClose()"-->
       <md-content class="md-padding">
  
     <md-chips class="custom-chips" ng-model="contrl2.annotations" readonly="contrl2.readonly" secondary-placeholder="+Tag"  placeholder="Enter a tag" 

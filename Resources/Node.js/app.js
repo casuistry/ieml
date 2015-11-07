@@ -189,7 +189,8 @@ req._parsedUrl.pathname.indexOf("/api/remieml")==0) {
 app.use('/', routes);
 app.all('/api/allieml', restapi.allieml);
 app.all('/api/getannotations', restapi.getannotations);
-app.all('/api/setannotations', restapi.setannotations);
+app.all('/api/removeannotation', restapi.removeannotation);
+app.all('/api/addannotation', restapi.addannotation);
 app.all('/api/newieml', restapi.newieml);
 app.all('/api/updateieml', restapi.updateieml);
 app.delete('/api/remieml/:id', restapi.remieml);
