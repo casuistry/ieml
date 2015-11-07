@@ -85,8 +85,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                         return $q.when();
                     } else {
                         if (scope.dirtyInputs[attributes.name].original_val==modelValue) return $q.when();
-                    }
-                 
+                    }                 
                 }
 
                 /*  if (attributes.name=="ieml" && scope.doNotValidate) {
@@ -170,11 +169,9 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     };
 })
 .service('sharedProperties', function ($rootScope) {
+    
     var iemlEntry;
-    var newIemlEntry;
-    var isDB = false; // default
     var allItems;
-
     var lastEditedIEML;
     var hasLastAction = false;
     var returnRoute;
@@ -182,7 +179,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     return {
 
         remeberLastAction:function (_returnRoute) {
-         
             returnRoute = _returnRoute;
             lastEditedIEML = iemlEntry;
             hasLastAction = true;
@@ -219,24 +215,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             iemlEntry = lastEditedIEML;
             return returnRoute;
         },
-
-        newItemSubscriber: function(scope, callback) {
-            /*var handler = */$rootScope.$on('newItem', callback);
-            //scope.$on('$destroy', handler);
-        },
-          
-        onNewItem: function(data) {
-            $rootScope.$emit('newItem', data);
-        },
-          
-        onModifyItem: function (data) {
-            $rootScope.$emit('modifyItem', data);
-        },
-          
-        modifyItemSubscriber:function(scope, callback) {
-            /*var handler = */$rootScope.$on('modifyItem', callback);
-        },
-          
+        
         getIemlEntry: function () {
             return iemlEntry;
         },
@@ -244,31 +223,13 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         setIemlEntry: function(value) {
             iemlEntry = value;
         },
-          
-        setNewIemlEntry: function(value) {
-            newIemlEntry = value;
-        },
-          
-        getNewIemlEntry: function() {
-            return newIemlEntry;
-        },
-          
-        iemlEntryUpdated: function() {
-            $rootScope.$emit("iemlEntryUpdated");
-        },      
-          
-        getDb: function () {
-            return isDB;
-        },
-          
-        setDb: function(value) {
-            isDB = value;
-        },
-          
+                 
+        // get local list of ieml  
         getAllItems: function () {
             return allItems;
         },
           
+        // store locally list of all ieml in DB  
         setAllItems: function(value) {
             allItems = value;
         } 
@@ -338,51 +299,47 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         
         //$rootScope.$emit("iemlEntryUpdated", toBeAdded);
         
-        if (sharedProperties.getDb() == true) {
-    
-            if (toBeAdded.ID==undefined) {
-                crudFactory.create(toBeAdded).success(function(data) {
+        if (toBeAdded.ID==undefined) {
+            crudFactory.create(toBeAdded).success(function(data) {
 
-                    // insert into all ieml tabe
-                    delete data[0].token;
-                    sharedProperties.addToIEMLLIST(data[0]);
+                // insert into all ieml tabe
+                delete data[0].token;
+                sharedProperties.addToIEMLLIST(data[0]);
 
-                    if (sharedProperties.hasLastAction()) {
-                        $location.path(sharedProperties.returnLastRoute());
-                    } else {
-                        $location.path('/loadTerms/');    
-                    } 
-                }).error(function(data, status, headers, config) {
+                if (sharedProperties.hasLastAction()) {
+                    $location.path(sharedProperties.returnLastRoute());
+                } else {
+                    $location.path('/loadTerms/');    
+                } 
+            }).error(function(data, status, headers, config) {
                     
-                    if (!data.success) {
-                        $rootScope.showAlert('Create operation failed', data.message?data.message:'This operation requires authentication.');
-                    } else {
-                        $rootScope.showAlert('Create operation failed', status);
-                    }    
-                });
-            } else {
-                //do update 
-                crudFactory.modify(toBeAdded).success(function(data, status, headers, config){ 
+                if (!data.success) {
+                    $rootScope.showAlert('Create operation failed', data.message?data.message:'This operation requires authentication.');
+                } else {
+                    $rootScope.showAlert('Create operation failed', status);
+                }    
+            });
+        } else {
+            //do update 
+            crudFactory.modify(toBeAdded).success(function(data, status, headers, config){ 
 
-                    sharedProperties.updateIEMLLIST(toBeAdded);
+                sharedProperties.updateIEMLLIST(toBeAdded);
 
-                    if (sharedProperties.hasLastAction()) {
-                        $location.path(sharedProperties.returnLastRoute());
-                    } else {
-                        $location.path('/loadTerms/');    
-                    } 
-                }).error(function(data, status, headers, config) {
+                if (sharedProperties.hasLastAction()) {
+                    $location.path(sharedProperties.returnLastRoute());
+                } else {
+                    $location.path('/loadTerms/');    
+                } 
+            }).error(function(data, status, headers, config) {
                     
-                    if (!data.success) {
-                        $rootScope.showAlert('Modify operation failed', data.message?data.message:'This operation requires authentication.');
-                    } else { 
-                        $rootScope.showAlert('Modify operation failed', status);
-                    }
-
-                    //$location.path('/loadTerms/');                        
-                });
-            }
-        }
+                if (!data.success) {
+                    $rootScope.showAlert('Modify operation failed', data.message?data.message:'This operation requires authentication.');
+                } else { 
+                    $rootScope.showAlert('Modify operation failed', status);
+                }
+                //$location.path('/loadTerms/');                        
+            });
+        }        
     };
     
     // temporary place-holder tempString for debug messages:
@@ -525,7 +482,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         crudFactory.get().success(function(data) {
             $scope.List = data;
             $scope.loadedfromDB = true;
-            sharedProperties.setDb(true);
             sharedProperties.setAllItems(data);
         });
     };
@@ -546,44 +502,16 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         });
     };    
     
-    /*
-    $scope.$on('iemlEntryUpdated', function() {
-        $scope.showAlert('entry to save:', sharedProperties.getIemlEntry());
-        var val = sharedProperties.getNewIemlEntry();
-        if (val === null) {
-            $scope.showAlert('error', 'entry to save is null');
-        }
-        else{
-            $scope.addEntry(val);
-        }    
-    });
-    */
-
     // http://www.codelord.net/2015/05/04/angularjs-notifying-about-changes-from-services-to-controllers/
     // http://toddmotto.com/all-about-angulars-emit-broadcast-on-publish-subscribing/
-      /*var myListener = $rootScope.$on('iemlEntryUpdated', function (event, data) {
-      alert(data);
-      //event.stopPropagation();
-    });    */
-    //$scope.$on('$destroy', myListener);
-
-    sharedProperties.newItemSubscriber($scope, function somethingChanged(event, data) {
-        $scope.addEntry(data);
-    });
-
-    sharedProperties.modifyItemSubscriber($scope, function somethingChanged1(event, data) {
-        $scope.modifyEntry(data);
-    });
 
     $scope.modifyEntry = function (changedItem) {      
         //TODO find and modify data in the List
         $scope.List;
     }
     
-    $scope.addEntry = function(toBeAdded) {    
-
-        //$scope.showAlert('adding:', toBeAdded);        
-        
+    $scope.addEntry = function(toBeAdded) {         
+        debugger;
         if ($scope.loadedfromDB == true) {
             crudFactory.create(toBeAdded).success(function(data) {
                 $scope.List.push(toBeAdded);
@@ -737,7 +665,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         crudFactory.get().success(function(data) {
             $scope.List = data;
             $scope.loadedfromDB = true;
-            sharedProperties.setDb(true);
             sharedProperties.setAllItems(data);
             sharedProperties["loadedfromDB"] = true;
             init();
@@ -918,5 +845,45 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 });
   
   
-  
+
+//pub-sub
+        /* possibly dead code
+        newItemSubscriber: function(scope, callback) {
+            $rootScope.$on('newItem', callback);
+        },
+        */
+        
+        /*possibly dead code
+        onNewItem: function(data) {
+            $rootScope.$emit('newItem', data);
+        },
+        */
+      
+        /* possibly dead code        
+        onModifyItem: function (data) {
+            $rootScope.$emit('modifyItem', data);
+        },
+        */
+        
+        /* possibly dead code
+        modifyItemSubscriber:function(scope, callback) {
+            $rootScope.$on('modifyItem', callback);
+        },
+        */ 
+        
+        /*  possibly dead code
+        iemlEntryUpdated: function() {
+            $rootScope.$emit("iemlEntryUpdated");
+        },      
+        */
+
+    /* possibly dead code
+    sharedProperties.newItemSubscriber($scope, function somethingChanged(event, data) {
+        $scope.addEntry(data);
+    });
+
+    sharedProperties.modifyItemSubscriber($scope, function somethingChanged1(event, data) {
+        $scope.modifyEntry(data);
+    });
+*/  
   
