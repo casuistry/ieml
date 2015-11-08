@@ -149,7 +149,8 @@ req._parsedUrl.pathname.indexOf("/api/remieml")==0) {
   if (token) {
 
     console.log("token value:"+token);
-
+    
+    delete req.body.token;
     
     // verifies secret and checks exp
     jwt.verify(token, app.get('superSecret'), function(err, decoded) {      
