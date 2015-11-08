@@ -95,6 +95,8 @@ module.exports.newieml = function (req, res) {
 	var db = req.db;
     console.log("before adding ieml");
 	console.log(req.body);
+
+	delete req.body.token;
 	
 	db.collection('terms').insert(
 		req.body, 
@@ -126,7 +128,7 @@ module.exports.updateieml = function (req, res) {
   
    console.log(e);
 }
-
+	delete rec.token;
 	db.collection('terms').update(id, {$set:rec}, function(err, result) {
 	//TODO return actual record for rhe convenience
     if (!err) {console.log('record updated'); res.json(result);}
