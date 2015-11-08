@@ -15,6 +15,8 @@ public class Token {
 	public int taille = -1;
 	public boolean isTailleComputed = false;
 	
+	public boolean expandedToken = false;
+	
 	public StringBuilder name = null;			
 	public ArrayList<Token> nodes = new ArrayList<Token>();	
 	public Token parent = null;
@@ -237,6 +239,7 @@ public class Token {
 		
 	public void AddNodes(ArrayList<Token> list) throws Exception {
 		for (Token n : list){
+			n.ComputeTaille();
 			AddNode(n);
 		}
 	}

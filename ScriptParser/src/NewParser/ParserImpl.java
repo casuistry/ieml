@@ -79,6 +79,7 @@ public class ParserImpl extends Tokenizer {
 			pop.layer = m_marks.get(c);
 			pop.opCode = addition;
 			pop.AddNodes(primitiveLookup.get(pop.GetName()).nodes);
+			pop.expandedToken = true;
 		}
 		
 		pushNode(pop);
@@ -230,8 +231,11 @@ public class ParserImpl extends Tokenizer {
 			return;
 		}
 		
+		// assemble an additive relation
+		// previous impl assumed that tokens such as O:, M:, etc. did not have children
+		// adjusting with 'expandedToken'
 		Token newNode;
-		if (popped.opCode == addition){
+		if (popped.opCode == addition && !popped.expandedToken){
 			newNode = popped;
 		}
 		else {
@@ -243,17 +247,17 @@ public class ParserImpl extends Tokenizer {
 		newNode.AppendToName(addition);
 		newNode.AppendToName(n.GetName());
 		
-		ArrayList<Token> children = newNode.nodes;
-		Token lastChild = children.get(children.size()-1);	
-		
-		//TODO:testcase
-		if (!lastChild.EvaluateOrder(n))
-			throw new Exception("standard order is not respected");
-		
-		//TODO: test cases
-        if (initDone)
-		    CheckExclusions(children, n);
-		
+        if (initDone) {
+        	
+    		ArrayList<Token> children = newNode.nodes;
+    		Token lastChild = children.get(children.size()-1);	
+    		
+    		if (!lastChild.EvaluateOrder(n))
+    			throw new Exception("standard order is not respected");
+    		
+        	CheckExclusions(children, n);
+        }
+		    
 		newNode.AddNode(n);
 		stack.push(newNode);
 	}
