@@ -121,7 +121,7 @@ module.exports.updateieml = function (req, res) {
 	var id = require('mongoskin').ObjectID.createFromHexString(rec.ID);
 	console.log("before editing ieml "+id);
 	id = {_id: id};
-	rec.ID=undefined;
+	delete rec.ID; //rec.ID=undefined;
 } catch (e) {
   
    console.log(e);
