@@ -184,24 +184,24 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             hasLastAction = true;
         },
       
+        // used by iemlEntryEditorController
         addToIEMLLIST:function (toBeAdded) {
             allItems.push(toBeAdded);
         },
       
+        // used by iemlEntryEditorController
         updateIEMLLIST:function(toBeAdded) {
- 
             var item;
-
             for (var i =0; i<allItems.length; i++) {
                 item=allItems[i];
                 if (item._id==toBeAdded.ID) {
-
                     allItems[i].IEML=toBeAdded.IEML;
                     allItems[i].CLASS=toBeAdded.CLASS;
                     allItems[i].EN=toBeAdded.EN;
                     allItems[i].FR=toBeAdded.FR;
                     allItems[i].LAYER=toBeAdded.LAYER;
                     allItems[i].PARADIGM=toBeAdded.PARADIGM;
+                    break;
                 }
             }
         },
@@ -285,7 +285,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     
     // form was submitted by user
     $scope.submitEdit = function() {
-
         var el=sharedProperties.getIemlEntry();
         var toBeAdded = {
             IEML:$scope.iemlValue,
@@ -296,9 +295,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             CLASS:$scope.data.gclass.toString(),
             ID:(el!=undefined && el._id!=undefined)?el._id:undefined
         }        
-        
-        //$rootScope.$emit("iemlEntryUpdated", toBeAdded);
-        
+                
         if (toBeAdded.ID==undefined) {
             crudFactory.create(toBeAdded).success(function(data) {
 
@@ -340,10 +337,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                 //$location.path('/loadTerms/');                        
             });
         }        
-    };
-    
-    // temporary place-holder tempString for debug messages:
-    $scope.tempString = '';    
+    };  
 })
 .controller('loadIEMLController', function($scope,  $rootScope, $location, $mdDialog, crudFactory, sharedProperties) {
         
@@ -846,7 +840,8 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
   
   
 
-//pub-sub
+//pub-sub  http://toddmotto.com/all-about-angulars-emit-broadcast-on-publish-subscribing/
+
         /* possibly dead code
         newItemSubscriber: function(scope, callback) {
             $rootScope.$on('newItem', callback);
