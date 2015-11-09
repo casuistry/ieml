@@ -286,6 +286,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     // form was submitted by user
     $scope.submitEdit = function() {
         var el=sharedProperties.getIemlEntry();
+        
         var toBeAdded = {
             IEML:$scope.iemlValue,
             FR:$scope.frenchValue,
@@ -297,6 +298,8 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         }        
                 
         if (toBeAdded.ID==undefined) {
+            
+            delete toBeAdded.ID; // this field is used during processing, but should not be stored
 
             crudFactory.create(toBeAdded).success(function(data) {
 
@@ -317,9 +320,10 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                     $rootScope.showAlert('Create operation failed', status);
                 }    
             });
-        } else {
-            //do update 
-            delete toBeAdded.ID; // this field is used during processing, but should not be stored
+        } else { //do update   
+               
+            delete toBeAdded.ID; // this field is used during processing, but should not be stored            
+        
             crudFactory.modify(toBeAdded).success(function(data, status, headers, config){ 
 
                 sharedProperties.updateIEMLLIST(toBeAdded);
