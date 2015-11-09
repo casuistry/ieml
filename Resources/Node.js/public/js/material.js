@@ -297,6 +297,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         }        
                 
         if (toBeAdded.ID==undefined) {
+
             crudFactory.create(toBeAdded).success(function(data) {
 
                 // insert into all ieml tabe
@@ -318,6 +319,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             });
         } else {
             //do update 
+            delete toBeAdded.ID; // this field is used during processing, but should not be stored
             crudFactory.modify(toBeAdded).success(function(data, status, headers, config){ 
 
                 sharedProperties.updateIEMLLIST(toBeAdded);
