@@ -35,6 +35,9 @@ public class TableGenerator {
 	}
 	
 	public static void main(String[] args) {
+		
+		System.out.println(System.getProperty("java.runtime.version"));
+		
 		TableGenerator tGen = new TableGenerator();
 		
 		tGen.generate();
@@ -58,7 +61,8 @@ public class TableGenerator {
 		//db.add("M:M:.e.-+O:M:O:.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:M:.o.-O:.-M:O:.M:O:.-', 2, 3, 4, 5, 6");
 		//db.add("S:M:., 2, 3, 4, 5, 6");
-		db.add("E:O:+M:.wo.-, 2, 3, 4, 5, 6");
+		//db.add("E:O:+M:.wo.-, 2, 3, 4, 5, 6");
+		db.add("E:F:.d.-, 2, 3, 4, 5, 6");
 		
 		
 		

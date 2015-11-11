@@ -1,8 +1,12 @@
 package NewParser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class Tokenizer {
 
@@ -136,11 +140,12 @@ public class Tokenizer {
 	public static HashMap<String, Token> primitiveLookup = new HashMap<String, Token>();
 	public static HashMap<String, String> primitiveAbbrev = new HashMap<String, String>();
 	static {
-		try {
-			primitiveLookup.put("O:", new ParserImpl().parse("U:+A:"));
+		try {			
 			primitiveLookup.put("M:", new ParserImpl().parse("S:+B:+T:"));
+			primitiveLookup.put("I:", new ParserImpl().parse("E:+U:+A:+S:+B:+T:"));			
+			primitiveLookup.put("O:", new ParserImpl().parse("U:+A:"));
 			primitiveLookup.put("F:", new ParserImpl().parse("U:+A:+S:+B:+T:"));
-			primitiveLookup.put("I:", new ParserImpl().parse("E:+U:+A:+S:+B:+T:"));
+			
 		}catch (Exception e) {
 			System.out.println("mapping failed: " + e.getMessage());
 		}
@@ -221,8 +226,23 @@ public class Tokenizer {
 		if (index < 0)
 			return ieml;
 		
+	    Comparator<String> x = new Comparator<String>() {	    	
+	    	@Override
+	    	public int compare(String o1, String o2)
+	    	{	
+	    		//Returns:the value 0 if x == y; a value less than 0 if x < y; and a value greater than 0 if x > y Since:1.7	    		
+	    		return Integer.compare(o2.length(), o1.length());
+	    	}	    	
+	    };
+
+	    ArrayList<String> patterns = new ArrayList<String>();
+	    for (String abrev : primitiveAbbrev.keySet()) {
+	    	patterns.add(abrev);
+	    }
+	    Collections.sort(patterns,  x);
+	    
 		// handle abbreviation for addition
-		for (String abrev : primitiveAbbrev.keySet()) {
+		for (String abrev : patterns) {
 			ieml = ieml.replace(abrev, primitiveAbbrev.get(abrev));
 		}
 		
@@ -231,7 +251,6 @@ public class Tokenizer {
 			ieml = ieml.replace(abrev, scAbbrev.get(abrev));
 		}
 		
-
 		//System.out.println("handling empties: " + index);
 		// handle trailing empties
 		for (int i = index; i >= 0; i--){
