@@ -420,7 +420,7 @@ public class Token {
 		
 		if (properties.containsKey("removeFromTableGenetration")) {
 			
-			properties.remove("removeFromTableGenetration", "removeFromTableGenetration");
+			properties.remove("removeFromTableGenetration");
 			
 			if (nodes != null) {
 				for (Token child : nodes) {
