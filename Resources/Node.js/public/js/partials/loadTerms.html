@@ -34,8 +34,14 @@
 		<md-select ng-model="filterLanguage" ng-change="triggerFiltering('LANGUAGE')">
 		  <md-option ng-repeat="filterLanguage in filterLanguageChoices" value="{{filterLanguage}}">{{filterLanguage}}</md-option>
 		</md-select>
-	</md-input-container>	
-	<md-input-container >
+	</md-input-container>
+	<md-input-container>
+	  <label>Display</label>
+		<md-select ng-model="filterOrder" ng-change="triggerFiltering('ORDER')">
+		  <md-option ng-repeat="filterOrder in filterOrderChoices" value="{{filterOrder}}">{{filterOrder}}</md-option>
+		</md-select>
+	</md-input-container>
+	<md-input-container>
 	  <label for="filterInput">Search for</label>
 	  <input type="text" id="filterInput" ng-change="triggerFiltering('TEXT')" data-ng-model="filterText" >
 	</md-input-container>  
@@ -46,7 +52,10 @@
 	  <md-virtual-repeat-container id="vertical-container">
 
 	  <md-list class="fixedRows">
-	    <md-list-item md-virtual-repeat="item in List | filter: filterText | filter:filterItemParadigm(filterParadigm) | filter:filterGrammaticalClass(filterClass) | filter:filterItemLayer(filterLayer)" class="repeated-item" flex> 
+	    <md-list-item md-virtual-repeat="item in List | filter: filterText | 
+                                                        filter:filterItemParadigm(filterParadigm) | 
+                                                        filter:filterGrammaticalClass(filterClass) | 
+                                                        filter:filterItemLayer(filterLayer)" class="repeated-item" flex> 
 	  
 		  <!-- md-primary for blue color, md-mini for smaller icon-->
 		  <md-button  title="xDelete this IEML" class="md-fab md-primary md-mini" ng-click="showConfirm(deleteEntry, List.indexOf(item))">
@@ -63,7 +72,7 @@
 		 
 		  <md-list-item class="md-2-line">
         	<div class="md-list-item-text">
-         		 <p  ng-show="filterLanguage=='English'">{{item.EN}}</p>
+         		 <p ng-show="filterLanguage=='English'">{{item.EN}}</p>
          		 <p ng-show="filterLanguage!='English'">{{item.FR}}</p>
         	</div>
     	  </md-list-item>

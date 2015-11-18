@@ -341,10 +341,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         }        
     };  
 })
-.controller('loadIEMLController', function($scope,  $rootScope, $location, $mdDialog, crudFactory, sharedProperties) {
-        
-    //just for safety
-    $scope.loadedfromDB = false;
+.controller('loadIEMLController', function($scope,  $rootScope, $location, $mdDialog, $filter, crudFactory, sharedProperties) {
 
     var fParadigms = "Paradigms";
     var fAllTerms = "All terms";
@@ -396,16 +393,21 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         fFrench,
         fEnglish          
     ];
-
-    //preserve selection navigating
-    $scope.filterLanguage = sharedProperties.filterLanguageSelected?sharedProperties.filterLanguageSelected:fFrench;
+   
+    var iemlOrder = "IEML";
+    var alphOrder = "Alphabetical";
+    $scope.filterOrderChoices = [
+        iemlOrder,
+        alphOrder          
+    ];
     
     // set defaults
     $scope.filterParadigm = sharedProperties.filterParadigmSelected?sharedProperties.filterParadigmSelected:fAllTerms; //default value
     $scope.filterClass = sharedProperties.filterClassSelected?sharedProperties.filterClassSelected:fAllClasses; //default value
     $scope.filterLayer = sharedProperties.filterLayerSelected?sharedProperties.filterLayerSelected:fAllLayers; //default value
     $scope.filterLanguage = sharedProperties.filterLanguageSelected?sharedProperties.filterLanguageSelected:fFrench; //default value
-    $scope.filterText = sharedProperties.filterTextSelected?sharedProperties.filterTextSelected:"";
+    $scope.filterOrder = sharedProperties.filterOrderSelected?sharedProperties.filterOrderSelected:iemlOrder; //default value
+    $scope.filterText = sharedProperties.filterTextSelected?sharedProperties.filterTextSelected:""; //default value
     
     $scope.triggerFiltering = function (selection) {
         //store selected filters in the service to preserve values
@@ -413,10 +415,26 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         sharedProperties.filterLayerSelected=$scope.filterLayer;
         sharedProperties.filterParadigmSelected=$scope.filterParadigm;
         sharedProperties.filterLanguageSelected=$scope.filterLanguage;
+        sharedProperties.filterOrderSelected=$scope.filterOrder;
         sharedProperties.filterTextSelected=$scope.filterText;
         //alert(selection);
+        
+        if (selection === 'ORDER' && $scope.filterOrder == alphOrder) {
+            
+            var orderBy = $filter('orderBy');
+                                    
+            $scope.order = function(predicate, reverse) {
+                 $scope.List = orderBy($scope.List, predicate, reverse);
+            };
+                  
+            if (sharedProperties.filterLanguageSelected === fFrench)
+                $scope.order('-FR',true);
+                
+            if (sharedProperties.filterLanguageSelected === fEnglish)
+                $scope.order('-EN',true);
+        }
     };    
-    
+
     //http://stackoverflow.com/questions/11753321/passing-arguments-to-angularjs-filters
     $scope.filterGrammaticalClass = function(selection) {
         return function(input) {
@@ -470,14 +488,13 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             return false;
         }
     };
-    
+        
     $scope.List = [];
     init();
     
     function init() {
         crudFactory.get().success(function(data) {
             $scope.List = data;
-            $scope.loadedfromDB = true;
             sharedProperties.setAllItems(data);
         });
     };
@@ -507,41 +524,31 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     }
     
     $scope.addEntry = function(toBeAdded) {         
-        debugger;
-        if ($scope.loadedfromDB == true) {
-            crudFactory.create(toBeAdded).success(function(data) {
-                $scope.List.push(toBeAdded);
-            }).
-            error(function(data, status, headers, config) {
-                // called asynchronously if an error occurs
-                // or server returns response with an error status.
-            });
-        } else {
+        crudFactory.create(toBeAdded).success(function(data) {
             $scope.List.push(toBeAdded);
-        }        
+        }).error(function(data, status, headers, config) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+        });      
     };    
     
     $scope.deleteEntry = function ( index ) {
         
         var toBeRemoved = $scope.List[index].IEML;
                 
-        if ($scope.loadedfromDB == true) {
-            crudFactory.remove(toBeRemoved).success(function(data) {
-                $scope.List.splice(index, 1);
-            }).error(function(data, status, headers, config) {
-                // called asynchronously if an error occurs
-                // or server returns response with an error status.
-                // this won't work in case you cannot connect to db
-                // because of long (infinite?) time-outs
-                if (!data.success&&data.message) {
-                    $scope.showAlert('Delete operation failed', data.message?data.message:'This operation requires authentication.')
-                } else {
-                 $scope.showAlert('Delete operation failed', status);
-                }
-            });
-        } else {
+        crudFactory.remove(toBeRemoved).success(function(data) {
             $scope.List.splice(index, 1);
-        }            
+        }).error(function(data, status, headers, config) {
+            // called asynchronously if an error occurs
+            // or server returns response with an error status.
+            // this won't work in case you cannot connect to db
+            // because of long (infinite?) time-outs
+            if (!data.success&&data.message) {
+                $scope.showAlert('Delete operation failed', data.message?data.message:'This operation requires authentication.')
+            } else {
+                $scope.showAlert('Delete operation failed', status);
+            }
+        });          
     };
     
     $scope.showAlert = function(title, status) {
@@ -655,29 +662,22 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     };
 
     //TODO  can be redesigned to always load before any view
-
     function init_0() {
-
         crudFactory.get().success(function(data) {
             $scope.List = data;
-            $scope.loadedfromDB = true;
             sharedProperties.setAllItems(data);
-            sharedProperties["loadedfromDB"] = true;
-            init();
         });
     };
     
     function init() {
 
+        // TODO: if from bookmark, this will be undefined.
         $scope.filterLanguage = sharedProperties.filterLanguageSelected;
 
         var v = sharedProperties.getIemlEntry();
         if (v == null) {
             //  the view is opened by bookmark try to get it from the URL
-            if (!sharedProperties.loadedfromDB){
-                init_0();
-                return;
-            }
+            init_0();
             tableTitle = decodeURIComponent($routeParams.IEML);
         } else {
             tableTitle = v.IEML;
