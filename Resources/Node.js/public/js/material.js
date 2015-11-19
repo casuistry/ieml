@@ -419,19 +419,10 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         sharedProperties.filterTextSelected=$scope.filterText;
         //alert(selection);
         
-        if (selection === 'ORDER' && $scope.filterOrder == alphOrder) {
-            
-            var orderBy = $filter('orderBy');
-                                    
-            $scope.order = function(predicate, reverse) {
-                 $scope.List = orderBy($scope.List, predicate, reverse);
-            };
-                  
-            if (sharedProperties.filterLanguageSelected === fFrench)
-                $scope.order('-FR',true);
-                
-            if (sharedProperties.filterLanguageSelected === fEnglish)
-                $scope.order('-EN',true);
+        // 'ORDER' and 'LANGUAGE' are not filtering but ordering by and 
+        // selecting a language to display respectively. 
+        if ((selection === 'ORDER' || selection === 'LANGUAGE') && $scope.filterOrder == alphOrder) {            
+            orderList();
         }
     };    
 
@@ -489,13 +480,28 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         }
     };
         
+    function orderList() {
+        var orderBy = $filter('orderBy');
+                                    
+        function order(predicate, reverse) {
+            $scope.List = orderBy($scope.List, predicate, reverse);
+        };
+                  
+        if (sharedProperties.filterLanguageSelected === fFrench)
+            order('-FR',true);
+                
+        if (sharedProperties.filterLanguageSelected === fEnglish)
+            order('-EN',true);
+    };
+    
     $scope.List = [];
     init();
     
     function init() {
-        crudFactory.get().success(function(data) {
-            $scope.List = data;
-            sharedProperties.setAllItems(data);
+        crudFactory.get().success(function(data) {            
+            $scope.List = data;            
+            orderList();            
+            sharedProperties.setAllItems($scope.List);
         });
     };
        
