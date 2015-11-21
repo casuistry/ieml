@@ -140,6 +140,9 @@ public class ParserImpl extends Tokenizer {
 			if (scAbbrev.containsKey(newNode.GetName())) {
 				throw new Exception("Abbreviation needed: " + scAbbrev.get(newNode.GetName()));			
 			}
+			if (scAbbrev2.containsKey(newNode.GetName())) {
+				throw new Exception("Abbreviation needed: " + scAbbrev2.get(newNode.GetName()));			
+			}
 		}
 		
 		if (initDone && newNode.HasTrailingEmpty())

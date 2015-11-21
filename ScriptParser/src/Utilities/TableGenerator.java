@@ -45,8 +45,8 @@ public class TableGenerator {
 		
 	public void generate(){
 		
-		//List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
-		ArrayList<String> db = new ArrayList<String>();
+		List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
+		//ArrayList<String> db = new ArrayList<String>();
 		//db.add("S:M:.e.-S:B:T:.S:B:T:.S:B:T:.-S:B:T:.S:B:T:.S:B:T:.-' , 2, 3, 4, 5, 6");
 		//db.add("M:.+O:M:.- , 2, 3, 4, 5, 6");
 		//db.add("(S:+B:)(S:+T:).f.- , 2, 3, 4, 5, 6");
@@ -62,8 +62,9 @@ public class TableGenerator {
 		//db.add("M:M:M:.o.-O:.-M:O:.M:O:.-', 2, 3, 4, 5, 6");
 		//db.add("S:M:., 2, 3, 4, 5, 6");
 		//db.add("E:O:+M:.wo.-, 2, 3, 4, 5, 6");
-		db.add("E:F:.d.-, 2, 3, 4, 5, 6");
-		
+		//db.add("E:F:.d.-, 2, 3, 4, 5, 6");
+		//db.add("B:B:., 2, 3, 4, 5, 6");
+		//db.add("A:+T:, 2, 3, 4, 5, 6");
 		
 		
 		//
@@ -92,7 +93,7 @@ public class TableGenerator {
 				
 				try {		
 					
-					Token n = parser.parse(ieml);//(ieml);	
+					Token n = parser.parse(ieml);	
 					String json = genJSONTables(n);
 					System.out.print(json);
 					

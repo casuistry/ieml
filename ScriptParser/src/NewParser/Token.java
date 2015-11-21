@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import Utilities.Helper;
+
 
 public class Token {
 	
@@ -22,6 +24,8 @@ public class Token {
 	public Token parent = null;
 	public Character opCode = null;
 	
+	public String orderString = null;
+	
 	private HashMap<String, String> properties = new HashMap<String, String>();
 	
 	public Token(Character c){
@@ -35,7 +39,7 @@ public class Token {
 		opCode = operator;
 		layer = l;
 	}
-	
+		
 	public int ComputeTaille() throws Exception {
 		
 		if (!isTailleComputed) {
@@ -119,7 +123,7 @@ public class Token {
 	}
 	
 	private Boolean m_a(Token bigger) throws Exception{
-		throw new Exception("not real");
+		return this.IsProperOrder(bigger.nodes.get(0));
 	}
 	
 	private Boolean a_n(Token bigger) throws Exception{		
@@ -127,21 +131,11 @@ public class Token {
 	}
 	
 	private Boolean a_m(Token bigger) throws Exception{
-		throw new Exception("not real");
+		return this.nodes.get(0).IsProperOrder(bigger);
 	}
 	
-	private Boolean a_a(Token bigger) throws Exception{
-		
-		for (int i = 0; i < this.nodes.size() && i < bigger.nodes.size(); i++ ){
-			Boolean res = this.nodes.get(i).IsProperOrder(bigger.nodes.get(i));
-			if (res != null)
-				return res;
-		}
-		
-		if (this.nodes.size() == bigger.nodes.size())
-			return null;
-		
-		return this.nodes.size() < bigger.nodes.size();
+	private Boolean a_a(Token bigger) throws Exception{		
+		return this.nodes.get(0).IsProperOrder(bigger.nodes.get(0));
 	}
 	
 	public boolean EvaluateOrder(Token n) throws Exception {
@@ -157,9 +151,11 @@ public class Token {
 			//sanity
 			throw new Exception("negative layer values");
 		
-		if (!this.isTailleComputed || !n.isTailleComputed)
-			//sanity
-			throw new Exception("taille not computed");
+		if (!this.isTailleComputed)
+			this.ComputeTaille();
+		
+		if (!n.isTailleComputed)
+			n.ComputeTaille();
 		
 		if (this.layer < n.layer)
 			return true;

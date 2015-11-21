@@ -154,6 +154,35 @@ public class Tokenizer {
 			primitiveAbbrev.put(primitiveLookup.get(key).GetName(), key);
 	}
 	
+	public static HashMap<String, String> scAbbrev2 = new HashMap<String, String>();
+	static {
+		scAbbrev2.put("U:U:.", "wo.");
+		scAbbrev2.put("U:A:.", "wa.");
+		scAbbrev2.put("A:U:.", "wu.");
+		scAbbrev2.put("A:A:.", "we.");
+		scAbbrev2.put("U:S:.", "y.");
+		scAbbrev2.put("U:B:.", "o.");
+		scAbbrev2.put("U:T:.", "e.");
+		scAbbrev2.put("A:S:.", "u.");
+		scAbbrev2.put("A:B:.", "a.");
+		scAbbrev2.put("A:T:.", "i.");
+		scAbbrev2.put("S:U:.", "j.");
+		scAbbrev2.put("S:A:.", "g.");
+		scAbbrev2.put("S:S:.", "s.");
+		scAbbrev2.put("S:B:.", "b.");
+		scAbbrev2.put("S:T:.", "t.");
+		scAbbrev2.put("B:U:.", "h.");
+		scAbbrev2.put("B:A:.", "c.");
+		scAbbrev2.put("B:S:.", "k.");
+		scAbbrev2.put("B:B:.", "m.");
+		scAbbrev2.put("B:T:.", "n.");
+		scAbbrev2.put("T:U:.", "p.");
+		scAbbrev2.put("T:A:.", "x.");
+		scAbbrev2.put("T:S:.", "d.");
+		scAbbrev2.put("T:B:.", "f.");
+		scAbbrev2.put("T:T:.", "l.");
+	}
+	
 	public static HashMap<String, Token> scLookup = new HashMap<String, Token>();
 	public static HashMap<String, String> scAbbrev = new HashMap<String, String>();
 	static {
@@ -190,7 +219,7 @@ public class Tokenizer {
 		for (String key : scLookup.keySet())
 			scAbbrev.put(scLookup.get(key).GetName(), key);
 	}
-	
+		
 	public static HashMap<Integer, Token> emptyLookup = new HashMap<Integer, Token>();
 	static {
 		try {
