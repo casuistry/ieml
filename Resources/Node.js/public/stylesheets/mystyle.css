@@ -147,3 +147,24 @@ span.ng-scope {
   .ghostCircle, .activeDrag .ghostCircle{
        display: none;
   }
+
+  /*------ links on definitions------*/
+  .buttonflat {
+    border: none;
+    background: #FFF;
+    color: blue;
+    padding: 5px 20px;
+    font-size: 22px;
+    font-family: Palatino;
+    font-weight: bold;
+}
+.buttonflatdis {
+    border: none;
+    background: #FFF;
+    color: gray;
+    padding: 5px 20px;
+    font-size: 22px;
+    font-family: Palatino;
+    font-weight: bold;
+}
+

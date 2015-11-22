@@ -5,6 +5,24 @@
     <h2 align="center">{{tableTitle}}</h2> 
 
     <md-tabs md-stretch-tabs="always" md-dynamic-height="" md-border-bottom="">
+      <md-tab label="DEFINITIONS">
+
+          <md-content class="md-padding">
+          <label>
+            <input style="font:small" type="checkbox" ng-model="showHidden">Show hidden
+         </label>
+            <div ng-repeat="def in definitions"> 
+              <li> {{def.reltype}}</li>
+              <div  layout="row">
+              <div ng-repeat="lnk in def.rellist">
+              <a style="border: none;" href="#/dicEdit/IEML/{{lnk.ieml}}" target="_self" ng-show="lnk.visible||showHidden"  ng-class="{disabled:!lnk.exists, buttonflat:lnk.exists, buttonflatdis:!lnk.exists}"   class="btn">{{lnk.ieml}}</a>
+              </div>
+              </div>
+            </div>
+     
+          </md-content>
+      </md-tab>
+
       <md-tab label="TABLE">
         <md-content class="md-padding">
         
@@ -40,17 +58,11 @@
 
   
 		
-		<div ng-show="!showTables">
-		<h2>{{tableError}}</h2>
-		</div>
+    		<div ng-show="!showTables">
+    		<h2>{{tableError}}</h2>
+    		</div>
 		
-		<div>
-          <br/><br/>
-          <!--md-button class="md-raised" ng-click="submitEdit()" disabled="disabled"> Submit </md-button--> 
-          <md-button class="md-raised" ng-click="cancelEdit()"> Back </md-button>
-        </div>
 		
-		<!--/div-->
 		
         </md-content>
       </md-tab>
@@ -88,7 +100,11 @@
     </md-tab>
 </div>   
   </md-tabs>
-
+<div>
+          <br/><br/>
+          <!--md-button class="md-raised" ng-click="submitEdit()" disabled="disabled"> Submit </md-button--> 
+          <md-button class="md-raised" ng-click="cancelEdit()"> Back </md-button>
+</div>
 </div>
 
 

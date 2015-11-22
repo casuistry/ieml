@@ -689,6 +689,22 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             tableTitle = v.IEML;
         }
 
+
+
+        //get the list of defintions
+        $scope.definitions = [
+        {"reltype":"reltype1", "rellist":
+            [{"ieml":"I:E:M:L","id":"xxxxxxxx","exists":false, "visible":true},
+            {"ieml":"I:E:M:L","id":"xxxxxxxx","visible":true, "exists":true},
+            {"ieml":"I:E:M:L","id":"xxxxxxxx","visible":true,  "exists":true}
+            ]},
+        {"reltype":"reltypeN", "rellist":
+            [{"ieml":"I:E:M:L","id":"xxxxxxxx","visible":true,  "exists":true},
+            {"ieml":"I:E:M:L","id":"xxxxxxxx","visible":false, "exists":true}
+            ]}
+        ];
+        
+
         // crudFactory.iemltable(sharedProperties.getIemlEntry().IEML).success(function(data) {
         crudFactory.iemltable(tableTitle).success(function(data) {
         $scope.fakeReply = data.tree;
