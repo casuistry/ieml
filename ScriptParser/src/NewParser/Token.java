@@ -97,7 +97,6 @@ public class Token {
 			return null;
 		if (a < b)
 			return true;			
-		//TODO: test case
 		throw new Exception("alphanumeric mismatch between " + this.GetName() + " and " + bigger.GetName());
 	}
 	
@@ -106,11 +105,35 @@ public class Token {
 	}
 	
 	private Boolean n_a(Token bigger) throws Exception{
-		return this.IsProperOrder(bigger.nodes.get(0));
+		throw new Exception("not viable");
 	}
 	
 	private Boolean m_n(Token bigger) throws Exception{
 		throw new Exception("not viable");
+	}
+	
+	private Boolean a_n(Token bigger) throws Exception{		
+		throw new Exception("not viable");
+	}
+		
+	private Boolean m_a(Token bigger) throws Exception{
+		return true;
+	}
+
+	private Boolean a_m(Token bigger) throws Exception{
+		return false;
+	}
+	
+	private Boolean a_a(Token bigger) throws Exception{		
+		if (this.nodes.size() == bigger.nodes.size()) {
+			for (int i = 0; i < this.nodes.size(); i++ ){
+				Boolean res = this.nodes.get(i).IsProperOrder(bigger.nodes.get(i));
+				if (res != null)
+					return res;
+			}
+			return null;
+		}
+		return this.nodes.size() < bigger.nodes.size();
 	}
 	
 	private Boolean m_m(Token bigger) throws Exception{
@@ -122,22 +145,6 @@ public class Token {
 		return null;
 	}
 	
-	private Boolean m_a(Token bigger) throws Exception{
-		return this.IsProperOrder(bigger.nodes.get(0));
-	}
-	
-	private Boolean a_n(Token bigger) throws Exception{		
-		return this.nodes.get(0).IsProperOrder(bigger);
-	}
-	
-	private Boolean a_m(Token bigger) throws Exception{
-		return this.nodes.get(0).IsProperOrder(bigger);
-	}
-	
-	private Boolean a_a(Token bigger) throws Exception{		
-		return this.nodes.get(0).IsProperOrder(bigger.nodes.get(0));
-	}
-	
 	public boolean EvaluateOrder(Token n) throws Exception {
 		Boolean res = IsProperOrder(n);
 		if (res == null)
@@ -147,15 +154,8 @@ public class Token {
 	
 	public Boolean IsProperOrder(Token n) throws Exception {
 		
-		if (this.layer < 0 || n.layer < 0)
-			//sanity
-			throw new Exception("negative layer values");
-		
-		if (!this.isTailleComputed)
-			this.ComputeTaille();
-		
-		if (!n.isTailleComputed)
-			n.ComputeTaille();
+		this.ComputeTaille();
+		n.ComputeTaille();			
 		
 		if (this.layer < n.layer)
 			return true;
