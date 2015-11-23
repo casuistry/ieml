@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import NewParser.ParserImpl;
 import NewParser.Token;
+import Utilities.RelationBuilder;
 import Utilities.TableGenerator;
 
 
@@ -190,5 +191,34 @@ public class ParserService {
 		return makeCORS(Response.status(200).entity(result));
 	  }
  
+	  @POST
+	  @Path("/relationship")
+	  @Produces("application/json")
+	  @Consumes("application/x-www-form-urlencoded")
+
+	  public Response relations(@FormParam("iemltext") String iemltext) throws JSONException {
+	 
+		  
 	
+		
+		 try {				
+				String rel = 
+						RelationBuilder.GetRelations(iemltext);
+				
+				return Response.status(200).entity(rel).build();
+				
+			} catch (Exception e) {
+				 
+				return Response.status(500).entity(e.getMessage()).build();
+				
+				
+				
+			}		
+			finally {
+				
+		} 
+	
+	
+	  }
+	  
 }
