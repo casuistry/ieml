@@ -53,9 +53,28 @@ var loadRelationships = function (result) {
 	//TODO 
 	//if element is not in all ieml set it to 'disabled'
 	//preperare multiple insert and inser it into relationshiops collection
-	console.log("Processing "+ current_index +" terms");
-	processOneIeml();
+	var new_records = [];
+	for (var i=0;i<result.relations.length;i++) {
+		var new_rec = {};
+		new_rec.start = result.relations[i].start;
+		new_rec.ieml = result.relations[i].stop;
+		new_rec.visible = true;
+		new_rec.exists = true;
+		new_rec.type = result.relations[i].name;
+		if (allieml.indexOf(new_rec.start)==-1 || allieml.indexOf(new_rec.ieml)==-1 ) {
+			new_rec.exists = false;
+		}
+		new_records.push(new_rec);
+	}
+
+	db.collection('relationships').insert(new_records, function(err, result) {
+    	console.log("Processing "+ current_index +" terms");
+		processOneIeml();
+		});
+
+	
 }
+	
 
 var processOneIeml = function () {
 
@@ -100,7 +119,7 @@ var processOneIeml = function () {
 		  res.on('end', function() {
 		  	var resp = {'relations':[]};
 		  	try {
-		  		
+
 		  		resp = JSON.parse(body)
 
 		  	} catch (e) {
