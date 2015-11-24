@@ -18,7 +18,8 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         })
         .when('/dicEdit/IEML/:IEML', {
             controller: 'iemlDictionaryController',
-            templateUrl: '/js/partials/dictionaryEdit.html'
+            templateUrl: '/js/partials/dictionaryEdit.html',
+            reloadOnSearch: true
         })
         .when('/graph', {
             controller: 'iemlDictionaryController',
@@ -659,8 +660,12 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     }
 })
 .controller('iemlDictionaryController', function($scope, $location, $mdToast,  $routeParams, $mdDialog, $document, $filter, crudFactory, sharedProperties) {
+
+
       
     var tableTitle =  decodeURIComponent($routeParams.IEML);
+
+    var previousTableTile = tableTitle;
       
     init();
 
@@ -684,11 +689,13 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     
     function init() {
 
+
         // TODO: if from bookmark, this will be undefined.
         $scope.filterLanguage = sharedProperties.filterLanguageSelected;
 
         var v = sharedProperties.getIemlEntry();
-        if (v == null) {
+        //if (v == null) {
+        if (1==1) {
             //  the view is opened by bookmark try to get it from the URL
             init_0();
             tableTitle = decodeURIComponent($routeParams.IEML);
@@ -710,7 +717,20 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             {"ieml":"I:E:M:L","id":"xxxxxxxx","visible":false, "exists":true}
             ]}
         ];*/
+
+       /* $scope.$on('$routeUpdate', function(scope, next, current) {
+              debugger;
+              alert('change');
+        });
         
+        $scope.$on('$locationChangeSuccess', function(event) {
+             debugger;
+             if (tableTitle == previousTableTile) {
+                tableTitle =  decodeURIComponent($routeParams.IEML);
+                init();
+            }
+        });*/
+
         crudFactory.rels(tableTitle).success(function(data) {
              $scope.definitions = data;
         });
