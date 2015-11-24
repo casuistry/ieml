@@ -264,6 +264,58 @@ module.exports.verifyEn = function (req, res) {
 	);
 };
 
+module.exports.getRels = function (req, res) {
+
+	var db = req.db;
+    console.log("Getting relationship ieml");
+	console.log(req.body.ieml);
+	
+	
+	var resultRel = [];
+	
+
+	//db.relationships.distinct("type",{"start":"x.t.-"})
+
+		db.collection('relationships').distinct("type",{"start":req.body.ieml},
+	    function(err, relNames) {
+			if (err) {
+				console.log("ERROR"+err);
+				throw err;
+				res.sendSatus(500);
+				return;
+			}
+			if (relNames) {
+
+				
+				if (relNames.length==0) {res.json(resultRel);return;}
+
+				db.collection('relationships').find({"start":req.body.ieml}).toArray(
+	  				  function(err, rels) {
+								for (var i=0;i<relNames.length;i++) {
+									var oneRel = {};
+									var oneRelList = [];
+									oneRel.reltype = relNames[i];
+									for (var k=0;k<rels.length;k++){
+										if (rels[k].type == relNames[i]) {
+										delete rels[k].type;
+										oneRelList.push(rels[k]);
+										}
+									}
+									oneRel.rellist = oneRelList;
+									resultRel.push(oneRel);
+								}
+
+							console.log(JSON.stringify(resultRel));
+							res.json(resultRel);
+							
+
+				});
+			}
+		}
+	);
+  
+};
+
 module.exports.partials = function (req, res) {
   var name = req.params.name;
   res.render('partials/' + name);

@@ -67,7 +67,14 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         iemltable : function(input) {            
           $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
           return $http.post('http://test-ieml.rhcloud.com/ScriptParser/rest/iemlparser/tables', 'iemltext='+encodeURIComponent(input));
-        }    
+        },
+
+        rels : function(input)  {
+                var data ={};
+                data.ieml = input;
+                $http.defaults.headers.post["Content-Type"] = "application/json";
+                return $http.post('../api/rels', data);
+        }
     }
 })
 .directive('exists', function($q, $timeout, $http, crudFactory) {
@@ -692,7 +699,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 
 
         //get the list of defintions
-        $scope.definitions = [
+        /*$scope.definitions = [
         {"reltype":"reltype1", "rellist":
             [{"ieml":"I:E:M:L","id":"xxxxxxxx","exists":false, "visible":true},
             {"ieml":"I:E:M:L","id":"xxxxxxxx","visible":true, "exists":true},
@@ -702,8 +709,11 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             [{"ieml":"I:E:M:L","id":"xxxxxxxx","visible":true,  "exists":true},
             {"ieml":"I:E:M:L","id":"xxxxxxxx","visible":false, "exists":true}
             ]}
-        ];
+        ];*/
         
+        crudFactory.rels(tableTitle).success(function(data) {
+             $scope.definitions = data;
+        });
 
         // crudFactory.iemltable(sharedProperties.getIemlEntry().IEML).success(function(data) {
         crudFactory.iemltable(tableTitle).success(function(data) {
