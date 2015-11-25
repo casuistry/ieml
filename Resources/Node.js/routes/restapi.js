@@ -109,6 +109,14 @@ module.exports.newieml = function (req, res) {
 			}
 		}
 	);
+
+	//call relationships parser and insert new records into relationships collection
+
+	//find and enable all relationships with stop == new ieml
+
+	loadRelsForIEML (req.body.ieml, db);
+
+	 
 };
 
 module.exports.updateieml = function (req, res) {
@@ -181,6 +189,21 @@ module.exports.remieml = function (req, res) {
 			}
 		}
 	);
+
+
+	
+	//find and remove all rels with start ==  ieml
+
+	db.collection('relationships').remove({start:req.params.id}, function(err, result) {
+    if (!err) console.log('Deleted '+result+' relationships for '+req.params.id);
+	});
+
+	//find and diasable all rels where ieml ==  ieml
+
+	db.collection('relationships').update({ieml:req.params.id}, {$set:{exists:false}} function(err, result) {
+    if (!err) console.log('Updated '+result+' relationships for '+req.params.id);
+	});
+
 };
 
 // Verify that new or modified field values are unique.
@@ -325,3 +348,163 @@ module.exports.templates = function (req, res) {
   var name = req.params.name;
   res.render('templates/' + name);
 };
+
+
+
+
+var loadRelsForIEML = function (ieml, db) {
+
+	var allieml=[];
+	var rellist;
+
+	async.series([
+        
+        function(callback) {  //call parser REST for the list of relationships
+            loadRelFromParser(ieml, function(err, list) {
+                if (err) return callback(err);
+                rellist = list;
+                callback(); //TODO check if needed
+          });
+        },
+        function(callback) {  //load existing IEML terms from terms collection equals to start and stop
+
+        	var iemlReconSet = [];
+
+		        	for (var i=0;i<rellist.relations.length;i++) {
+						var new_rec = {};
+						iemlReconSet.push(result.relations[i].start);
+						iemlReconSet.push(result.relations[i].stop);
+					}
+
+        	db.collection('terms').find({IEML:{$in:iemlReconSet}}, {IEML:1}).toArray(function(err, result) {
+					if (err) {
+						console.log("ERROR"+err);
+						callback(err);
+					}
+		
+					console.log("newieml loading terms "+result.length);
+					for (var i=0;i<result.length;i++) {
+						allieml[i] = result[i].IEML;
+					}
+					//console.dir(allieml);
+					//return;
+					callback();
+			});
+        },
+        function (callback) { //prepeare and load relationships db
+
+        		var loadRelationships = function (ieml, rellist, allieml, function (err, loadedrecs) { 
+        			console.log("SUCCESSFULLY LOADED RELATIONSHIPS "+JSON.strigify(loadedrecs));
+        			callback();}
+        		);
+
+        }
+    ], function(err) {
+        if (err) return;
+       
+    });
+
+});
+};
+
+
+var loadRelFromParser = function (ieml, callback) {
+
+	    var http = require('http');
+
+		var querystring = require('querystring');
+
+
+		var postData = querystring.stringify({
+		  'iemltext' : ieml
+		});
+
+		var options = {
+		  hostname: 'test-ieml.rhcloud.com',
+		  port: 80,
+		  //hostname:'localhost',
+		  //port:8081,
+		  path: '/ScriptParser/rest/iemlparser/relationship',
+		  method: 'POST',
+		  headers: {
+		    'Content-Type': 'application/x-www-form-urlencoded',
+		    'Content-Length': postData.length
+		  }
+		};
+
+		var body = '';
+		var req = http.request(options, function(res) {
+		  //console.log('STATUS: ' + res.statusCode);
+		  //console.log('HEADERS: ' + JSON.stringify(res.headers));
+		  res.setEncoding('utf8');
+		  res.on('data', function (chunk) {
+		     body += chunk;
+		  });
+		  res.on('end', function() {
+		  	var resp = {'relations':[]};
+		  	try {
+
+		  		resp = JSON.parse(body)
+
+		  	} catch (e) {
+		  		console.log("ERROR: problem parsing "+ieml);
+		  		callback(new Error());
+		  	}
+		    callback(null, resp);
+		  })
+		});
+
+		req.on('error', function(e) {
+		  console.log('problem with request: ' + e.message);
+		});
+
+		// write data to request body
+		req.write(postData);
+		req.end();
+};
+
+
+
+var loadRelationships = function (ieml, result, allieml, next) {
+	//TODO 
+	//if element is not in all ieml set it to 'disabled'
+	//preperare multiple insert and inser it into relationshiops collection
+	var new_records = [];
+
+	for (var i=0;i<result.relations.length;i++) {
+		var new_rec = {};
+		new_rec.start = result.relations[i].start;
+		new_rec.ieml = result.relations[i].stop;
+		new_rec.visible = true;
+		new_rec.exists = true;
+		new_rec.type = result.relations[i].name;
+		if (allieml.indexOf(new_rec.start)==-1 || allieml.indexOf(new_rec.ieml)==-1 ) {
+			new_rec.exists = false;
+		}
+		new_records.push(new_rec);
+	}
+
+		db.collection('relationships').insert(new_records, function(err, result) {
+    	
+		     
+		 //re-enable all existing rels for the ieml 
+		 async.parallel([
+		 	function (callback) {
+		    db.collection('relationships').update({ieml:ieml}, {$set:{exists:true}} function(err, result) {
+    			if (!err) console.log('Updated new'+result+' relationships');
+    			callback();
+			})
+			},
+			function (callback) {
+		    db.collection('relationships').update({start:ieml}, {$set:{exists:true}} function(err, result) {
+    			if (!err) console.log('Updated new'+result+' relationships');
+    			callback();
+			})
+			}
+		    ], function (err) {  next(err, new_records); }
+		  ); //end async.parallel
+		});
+	
+};
+
+//TODO clean up logging and error handling
