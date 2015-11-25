@@ -1,4 +1,9 @@
 //REST IEML api
+
+
+
+var async = require('../public/libs/async');
+
 module.exports.getannotations = function (req, res) {
 
 	var db = req.db;
@@ -104,7 +109,9 @@ module.exports.newieml = function (req, res) {
 				throw err;
 			}
 			if (result) {
-				console.log('Added!');
+				console.log('Added! ');
+
+				loadRelsForIEML(req.body.IEML, db);
 				res.json(result);
 			}
 		}
@@ -114,7 +121,7 @@ module.exports.newieml = function (req, res) {
 
 	//find and enable all relationships with stop == new ieml
 
-	loadRelsForIEML (req.body.ieml, db);
+
 
 	 
 };
@@ -191,7 +198,7 @@ module.exports.remieml = function (req, res) {
 	);
 
 
-	
+	//TODO wrap this and previous call into asycn parallel, return message on complete
 	//find and remove all rels with start ==  ieml
 
 	db.collection('relationships').remove({start:req.params.id}, function(err, result) {
@@ -200,7 +207,7 @@ module.exports.remieml = function (req, res) {
 
 	//find and diasable all rels where ieml ==  ieml
 
-	db.collection('relationships').update({ieml:req.params.id}, {$set:{exists:false}} function(err, result) {
+	db.collection('relationships').update({ieml:req.params.id}, {$set:{exists:false}}, function(err, result) {
     if (!err) console.log('Updated '+result+' relationships for '+req.params.id);
 	});
 
@@ -357,6 +364,8 @@ var loadRelsForIEML = function (ieml, db) {
 	var allieml=[];
 	var rellist;
 
+console.log("BEFORE UPDATING RELS");
+
 	async.series([
         
         function(callback) {  //call parser REST for the list of relationships
@@ -372,8 +381,8 @@ var loadRelsForIEML = function (ieml, db) {
 
 		        	for (var i=0;i<rellist.relations.length;i++) {
 						var new_rec = {};
-						iemlReconSet.push(result.relations[i].start);
-						iemlReconSet.push(result.relations[i].stop);
+						iemlReconSet.push(rellist.relations[i].start);
+						iemlReconSet.push(rellist.relations[i].stop);
 					}
 
         	db.collection('terms').find({IEML:{$in:iemlReconSet}}, {IEML:1}).toArray(function(err, result) {
@@ -393,8 +402,8 @@ var loadRelsForIEML = function (ieml, db) {
         },
         function (callback) { //prepeare and load relationships db
 
-        		var loadRelationships = function (ieml, rellist, allieml, function (err, loadedrecs) { 
-        			console.log("SUCCESSFULLY LOADED RELATIONSHIPS "+JSON.strigify(loadedrecs));
+        			loadRelationships(ieml, rellist, allieml, db, function (err, loadedrecs) { 
+        			console.log("SUCCESSFULLY LOADED RELATIONSHIPS "+JSON.stringify(loadedrecs));
         			callback();}
         		);
 
@@ -404,7 +413,6 @@ var loadRelsForIEML = function (ieml, db) {
        
     });
 
-});
 };
 
 
@@ -465,7 +473,7 @@ var loadRelFromParser = function (ieml, callback) {
 
 
 
-var loadRelationships = function (ieml, result, allieml, next) {
+var loadRelationships = function (ieml, result, allieml, db, next) {
 	//TODO 
 	//if element is not in all ieml set it to 'disabled'
 	//preperare multiple insert and inser it into relationshiops collection
@@ -488,15 +496,15 @@ var loadRelationships = function (ieml, result, allieml, next) {
     	
 		     
 		 //re-enable all existing rels for the ieml 
-		 async.parallel([
+		  async.parallel([
 		 	function (callback) {
-		    db.collection('relationships').update({ieml:ieml}, {$set:{exists:true}} function(err, result) {
+		    db.collection('relationships').update({ieml:ieml}, {$set:{exists:true}}, function(err, result) {
     			if (!err) console.log('Updated new'+result+' relationships');
     			callback();
 			})
 			},
 			function (callback) {
-		    db.collection('relationships').update({start:ieml}, {$set:{exists:true}} function(err, result) {
+		    db.collection('relationships').update({start:ieml}, {$set:{exists:true}}, function(err, result) {
     			if (!err) console.log('Updated new'+result+' relationships');
     			callback();
 			})
@@ -506,5 +514,5 @@ var loadRelationships = function (ieml, result, allieml, next) {
 		});
 	
 };
-
+//http://www.sebastianseilund.com/nodejs-async-in-practice
 //TODO clean up logging and error handling
