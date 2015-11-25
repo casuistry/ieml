@@ -75,6 +75,13 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                 data.ieml = input;
                 $http.defaults.headers.post["Content-Type"] = "application/json";
                 return $http.post('../api/rels', data);
+        },
+        toggleRels : function(ID) {
+            var newData = {};
+            $http.defaults.headers.post["Content-Type"] = "application/json";
+            newData.token=sharedProperties.secToken;
+            newData.ID = ID;
+            return $http.post('../api/toggleRelVisibility', newData);
         }
     }
 })
@@ -677,6 +684,10 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         var lst = sharedProperties.getAllItems();
         var newTemp = $filter("filter")(lst, {IEML:input}, true);  
         return newTemp;
+    };
+
+    $scope.toggleRelVis = function(id) {
+        return crudFactory.toggleRels(id);
     };
 
     //TODO  can be redesigned to always load before any view

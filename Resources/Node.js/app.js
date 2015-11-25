@@ -192,6 +192,7 @@ app.all('/api/allieml', restapi.allieml);
 app.all('/api/getannotations', restapi.getannotations);
 app.all('/api/removeannotation', restapi.removeannotation);
 app.all('/api/addannotation', restapi.addannotation);
+app.all('/api/toggleRelVisibility', restapi.toggleRelVisibility);
 app.all('/api/rels', restapi.getRels);
 app.all('/api/newieml', restapi.newieml);
 app.all('/api/updateieml', restapi.updateieml);

@@ -386,6 +386,7 @@ console.log("BEFORE UPDATING RELS");
 					}
 
         	db.collection('terms').find({IEML:{$in:iemlReconSet}}, {IEML:1}).toArray(function(err, result) {
+        	//db.collection('terms').find({}, {IEML:1}).toArray(function(err, result) {
 					if (err) {
 						console.log("ERROR"+err);
 						callback(err);
@@ -513,6 +514,64 @@ var loadRelationships = function (ieml, result, allieml, db, next) {
 		  ); //end async.parallel
 		});
 	
+};
+
+
+module.exports.toggleRelVisibility = function (req, res) {
+
+	var db = req.db;
+  
+	console.log(req.body);
+	try {
+	var rec=req.body;
+	var id = require('mongoskin').ObjectID.createFromHexString(rec.ID);
+
+	console.log("toggling rel visibility for "+id);
+	id = {_id: id};
+
+	delete rec.ID; //rec.ID=undefined;
+} catch (e) {
+  
+   console.log(e);
+}
+
+	 var record;
+
+	 async.series([
+        
+        function(callback) {  //find current value of visible
+           
+           		console.log('beofre find relationship');
+        		db.collection('relationships').findOne(id, {},  function(err, result) {
+    			    if (err) callback(err); 
+
+    			    console.dir(result);
+    			    record = result;
+    			    console.dir(record);
+    			    callback();
+           		 });
+
+        		
+          
+        },
+        function(callback) {
+        	console.log('beofre toggling relationship');
+        	 db.collection('relationships').update(id, {$set:{visible:!record.visible}}, function(err, result) {
+    			if (!err) console.log('visibility toggled');
+    			if (err) {
+    				console.log('visibilty error '+err);
+    				callback(err);
+    			}
+    			callback();
+			});
+       }], function (err){
+        	if (err) res.sendStatus(500); 
+        		else res.sendStatus(200); 
+
+        }
+        );
+ 
+
 };
 //http://www.sebastianseilund.com/nodejs-async-in-practice
 //TODO clean up logging and error handling
