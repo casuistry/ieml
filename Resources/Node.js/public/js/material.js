@@ -167,6 +167,8 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                         // {"level":0,"class":4,"success":true}
                         scope.data.layer = data.level;
                         scope.data.gclass = data.class;
+                        scope.data.taille = data.taille;
+                        scope.data.canonical = data.canonical;
                         scope.tempString = '';
                         deferred.resolve();
                     } else {
@@ -309,6 +311,8 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             PARADIGM:$scope.data.isParadigm ? "1" : "0",
             LAYER:$scope.data.layer.toString(),
             CLASS:$scope.data.gclass.toString(),
+            TAILLE:$scope.data.taille.toString(),
+            CANONICAL:$scope.data.canonical,
             ID:(el!=undefined && el._id!=undefined)?el._id:undefined
         }        
                 
