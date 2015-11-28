@@ -63,6 +63,8 @@ public class ParserService {
 				jsonObject.put("success", true); 
 				jsonObject.put("class", n.GetTokenClass());
 				jsonObject.put("level", n.layer);
+				jsonObject.put("taille", n.taille);
+				jsonObject.put("canonical", n.buildCanonical());
 				
 			} catch (Exception e) {
 				
@@ -96,7 +98,8 @@ public class ParserService {
 				jsonObject.put("success", true); 
 				jsonObject.put("class", n.GetTokenClass());
 				jsonObject.put("level", n.layer);
-				
+				jsonObject.put("taille", n.taille);
+				jsonObject.put("canonical", n.buildCanonical());
 				
 			} catch (Exception e) {
 				
@@ -133,7 +136,8 @@ public class ParserService {
 				jsonObject.put("success", true); 
 				jsonObject.put("tree", n.buildTree(null));
 				jsonObject.put("level", n.layer);
-				
+				jsonObject.put("taille", n.taille);
+				jsonObject.put("canonical", n.buildCanonical());
 				
 			} catch (Exception e) {
 				

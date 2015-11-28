@@ -13,9 +13,12 @@ public class TestParseTree {
 	@Test
 	public void test() throws Exception {
 		ParserImpl parser = new ParserImpl();
-		Token n = parser.parse("t.i.-s.i.-'");
+		Token n = parser.parse("t.i.-s.i.-'+ F:.-'");
 		
 		JSONObject tree= n.buildTree(null);
+		
+		tree.put("taille", n.taille);
+		tree.put("canonical", n.buildCanonical());
 		
 		n.PrintNodes("");
 		

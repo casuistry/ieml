@@ -1,5 +1,6 @@
 package Utilities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import NewParser.ParserImpl;
@@ -52,40 +53,58 @@ public class RelationBuilder {
 	
 	public static String BuildRelations(Token n) throws Exception{
 				
+		ArrayList<String> result = new ArrayList<String>();
+		
+		result.addAll(BuildFamily(n));
+		
 		StringBuilder builder = new StringBuilder("{\"relations\":[");
-		
-		builder.append(BuildFamily(n));
-		
+		for (int i = 0; i < result.size(); i++){
+			builder.append(result.get(i));
+			if (i < result.size() - 1)
+				builder.append(",");
+		}
 		builder.append("]}");
-		
 		return builder.toString();
 	}
 	
-	public static String BuildFamily(Token n) throws Exception {
+	public static ArrayList<String> BuildFamily(Token n) throws Exception {
 		
-		StringBuilder builder = new StringBuilder();
-
+		ArrayList<String> result = new ArrayList<String>();
+		
 		String parentRel = "ParentOf";
 		String childRel = "ChildOf";
 				
 		String inputName = n.GetName();
 		
 		if (n.layer == 0) {
-			
+			// no relations
 		} else if (n.opCode.equals(Tokenizer.addition)) {
-			
+			// no relations
 		} else if (n.opCode.equals(Tokenizer.multiplication)) {
-			builder.append(build(inputName, n.nodes.get(0).GetName(), childRel)); builder.append(",");
-			builder.append(build(inputName, n.nodes.get(1).GetName(), childRel)); builder.append(",");
-			builder.append(build(inputName, n.nodes.get(2).GetName(), childRel)); builder.append(",");			
-			builder.append(build(n.nodes.get(0).GetName(), inputName, parentRel));builder.append(",");
-			builder.append(build(n.nodes.get(1).GetName(), inputName, parentRel));builder.append(",");
-			builder.append(build(n.nodes.get(2).GetName(), inputName, parentRel));
+			
+			if (!n.IsEmpty()) {
+				
+				if (!n.nodes.get(0).IsEmpty()) {
+					result.add(build(inputName, n.nodes.get(0).GetName(), childRel)); 
+					result.add(build(n.nodes.get(0).GetName(), inputName, parentRel));
+				}
+
+				if (!n.nodes.get(1).IsEmpty()) {
+					result.add(build(inputName, n.nodes.get(1).GetName(), childRel)); 
+					result.add(build(n.nodes.get(1).GetName(), inputName, parentRel));
+				}
+
+				if (!n.nodes.get(2).IsEmpty()) {
+					result.add(build(inputName, n.nodes.get(2).GetName(), childRel)); 	
+					result.add(build(n.nodes.get(2).GetName(), inputName, parentRel));
+				}
+			}
+
 		} else {
 			throw new Exception("Cannot generate family relations");
 		}
 		
-		return builder.toString();
+		return result;
 	}
 	
 	public static String build(String start, String stop, String name) {

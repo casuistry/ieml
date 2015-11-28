@@ -26,7 +26,35 @@ public class ParserImpl extends Tokenizer {
 		if (stack.size() > 1)
 			throw new Exception("missing layer mark?");
 		
-		return stack.pop();
+		Token parsed = stack.pop();
+		
+		if (initDone) {
+			parsed.ComputeTaille();
+			Token.SetCanonical(parsed);
+		}
+
+		return parsed;
+	}
+	
+	// method called from Token when creating a 'canonical' representation
+	// it is here to avoid recursive calls.
+	public Token parse_internal(String input) throws Exception {
+
+		for (counter = 0; counter < input.length(); counter++){			
+			Character charIn = new Character(input.charAt(counter));						
+			nextChar(charIn);
+		}
+		
+		//TODO: test case
+		if (currentState != States.state_f) 
+			throw new Exception("bad final state, missing *");
+		
+		//TODO:test case
+		if (stack.size() > 1)
+			throw new Exception("missing layer mark?");
+		
+		Token parsed = stack.pop();
+		return parsed;
 	}
 	
 	protected void reset() {
@@ -73,8 +101,6 @@ public class ParserImpl extends Tokenizer {
 		pop.AppendToName(c);
 		pop.layer = m_marks.get(c);
 			
-		pop.ComputeTaille();
-		
 		if (primitiveLookup.containsKey(pop.GetName())) {
 			pop.layer = m_marks.get(c);
 			pop.opCode = addition;
@@ -82,6 +108,7 @@ public class ParserImpl extends Tokenizer {
 			pop.expandedToken = true;
 		}
 		
+		pop.ComputeTaille();		
 		pushNode(pop);
 	}
 	protected void a_sc_f(Character c) throws Exception{ 
@@ -255,8 +282,11 @@ public class ParserImpl extends Tokenizer {
     		ArrayList<Token> children = newNode.nodes;
     		Token lastChild = children.get(children.size()-1);	
     		
-    		if (!lastChild.EvaluateOrder(n))
+    		if (!Token.IsSmaller(lastChild, n)) 
     			throw new Exception("standard order is not respected");
+    		
+    		//if (!lastChild.EvaluateOrder(n))
+    		//	throw new Exception("standard order is not respected");
     		
         	CheckExclusions(children, n);
         }

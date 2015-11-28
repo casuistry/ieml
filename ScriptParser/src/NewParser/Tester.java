@@ -13,6 +13,7 @@ public class Tester {
 			
 		//ArrayList<String> list = new ArrayList<String>();
 		
+		/*
 		list.addAll(Arrays.asList(
 				"E:+F:",												//has to fail - OK
 				"U:S:.E:.U:S:.-", 										//has to fail - OK
@@ -44,9 +45,10 @@ public class Tester {
 				"we.+we.",												//has to fail - OK
 				"O:B:(S:+A:)B:S:",										//has to fail - OK
 				"E:O:+M:.wo.-",
+				"S:B:+O:S:.",
 				"S:A:+T:."
 				));
-
+*/
 		//list.add(ScriptExamples.StudentLearnsMathematics);
 		//list.add(ScriptExamples.CesJeux);
 		//list.add(ScriptExamples.JeSaurai);

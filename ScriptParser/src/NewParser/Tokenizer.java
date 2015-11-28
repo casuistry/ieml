@@ -10,6 +10,8 @@ import java.util.Set;
 
 public class Tokenizer {
 
+	public static String natural_alphabet = "abcdefghijklmnopqrstuvwxy";
+	
 	public static boolean initDone = false;
 	public static Character multiplication = '*';
 	public static Character addition = '+';	
@@ -29,6 +31,10 @@ public class Tokenizer {
     public static List<Character> c_full      = Arrays.asList(new Character[]{'F'});
     public static List<Character> c_inf      = Arrays.asList(new Character[]{'I'});
     
+    public static List<Character> c_exp      = Arrays.asList(new Character[]{'O','M','F','I'});
+    
+	public static String token_regex = ":|\\.|-|\\'|,|_|;";
+	
 	public enum GrammaticalClass {
 		
 		auxiliary(1),

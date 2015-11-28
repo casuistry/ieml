@@ -1,13 +1,10 @@
 package Utilities;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
 import NewParser.ParserImpl;
-import NewParser.ScriptExamples;
 import NewParser.Token;
 import NewParser.Tokenizer;
-import Utilities.TableGenerator.TableType;
+
 
 public class TableGenerator {
 
@@ -48,7 +45,7 @@ public class TableGenerator {
 		List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
 		//ArrayList<String> db = new ArrayList<String>();
 		//db.add("S:M:.e.-S:B:T:.S:B:T:.S:B:T:.-S:B:T:.S:B:T:.S:B:T:.-' , 2, 3, 4, 5, 6");
-		//db.add("M:.+O:M:.- , 2, 3, 4, 5, 6");
+		//db.add("M:O:.j.- , 2, 3, 4, 5, 6");
 		//db.add("(S:+B:)(S:+T:).f.- , 2, 3, 4, 5, 6");
 		//db.add("S:B:.E:.S:B:.- , 2, 3, 4, 5, 6");
 		//db.add("E:F:.O:M:.- , 2, 3, 4, 5, 6");
@@ -56,7 +53,7 @@ public class TableGenerator {
 		//db.add("t.i.-s.i.-', 2, 3, 4, 5, 6");
 		//db.add("O:. + O:O:O:. + M:O:M:., 2, 3, 4, 5, 6");
 		//db.add("O:O:.-, 2, 3, 4, 5, 6");
-		//db.add("O:M:O:., 2, 3, 4, 5, 6");
+		//db.add("O:., 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:.e.-+O:M:O:.-, 2, 3, 4, 5, 6");
 		//db.add("M:M:M:.o.-O:.-M:O:.M:O:.-', 2, 3, 4, 5, 6");
@@ -133,9 +130,9 @@ public class TableGenerator {
 			
 			ArrayList<String> sub, att, mod;
 			
-			sub = genVariables(root.nodes.get(0));
-			att = genVariables(root.nodes.get(1));
-			mod = genVariables(root.nodes.get(2));
+			sub = Token.genVariables(root.nodes.get(0));
+			att = Token.genVariables(root.nodes.get(1));
+			mod = Token.genVariables(root.nodes.get(2));
 			
 			String prefix = "";
 			String postfix = "";
@@ -152,9 +149,9 @@ public class TableGenerator {
 					rootToken = root.nodes.get(0);
 					prefix = "";
 					postfix = root.nodes.get(1).GetName() + root.nodes.get(2).GetName() + Tokenizer.c_marks.get(root.layer);					
-					sub = genVariables(rootToken.nodes.get(0));
-					att = genVariables(rootToken.nodes.get(1));
-					mod = genVariables(rootToken.nodes.get(2));
+					sub = Token.genVariables(rootToken.nodes.get(0));
+					att = Token.genVariables(rootToken.nodes.get(1));
+					mod = Token.genVariables(rootToken.nodes.get(2));
 					useType = getTableType(sub, att, mod);
 				}
 				
@@ -162,9 +159,9 @@ public class TableGenerator {
 					rootToken = root.nodes.get(1);
 					prefix = root.nodes.get(0).GetName();
 					postfix = root.nodes.get(2).GetName() + Tokenizer.c_marks.get(root.layer);
-					sub = genVariables(rootToken.nodes.get(0));
-					att = genVariables(rootToken.nodes.get(1));
-					mod = genVariables(rootToken.nodes.get(2));
+					sub = Token.genVariables(rootToken.nodes.get(0));
+					att = Token.genVariables(rootToken.nodes.get(1));
+					mod = Token.genVariables(rootToken.nodes.get(2));
 					useType = getTableType(sub, att, mod);
 				}
 				
@@ -172,9 +169,9 @@ public class TableGenerator {
 					rootToken = root.nodes.get(2);
 					prefix = root.nodes.get(0).GetName() + root.nodes.get(1).GetName();
 					postfix = Tokenizer.c_marks.get(root.layer).toString();
-					sub = genVariables(rootToken.nodes.get(0));
-					att = genVariables(rootToken.nodes.get(1));
-					mod = genVariables(rootToken.nodes.get(2));
+					sub = Token.genVariables(rootToken.nodes.get(0));
+					att = Token.genVariables(rootToken.nodes.get(1));
+					mod = Token.genVariables(rootToken.nodes.get(2));
 					useType = getTableType(sub, att, mod);
 				}
 			}
@@ -236,84 +233,6 @@ public class TableGenerator {
 			if (t.layer == 0) {
 				if (!Tokenizer.primitiveLookup.containsKey(t.GetName())) {
 					throw new Exception("not enough semes to generate table");
-				}
-			}
-		}
-		
-		return result;
-	}
-	
-	//STEP 2:
-	// Creates a set by writing out the "+" operands and replacing "I, F, O, M"
-	// by its components
-	private ArrayList<String> genVariables(Token parent) {
-		ArrayList<String> result = new ArrayList<String>();
-		ArrayList<String> temp = recursiveGenVariables(parent);
-		for (String s : temp){
-			
-			// kludge: if this is an empty sequence, MakeParsable will abbreviate it
-			// and it will not be possible to remove trailing empties afterwards by
-			// running MakeParsable again. But we need to run it now in order to find
-			// all the abbreviations, etc. So, if after MakeParsable the first letter 
-			// is 'E', it means it was an empty sequence and we will not use the output
-			//of MakeParsable.
-			String intermediate = Tokenizer.MakeParsable(s);
-			if ('E' == intermediate.charAt(0))
-				result.add(s);
-			else 
-				result.add(intermediate);
-		}
-		return result;
-	}
-	private ArrayList<String> recursiveGenVariables(Token parent) {
-		
-		ArrayList<String> result = new ArrayList<String>();
-		
-		if (parent.opCode == null) { // primitive layer: check if we can expand, if yes, do it, otherwise use parent
-			String pName = parent.GetName();
-			if (Tokenizer.primitiveLookup.containsKey(pName)) {
-				for (Token sub : Tokenizer.primitiveLookup.get(pName).nodes){
-					result.add(sub.GetName());
-				}
-			}
-			else {
-				result.add(pName);
-			}
-		}
-		else {
-			
-			if (parent.opCode.equals(Tokenizer.addition)) { // addition
-				for (Token child : parent.nodes) {					
-					result.addAll(recursiveGenVariables(child));					
-				}
-			}
-			else { // multiplication
-				
-				if (parent.IsEmpty()) {
-					result.add(parent.GenerateSequenceForTable(false));
-				}
-				else {
-					for (Token child : parent.nodes) {	
-						if (result.isEmpty()) {
-							result.addAll(recursiveGenVariables(child));
-						}
-						else {
-							ArrayList<String> temp = new ArrayList<String>();
-							for (String prefix : result) {
-								for (String postfix : recursiveGenVariables(child)) {
-									temp.add(prefix+postfix);
-								}
-							}
-							result = temp;
-						}
-					}
-					
-					ArrayList<String> temp = new ArrayList<String>();
-					for (String prefix : result) {
-						temp.add(prefix+Tokenizer.c_marks.get(parent.layer));
-					}
-					
-					result = temp;
 				}
 			}
 		}
