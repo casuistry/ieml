@@ -12,12 +12,12 @@
             <input type="checkbox" ng-model="showHidden">Show hidden
          </label>
             <div ng-repeat="def in definitions"> 
-              <li> {{def.reltype}}</li>
+              <div layout="row"><li> {{def.reltype}}</li>   <md-switch  style = "margin: 0px 0px 0px 80px;" ng-change="toggleRelVis(def.reltype)" ng-disabled="false" aria-label="Hide" ng-model="lnk.visible" class="md-block">  </div>
               <div  layout="row">
               <div ng-repeat="lnk in def.rellist">
               <div layout="row" ng-show="lnk.visible||showHidden">
                 <a style="border: none;" href="#/dicEdit/IEML/{{lnk.ieml}}" target="_self" ng-show="lnk.visible||showHidden"  ng-class="{disabled:!lnk.exists, buttonflat:lnk.exists, buttonflatdis:!lnk.exists}"   class="btn">{{lnk.ieml}}</a>
-                <md-switch ng-show"!lnk.visible||showHidden" ng-change="toggleRelVis(lnk._id)" ng-disabled="false" aria-label="Hide" ng-model="lnk.visible" class="md-block">
+              
                   
                 </md-switch>
               </div>

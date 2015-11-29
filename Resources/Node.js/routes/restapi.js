@@ -522,22 +522,18 @@ var loadRelationships = function (ieml, result, allieml, db, next) {
 module.exports.toggleRelVisibility = function (req, res) {
 
 	var db = req.db;
-  
-	console.log(req.body);
-	try {
-	var rec=req.body;
-	var id = require('mongoskin').ObjectID.createFromHexString(rec.ID);
+    var record;
+    var idfac = require('mongoskin').ObjectID.createFromHexString;
 
-	console.log("toggling rel visibility for "+id);
-	id = {_id: id};
+console.dir(req.body.itemids);
+    var list = req.body.itemids;
 
-	delete rec.ID; //rec.ID=undefined;
-} catch (e) {
-  
-   console.log(e);
-}
+ async.forEachLimit(list, 1, function(mainrecord, callbackMain) {
+ 
+ 	var id = idfac(mainrecord);
 
-	 var record;
+ 		console.log("toggling rel visibility for "+id);
+		id = {_id: id};
 
 	 async.series([
         
@@ -567,11 +563,13 @@ module.exports.toggleRelVisibility = function (req, res) {
     			callback();
 			});
        }], function (err){
-        	if (err) res.sendStatus(500); 
-        		else res.sendStatus(200); 
+        	
+        		callbackMain(err);
 
         }
         );
+	}, function (err){if (err) res.sendStatus(500); 
+        		else res.sendStatus(200); });
  
 
 };
