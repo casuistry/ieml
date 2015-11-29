@@ -100,6 +100,7 @@ module.exports.newieml = function (req, res) {
 	var db = req.db;
     console.log("before adding ieml");
 	console.log(req.body);
+	delete req.body.token;
 	
 	db.collection('terms').insert(
 		req.body, 
@@ -137,6 +138,7 @@ module.exports.updateieml = function (req, res) {
 	console.log("before editing ieml "+id);
 	id = {_id: id};
 	delete rec.ID; //rec.ID=undefined;
+	delete rec.token;
 } catch (e) {
   
    console.log(e);
