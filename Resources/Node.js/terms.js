@@ -40,8 +40,8 @@ var main = function() {
     // Fetch the first object
 
     
-
-    cursor.forEach(function(record) {
+    async.forEachLimit(cursor, 1, function(record, callbackMain) {
+   // cursor.forEach(function(record) {
     
      	
          //call parse and update record
@@ -131,8 +131,10 @@ var main = function() {
          function(err) {
 	        if (err) {
 	        	console.log("ERROR>>>"+err);
+	        	callbackMain();
 	        	return;
 	        }
+			callbackMain ();
        
    		 });
 
