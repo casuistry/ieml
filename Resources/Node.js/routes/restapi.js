@@ -325,12 +325,14 @@ module.exports.getRels = function (req, res) {
 	  				  function(err, rels) {
 								for (var i=0;i<relNames.length;i++) {
 									var oneRel = {};
+									oneRel.visible = false;
 									var oneRelList = [];
 									oneRel.reltype = relNames[i];
 									for (var k=0;k<rels.length;k++){
 										if (rels[k].type == relNames[i]) {
 										delete rels[k].type;
 										oneRelList.push(rels[k]);
+										oneRel.visible = rels[k].visible;
 										}
 									}
 									oneRel.rellist = oneRelList;
