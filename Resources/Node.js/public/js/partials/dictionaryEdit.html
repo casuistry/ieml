@@ -12,7 +12,7 @@
             <input type="checkbox" ng-model="showHidden">Show hidden
          </label>
             <div ng-repeat="def in definitions"> 
-              <div layout="row"><li> {{def.reltype}}</li>   <md-switch  style = "margin: 0px 0px 0px 80px;" ng-change="toggleRelVis(def.reltype)" ng-disabled="false" aria-label="Hide" ng-model="def.visible" class="md-block">  </div>
+              <div layout="row" layout-align="start center"><li  style = "width:15%;padding-top: 2px;"> {{def.reltype}}</li>   <md-switch  style = "margin: 0px 0px 0px 10px;" ng-change="toggleRelVis(def.reltype)" ng-disabled="false" aria-label="Hide" ng-model="def.visible" class="md-block">  </div>
               <div  layout="row">
               <div ng-repeat="lnk in def.rellist">
               <div layout="row" ng-show="lnk.visible||showHidden">

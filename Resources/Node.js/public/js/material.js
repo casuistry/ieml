@@ -734,6 +734,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             //  the view is opened by bookmark try to get it from the URL
             init_0();
             tableTitle = decodeURIComponent($routeParams.IEML);
+            $scope.tableTitle = tableTitle;
         } else {
             tableTitle = v.IEML;
         }
@@ -811,7 +812,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                 }
             }
 
-            $scope.tableTitle = $scope.fakeReply.input;
+            //$scope.tableTitle = $scope.fakeReply.input;
             $scope.materialTables = $scope.fakeReply.Tables;
         }        
       }); 
