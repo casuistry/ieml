@@ -21,6 +21,7 @@ import NewParser.ParserImpl;
 import NewParser.Token;
 import Utilities.RelationBuilder;
 import Utilities.TableGenerator;
+import Utilities.TableGenerator.JsonTables;
 
 
 
@@ -173,9 +174,8 @@ public class ParserService {
 				Token n = parser.parse(iemltext);
 				jsonObject.put("success", true); 
 				TableGenerator tgen = new TableGenerator();
-				String s = tgen.genJSONTables(n);
-				jsonObject.put("tree", new JSONObject(s));
-				
+				JsonTables json = tgen.genJSONTables(n);			
+				jsonObject.put("tree", new JSONObject(json.getMaterial()));			
 				
 			} catch (Exception e) {
 				
