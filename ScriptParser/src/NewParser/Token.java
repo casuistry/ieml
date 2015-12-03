@@ -198,8 +198,17 @@ public class Token {
 		
 	}
 	
-	public String buildCanonical() {
+	public JSONObject buildCanonical() {
 		
+		JSONObject _this=new JSONObject();		
+		_this.put("canonical", new JSONArray());
+		
+		for (String canon : canonicalOrder){
+			_this.optJSONArray("canonical").put(canon);
+		}
+		return _this;
+		
+		/*
 		StringBuilder builder = new StringBuilder("[");
 
 		String comma = "";
@@ -212,6 +221,8 @@ public class Token {
 		
 		builder.append("]");
 		return builder.toString();
+		*/
+		
 	}	  
 	
 	public Token GetFirstToken() {

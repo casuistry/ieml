@@ -64,8 +64,9 @@ public class ParserService {
 				jsonObject.put("success", true); 
 				jsonObject.put("class", n.GetTokenClass());
 				jsonObject.put("level", n.layer);
-				jsonObject.put("taille", n.taille);
-				jsonObject.put("canonical", n.buildCanonical());
+				jsonObject.put("taille", n.taille);				
+				JSONObject canon = n.buildCanonical();
+				jsonObject.put("canonical", canon.getJSONArray("canonical"));
 				
 			} catch (Exception e) {
 				
@@ -100,7 +101,8 @@ public class ParserService {
 				jsonObject.put("class", n.GetTokenClass());
 				jsonObject.put("level", n.layer);
 				jsonObject.put("taille", n.taille);
-				jsonObject.put("canonical", n.buildCanonical());
+				JSONObject canon = n.buildCanonical();
+				jsonObject.put("canonical", canon.getJSONArray("canonical"));
 				
 			} catch (Exception e) {
 				
@@ -138,7 +140,8 @@ public class ParserService {
 				jsonObject.put("tree", n.buildTree(null));
 				jsonObject.put("level", n.layer);
 				jsonObject.put("taille", n.taille);
-				jsonObject.put("canonical", n.buildCanonical());
+				JSONObject canon = n.buildCanonical();
+				jsonObject.put("canonical", canon.getJSONArray("canonical"));
 				
 			} catch (Exception e) {
 				

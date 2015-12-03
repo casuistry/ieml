@@ -42,8 +42,8 @@ public class TableGenerator {
 		
 	public void generate(){
 		
-		//List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
-		ArrayList<String> db = new ArrayList<String>();
+		List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
+		//ArrayList<String> db = new ArrayList<String>();
 		//db.add("S:M:.e.-S:B:T:.S:B:T:.S:B:T:.-S:B:T:.S:B:T:.S:B:T:.-' , 2, 3, 4, 5, 6");
 		//db.add("M:O:.j.- , 2, 3, 4, 5, 6");
 		//db.add("(S:+B:)(S:+T:).f.- , 2, 3, 4, 5, 6");
