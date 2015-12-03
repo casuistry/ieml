@@ -61,7 +61,7 @@ public class TableGenerator {
 		//db.add("E:O:+M:.wo.-, 2, 3, 4, 5, 6");
 		//db.add("E:F:.d.-, 2, 3, 4, 5, 6");
 		//db.add("B:B:., 2, 3, 4, 5, 6");
-		//db.add("A:+T:, 2, 3, 4, 5, 6");
+		db.add("O:M:.O:M:.-we.h.-', 2, 3, 4, 5, 6");
 		
 		
 		//
@@ -91,8 +91,8 @@ public class TableGenerator {
 				try {		
 					
 					Token n = parser.parse(ieml);	
-					String json = genJSONTables(n);
-					System.out.print(json);
+					JsonTables json = genJSONTables(n);
+					System.out.print(json.getMaterial());
 					
 				} catch (Exception e) {
 					System.out.print(ieml+"\t");
@@ -114,7 +114,7 @@ public class TableGenerator {
 					
 	
 	// STEP 0:
-	public String genJSONTables(Token token) throws Exception {
+	public JsonTables genJSONTables(Token token) throws Exception {
 			
 		JsonTables jsonTables = new JsonTables(token.GetName());
 			
@@ -198,7 +198,7 @@ public class TableGenerator {
 			jsonTables.add(table);
 		}
 		
-		return jsonTables.getMaterial();
+		return jsonTables;
 	}
 	
 	
@@ -451,7 +451,7 @@ public class TableGenerator {
 	}
 	
 	
-	class JsonTables {
+	public class JsonTables {
 		
 		String value;
 		ArrayList<JsonTable> tables = new ArrayList<JsonTable>();
@@ -511,7 +511,7 @@ public class TableGenerator {
 	}
 
 	
-	class JsonTable {
+	public class JsonTable {
 		
 		//https://jsonformatter.curiousconcept.com/
 		
@@ -697,7 +697,7 @@ public class TableGenerator {
 	}
 
 	
-	class JsonSlice {
+	public class JsonSlice {
 		
 		int positionZ;
 		String sTitle = "";
@@ -770,7 +770,7 @@ public class TableGenerator {
 	}
 	
 	
-	class JsonSliceEntry {
+	public class JsonSliceEntry {
 		
 		int positionX, positionY;
 		String value;

@@ -6,6 +6,10 @@ import java.util.List;
 import NewParser.ParserImpl;
 import NewParser.Token;
 import NewParser.Tokenizer;
+import Utilities.TableGenerator.JsonSlice;
+import Utilities.TableGenerator.JsonSliceEntry;
+import Utilities.TableGenerator.JsonTable;
+import Utilities.TableGenerator.JsonTables;
 
 public class RelationBuilder {
 
@@ -56,6 +60,7 @@ public class RelationBuilder {
 		ArrayList<String> result = new ArrayList<String>();
 		
 		result.addAll(BuildFamily(n));
+		result.addAll(BuildTaxonomy(n));
 		
 		StringBuilder builder = new StringBuilder("{\"relations\":[");
 		for (int i = 0; i < result.size(); i++){
@@ -102,6 +107,40 @@ public class RelationBuilder {
 
 		} else {
 			throw new Exception("Cannot generate family relations");
+		}
+		
+		return result;
+	}
+	
+	public static ArrayList<String> BuildTaxonomy(Token n) throws Exception {
+		
+		ArrayList<String> result = new ArrayList<String>();
+	
+		String TableContains = "TableContains";
+		String GeneratedBy = "GeneratedBy";
+		String ContainedBy ="ContainedBy";
+		
+		TableGenerator tGen = new TableGenerator();
+		
+		JsonTables json = tGen.genJSONTables(n);
+
+		for (JsonTable table : json.tables){
+			
+			int z = table.slices.size();
+			
+			for (JsonSlice slice : table.slices) {
+				
+				int rows = table.materialRow;
+				int cols = table.materialCol;
+				
+				for (JsonSliceEntry cell : slice.cells){
+					if (cell.positionX == 0 && cell.positionY == 0)
+						continue;
+
+					//result.add(build(inputName, n.nodes.get(2).GetName(), childRel)); 
+				}
+				
+			}
 		}
 		
 		return result;

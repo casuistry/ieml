@@ -440,7 +440,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         
         // 'ORDER' and 'LANGUAGE' are not filtering but ordering by and 
         // selecting a language to display respectively. 
-        if ((selection === 'ORDER' || selection === 'LANGUAGE') && $scope.filterOrder == alphOrder) {            
+        if ((selection === 'ORDER' || selection === 'LANGUAGE') /*&& $scope.filterOrder == alphOrder*/) {            
             orderList();
         }
     };    
@@ -505,12 +505,49 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         function order(predicate, reverse) {
             $scope.List = orderBy($scope.List, predicate, reverse);
         };
-                  
-        if (sharedProperties.filterLanguageSelected === fFrench)
-            order('-FR',true);
+
+        function iemlOrderFunction(a, b){
+            //http://www.javascriptkit.com/javatutors/arraysort.shtml
+            //http://stackoverflow.com/questions/979256/sorting-an-array-of-javascript-objects
+            //Compare "a" and "b" in some fashion, and return -1, 0, or 1
+            if (parseInt(a.LAYER) < parseInt(b.LAYER))
+                return -1;
+            if (parseInt(a.LAYER) > parseInt(b.LAYER))
+                return 1;
+            if (parseInt(a.taille) < parseInt(b.taille))
+                return -1;
+            if (parseInt(a.taille) > parseInt(b.taille))
+                return 1;
+            
+            if (a.canonical.length == b.canonical.length) {
+                //for (int i = 0; i < smaller.canonicalOrder.size(); i++){				    				
+                //   int comp = smaller.canonicalOrder.get(i).compareTo(bigger.canonicalOrder.get(i));
+                //   if (comp == 0)
+                //       continue;
+                //   return comp;
+                //} 
+                var i=0, len=a.canonical.length;
+                for (; i<len; i++) {  
+                    var comp = a.canonical[i].localeCompare(b.canonical[i]);
+                    if (comp == 0)
+                        continue;
+                    return comp;
+                }                        
+            }
+            
+            return 0;
+        }
+
+        if (sharedProperties.filterOrderSelected === iemlOrder) {
+            $scope.List.sort(iemlOrderFunction);
+        }
+        else {
+            if (sharedProperties.filterLanguageSelected === fFrench)
+                order('-FR',true);
                 
-        if (sharedProperties.filterLanguageSelected === fEnglish)
-            order('-EN',true);
+            if (sharedProperties.filterLanguageSelected === fEnglish)
+                order('-EN',true);
+        }
     };
     
     $scope.List = [];

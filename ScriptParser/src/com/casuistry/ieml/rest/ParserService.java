@@ -21,6 +21,7 @@ import NewParser.ParserImpl;
 import NewParser.Token;
 import Utilities.RelationBuilder;
 import Utilities.TableGenerator;
+import Utilities.TableGenerator.JsonTables;
 
 
 
@@ -63,8 +64,9 @@ public class ParserService {
 				jsonObject.put("success", true); 
 				jsonObject.put("class", n.GetTokenClass());
 				jsonObject.put("level", n.layer);
-				jsonObject.put("taille", n.taille);
-				jsonObject.put("canonical", n.buildCanonical());
+				jsonObject.put("taille", n.taille);				
+				JSONObject canon = n.buildCanonical();
+				jsonObject.put("canonical", canon.getJSONArray("canonical"));
 				
 			} catch (Exception e) {
 				
@@ -99,7 +101,8 @@ public class ParserService {
 				jsonObject.put("class", n.GetTokenClass());
 				jsonObject.put("level", n.layer);
 				jsonObject.put("taille", n.taille);
-				jsonObject.put("canonical", n.buildCanonical());
+				JSONObject canon = n.buildCanonical();
+				jsonObject.put("canonical", canon.getJSONArray("canonical"));
 				
 			} catch (Exception e) {
 				
@@ -137,7 +140,8 @@ public class ParserService {
 				jsonObject.put("tree", n.buildTree(null));
 				jsonObject.put("level", n.layer);
 				jsonObject.put("taille", n.taille);
-				jsonObject.put("canonical", n.buildCanonical());
+				JSONObject canon = n.buildCanonical();
+				jsonObject.put("canonical", canon.getJSONArray("canonical"));
 				
 			} catch (Exception e) {
 				
@@ -173,9 +177,8 @@ public class ParserService {
 				Token n = parser.parse(iemltext);
 				jsonObject.put("success", true); 
 				TableGenerator tgen = new TableGenerator();
-				String s = tgen.genJSONTables(n);
-				jsonObject.put("tree", new JSONObject(s));
-				
+				JsonTables json = tgen.genJSONTables(n);			
+				jsonObject.put("tree", new JSONObject(json.getMaterial()));			
 				
 			} catch (Exception e) {
 				

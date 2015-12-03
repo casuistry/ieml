@@ -18,7 +18,9 @@ public class TestParseTree {
 		JSONObject tree= n.buildTree(null);
 		
 		tree.put("taille", n.taille);
-		tree.put("canonical", n.buildCanonical());
+		
+		JSONObject canon = n.buildCanonical();
+		tree.put("canonical", canon.getJSONArray("canonical"));
 		
 		n.PrintNodes("");
 		
