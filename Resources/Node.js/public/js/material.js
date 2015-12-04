@@ -252,7 +252,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         } 
     };    
 }) 
-.controller('iemlEntryEditorController', function($scope,  $rootScope, $location, crudFactory, sharedProperties) {
+.controller('iemlEntryEditorController', function($scope,  $rootScope, $location, $window, crudFactory, sharedProperties) {
 
     $scope.data = {};
     $scope.data.isParadigm = false;
@@ -290,15 +290,16 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     // form was cancelled by user, we discard all entered information and just return.
     $scope.cancelEdit = function() {
         
-        //do nothing, return to default (previous ?) screen
-        if (sharedProperties.hasLastAction()) {
-            var earl = sharedProperties.returnLastRoute();
-            $location.path(earl);
-        } else {
+       
             var earl = '/loadTerms/';
             $location.path(earl);    
-        } 
-    };    
+        
+    }; 
+
+    $scope.prevHistory = function() {    
+        //do nothing, return to default (previous ?) screen
+        $window.history.back();   
+    };      
     
     // form was submitted by user
     $scope.submitEdit = function() {
@@ -883,7 +884,10 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         //do nothing, return to default (previous ?) screen
         var earl = '/loadTerms/';
         $location.path(earl);     
-    };        
+    };   
+
+      
+          
 })
 .controller('welcomeController', function($scope, $location) {
 
