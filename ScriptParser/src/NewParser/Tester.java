@@ -9,10 +9,10 @@ public class Tester {
 	
 	public static void main(String[] args) {		
 		
-		List<String> list = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
+		//List<String> list = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
 			
-		//ArrayList<String> list = new ArrayList<String>();
-		
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("E:T:.j.-");
 		/*
 		list.addAll(Arrays.asList(
 				"E:+F:",												//has to fail - OK

@@ -112,7 +112,7 @@ public class RelationBuilder {
 		return result;
 	}
 	
-	public static ArrayList<String> BuildTaxonomy(Token n) throws Exception {
+	public static ArrayList<String> BuildTaxonomy(Token n) {
 		
 		ArrayList<String> result = new ArrayList<String>();
 	
@@ -122,27 +122,33 @@ public class RelationBuilder {
 		
 		TableGenerator tGen = new TableGenerator();
 		
-		JsonTables json = tGen.genJSONTables(n);
-
-		for (JsonTable table : json.tables){
+		JsonTables json;
+		try {
+			json = tGen.genJSONTables(n);
 			
-			int z = table.slices.size();
-			
-			for (JsonSlice slice : table.slices) {
+			for (JsonTable table : json.tables){
 				
-				int rows = table.materialRow;
-				int cols = table.materialCol;
+				int z = table.slices.size();
 				
-				for (JsonSliceEntry cell : slice.cells){
-					if (cell.positionX == 0 && cell.positionY == 0)
-						continue;
+				for (JsonSlice slice : table.slices) {
+					
+					int rows = table.materialRow;
+					int cols = table.materialCol;
+					
+					for (JsonSliceEntry cell : slice.cells){
+						if (cell.positionX == 0 && cell.positionY == 0)
+							continue;
 
-					//result.add(build(inputName, n.nodes.get(2).GetName(), childRel)); 
+						//result.add(build(inputName, n.nodes.get(2).GetName(), childRel)); 
+					}
+					
 				}
-				
 			}
+			
+		} catch (Exception e) {
+
 		}
-		
+
 		return result;
 	}
 	
