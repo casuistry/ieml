@@ -163,8 +163,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
           
                 crudFactory.iemlvalid(modelValue).success(function(data, status, headers, config) {
                     if (data.success === true) {
-                        // attach info to scope
-                        // {"level":0,"class":4,"success":true}
                         scope.data.layer = data.level;
                         scope.data.gclass = data.class;
                         scope.data.taille = data.taille;
@@ -200,7 +198,13 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             lastEditedIEML = iemlEntry;
             hasLastAction = true;
         },
-      
+
+        returnLastRoute: function () {
+            hasLastAction = false;
+            iemlEntry = lastEditedIEML;
+            return returnRoute;
+        },
+        
         // used by iemlEntryEditorController
         addToIEMLLIST:function (toBeAdded) {
             allItems.push(toBeAdded);
@@ -225,12 +229,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 
         hasLastAction:function () {
             return hasLastAction;
-        },
-
-        returnLastRoute: function () {
-            hasLastAction = false;
-            iemlEntry = lastEditedIEML;
-            return returnRoute;
         },
         
         getIemlEntry: function () {
@@ -289,11 +287,8 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     
     // form was cancelled by user, we discard all entered information and just return.
     $scope.cancelEdit = function() {
-        
-       
-            var earl = '/loadTerms/';
-            $location.path(earl);    
-        
+        var earl = '/loadTerms/';
+        $location.path(earl);          
     }; 
 
     $scope.prevHistory = function() {    
@@ -312,7 +307,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             PARADIGM:$scope.data.isParadigm ? "1" : "0",
             LAYER:$scope.data.layer.toString(),
             CLASS:$scope.data.gclass.toString(),
-            TAILLE:$scope.data.taille.toString(),
+            TAILLE:$scope.data.taille,
             CANONICAL:$scope.data.canonical,
             ID:(el!=undefined && el._id!=undefined)?el._id:undefined
         }        
@@ -515,18 +510,13 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                 return -1;
             if (parseInt(a.LAYER) > parseInt(b.LAYER))
                 return 1;
-            if (parseInt(a.taille) < parseInt(b.taille))
+            if (a.taille < b.taille)
                 return -1;
-            if (parseInt(a.taille) > parseInt(b.taille))
+            if (a.taille > b.taille)
                 return 1;
             
             if (a.canonical.length == b.canonical.length) {
-                //for (int i = 0; i < smaller.canonicalOrder.size(); i++){				    				
-                //   int comp = smaller.canonicalOrder.get(i).compareTo(bigger.canonicalOrder.get(i));
-                //   if (comp == 0)
-                //       continue;
-                //   return comp;
-                //} 
+
                 var i=0, len=a.canonical.length;
                 for (; i<len; i++) {  
                     var comp = a.canonical[i].localeCompare(b.canonical[i]);
@@ -534,19 +524,35 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                         continue;
                     return comp;
                 }                        
+            } else if (a.canonical.length < b.canonical.length) {
+                var i=0, len=a.canonical.length;
+                for (; i<len; i++) {  
+                    var comp = a.canonical[i].localeCompare(b.canonical[i]);
+                    if (comp == 0)
+                        continue;
+                    return comp;
+                }
+            } else {
+                var i=0, len=b.canonical.length;
+                for (; i<len; i++) {  
+                    var comp = a.canonical[i].localeCompare(b.canonical[i]);
+                    if (comp == 0)
+                        continue;
+                    return comp;
+                }                
             }
-            
+
             return 0;
         }
 
-        if (sharedProperties.filterOrderSelected === iemlOrder) {
+        if ($scope.filterOrder === iemlOrder) {
             $scope.List.sort(iemlOrderFunction);
         }
         else {
-            if (sharedProperties.filterLanguageSelected === fFrench)
+            if ($scope.filterLanguage === fFrench)
                 order('-FR',true);
                 
-            if (sharedProperties.filterLanguageSelected === fEnglish)
+            if ($scope.filterLanguage === fEnglish)
                 order('-EN',true);
         }
     };
