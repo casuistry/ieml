@@ -509,32 +509,32 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                 return -1;
             if (parseInt(a.LAYER) > parseInt(b.LAYER))
                 return 1;
-            if (parseInt(a.taille) < parseInt(b.taille))
+            if (parseInt(a.TAILLE) < parseInt(b.TAILLE))
                 return -1;
-            if (parseInt(a.taille) > parseInt(b.taille))
+            if (parseInt(a.TAILLE) > parseInt(b.TAILLE))
                 return 1;
             
-            if (a.canonical.length == b.canonical.length) {
+            if (a.CANONICAL.length == b.CANONICAL.length) {
 
-                var i=0, len=a.canonical.length;
+                var i=0, len=a.CANONICAL.length;
                 for (; i<len; i++) {  
-                    var comp = a.canonical[i].localeCompare(b.canonical[i]);
+                    var comp = a.CANONICAL[i].localeCompare(b.CANONICAL[i]);
                     if (comp == 0)
                         continue;
                     return comp;
                 }                        
-            } else if (a.canonical.length < b.canonical.length) {
-                var i=0, len=a.canonical.length;
+            } else if (a.CANONICAL.length < b.CANONICAL.length) {
+                var i=0, len=a.CANONICAL.length;
                 for (; i<len; i++) {  
-                    var comp = a.canonical[i].localeCompare(b.canonical[i]);
+                    var comp = a.CANONICAL[i].localeCompare(b.CANONICAL[i]);
                     if (comp == 0)
                         continue;
                     return comp;
                 }
             } else {
-                var i=0, len=b.canonical.length;
+                var i=0, len=b.CANONICAL.length;
                 for (; i<len; i++) {  
-                    var comp = a.canonical[i].localeCompare(b.canonical[i]);
+                    var comp = a.CANONICAL[i].localeCompare(b.CANONICAL[i]);
                     if (comp == 0)
                         continue;
                     return comp;
