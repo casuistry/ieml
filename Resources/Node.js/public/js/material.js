@@ -156,25 +156,19 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                 }
 
                 var deferred = $q.defer();
-  
-                // for invalid ieml, for some reason,
-                // the message is not displayed automatically 
-                // so we temporarily supply our own.
           
                 crudFactory.iemlvalid(modelValue).success(function(data, status, headers, config) {
                     if (data.success === true) {
+                        // save computed characteristics on calling scope for later usage
                         scope.data.layer = data.level;
                         scope.data.gclass = data.class;
                         scope.data.taille = data.taille;
                         scope.data.canonical = data.canonical;
-                        scope.tempString = '';
                         deferred.resolve();
                     } else {
-                        //scope.tempString=data.exception;
                         deferred.reject();
                     }               
                 }).error(function(data, status, headers, config) {
-                    scope.tempString = "Error executing 'iemlvalid' directive. Is validation service running?";
                     deferred.reject();
                 });
 
@@ -262,6 +256,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     init();
     
     function init() {
+        
         var v = sharedProperties.getIemlEntry();
 
         $scope.readOnly = sharedProperties.readOnly;
@@ -273,6 +268,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             $scope.formTitle = 'Adding new entry';
             $scope.doNotValidate = false;
         } else {
+            // provide values so html can be updated
             $scope.formTitle = 'Editing ' + v.IEML;
             $scope.iemlValue = v.IEML;
             $scope.frenchValue = v.FR;
@@ -282,6 +278,8 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             $scope.data.isParadigm = v.PARADIGM == "1" ? true : false;
             $scope.data.layer = v.LAYER;
             $scope.data.gclass = v.CLASS;
+            $scope.data.taille = v.TAILLE;
+            $scope.data.canonical = v.CANONICAL;
         }
     };
     
@@ -298,6 +296,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     
     // form was submitted by user
     $scope.submitEdit = function() {
+        
         var el=sharedProperties.getIemlEntry();
         
         var toBeAdded = {
@@ -307,7 +306,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             PARADIGM:$scope.data.isParadigm ? "1" : "0",
             LAYER:$scope.data.layer.toString(),
             CLASS:$scope.data.gclass.toString(),
-            TAILLE:$scope.data.taille,
+            TAILLE:$scope.data.taille.toString(),
             CANONICAL:$scope.data.canonical,
             ID:(el!=undefined && el._id!=undefined)?el._id:undefined
         }        
@@ -351,7 +350,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                 } else { 
                     $rootScope.showAlert('Modify operation failed', status);
                 }
-                //$location.path('/loadTerms/');                        
+                                        
             });
         }        
     };  
@@ -510,9 +509,9 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                 return -1;
             if (parseInt(a.LAYER) > parseInt(b.LAYER))
                 return 1;
-            if (a.taille < b.taille)
+            if (parseInt(a.taille) < parseInt(b.taille))
                 return -1;
-            if (a.taille > b.taille)
+            if (parseInt(a.taille) > parseInt(b.taille))
                 return 1;
             
             if (a.canonical.length == b.canonical.length) {
