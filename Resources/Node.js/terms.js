@@ -114,21 +114,25 @@ var main = function() {
          		//var id = require('mongoskin').ObjectID.createFromHexString(record._id.id);
 				var id = {_id: id};
 
-         		db.collection('terms').update({_id:record._id}, {$set:record}, function(err, result) {
-				//TODO return actual record for rhe convenience
-			    if (!err) {
-			    	console.log('record updated'); 
-			    	callback();
-					}
-    			else console.log('error updating record ' +record._id);
-	
-				});
-
+         		db.collection('terms').update(
+                    {_id:record._id}, 
+                    { $set: { "TAILLE": parseResult.taille.toString(), "CANONICAL":parseResult.canonical} },
+                    //{$set:record}, 
+                    function(err, result) {
+                      //TODO return actual record for rhe convenience
+			          if (!err) {
+			    	    console.log('record updated'); 
+			    	    callback();
+					  } else {
+                        //console.log('error updating record ' +record._id);
+                        console.log("ERROR>>>"+err);
+                      }
+				    }
+                );
          	}
+         ], 
 
-         	], 
-
-         function(err) {
+        function(err) {
 	        if (err) {
 	        	console.log("ERROR>>>"+err);
 	        	callbackMain();
@@ -136,7 +140,7 @@ var main = function() {
 	        }
 			callbackMain ();
        
-   		 });
+   		});
 
     });
 
