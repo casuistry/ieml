@@ -250,7 +250,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     $scope.data.isParadigm = false;
     $scope.data.layer = 'n/a';
     $scope.data.gclass = 'n/a';
-    
     $scope.doNotValidate = false;
     
     init();
@@ -655,9 +654,10 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         }  
     };
 
+    // 
     $scope.showDicEdit = function( index ) {
-        if (index === -1) {
-            // do nothing: this needs to be refactored
+        if (index < 0) {
+            // do nothing: error condition
         } else {
             var toBeEdited = $scope.List[index];
             sharedProperties.setIemlEntry(toBeEdited);
@@ -669,56 +669,51 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 })
 .controller ('toastControler',function($scope, $mdToast, $mdDialog, $location, sharedProperties){
 
-    $scope.closeToast = function() {
-        $mdToast.hide();
-    };
-
     init();
 
     function init(){
+        // Used to pupulate html
         $scope.tableTile = sharedProperties.tableTile;
     };
 
-    $scope.editTile = function (tableTile) {
-          
+    function common(){
         $mdDialog.hide();
         var toBeEdited = sharedProperties.getIemlEntry();
         var earl = '/dicEdit/IEML/'+encodeURIComponent(toBeEdited);
-        
         sharedProperties.remeberLastAction(earl);
         sharedProperties["readOnly"] = true;
+    };
+    
+    // Called from html. For a given ieml, FR/EN exist: allow only edits of non-ieml field
+    $scope.editTile = function (tableTile) {
+          
+        common();
 
         var lst = sharedProperties.getAllItems();
         for (var i=0;i<lst.length; i++) {
             if (lst[i].IEML == tableTile.value) {
-                sharedProperties.setIemlEntry(lst[i]);
-                var earl = '/edit/' + i;    
-                $location.path(earl);
+                sharedProperties.setIemlEntry(lst[i]);  
+                //route to ieml edit dialog 
+                $location.path('/edit/' + i);
                 return;           
             }
         }
     }
 
+    // Called from html. For a given ieml, FR/EN do NOT exist: allow only edits of non-ieml field 
     $scope.createIEMLfromTile = function (tableTile) {
 
-        $mdDialog.hide();
-
-        var toBeEdited = sharedProperties.getIemlEntry();
-        var earl = '/dicEdit/IEML/'+encodeURIComponent(toBeEdited);
-        sharedProperties.remeberLastAction(earl);     
-        sharedProperties["readOnly"] = true;
+        common();
+        
         sharedProperties.setIemlEntry(null);
-        sharedProperties.tileIEML = tableTile.value;        
-        var earl = '/edit/new';
-        $location.path(earl);
+        sharedProperties.tileIEML = tableTile.value;   
+        //route to ieml edit dialog - new entry        
+        $location.path('/edit/new');
     }
 })
 .controller('iemlDictionaryController', function($scope, $location, $mdToast,  $routeParams, $mdDialog, $document, $filter, crudFactory, sharedProperties) {
-
-
-      
+ 
     var tableTitle =  decodeURIComponent($routeParams.IEML);
-
     var previousTableTile = tableTitle;
       
     init();
@@ -745,16 +740,11 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                 el.rellist.forEach(function (singlrel){
                     singlrel.visible=!singlrel.visible;
                     ids.push(singlrel._id);
-                });  
-                
+                });                  
             }
 
-            debugger;
             return crudFactory.toggleRels(ids);
-
         });
-
-        
     };
 
     //TODO  can be redesigned to always load before any view
@@ -767,8 +757,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     
     function init() {
 
-
-        // TODO: if from bookmark, this will be undefined.
+    // TODO: if from bookmark, this will be undefined.
         $scope.filterLanguage = sharedProperties.filterLanguageSelected;
 
         var v = sharedProperties.getIemlEntry();
@@ -781,34 +770,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         } else {
             tableTitle = v.IEML;
         }
-
-
-
-        //get the list of defintions
-        /*$scope.definitions = [
-        {"reltype":"reltype1", "rellist":
-            [{"ieml":"I:E:M:L","id":"xxxxxxxx","exists":false, "visible":true},
-            {"ieml":"I:E:M:L","id":"xxxxxxxx","visible":true, "exists":true},
-            {"ieml":"I:E:M:L","id":"xxxxxxxx","visible":true,  "exists":true}
-            ]},
-        {"reltype":"reltypeN", "rellist":
-            [{"ieml":"I:E:M:L","id":"xxxxxxxx","visible":true,  "exists":true},
-            {"ieml":"I:E:M:L","id":"xxxxxxxx","visible":false, "exists":true}
-            ]}
-        ];*/
-
-       /* $scope.$on('$routeUpdate', function(scope, next, current) {
-              debugger;
-              alert('change');
-        });
-        
-        $scope.$on('$locationChangeSuccess', function(event) {
-             debugger;
-             if (tableTitle == previousTableTile) {
-                tableTitle =  decodeURIComponent($routeParams.IEML);
-                init();
-            }
-        });*/
 
         crudFactory.rels(tableTitle).success(function(data) {
              $scope.definitions = data;
@@ -861,24 +822,17 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
       }); 
     };
     
+    // user clicked on a cell in the table: trigger an action.
     $scope.showLables = function (tableTile) {
 
+        // remember which cell was clicked, will be used in 'toastControler'
         sharedProperties.tableTile=tableTile;
 
         if (tableTile.editable||tableTile.creatable) {
-          
-            /* $mdToast.show({
-            controller: 'toastControler',
-            templateUrl: '/js/templates/toast1.tmpl.html',
-            parent : $document[0].querySelector('#toastBounds'),
-            hideDelay: 10000,
-            position: 'bottom right'
-            });*/
             $mdDialog.show({
                 controller:'toastControler',
                 templateUrl: '/js/templates/toast1.tmpl.html',
                 parent: angular.element(document.body),
-                //targetEvent: ev,
                 clickOutsideToClose:true
             });
         }
@@ -889,10 +843,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         //do nothing, return to default (previous ?) screen
         var earl = '/loadTerms/';
         $location.path(earl);     
-    };   
-
-      
-          
+    };     
 })
 .controller('welcomeController', function($scope, $location) {
 
