@@ -1,6 +1,10 @@
 
 Resources/Node.js/node_modules
 Resources/Node.js/public/libs/*
+ScriptParser/.settings/*
+ScriptParser/bin/*
+ScriptParser/target/*
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
@@ -49,4 +53,4 @@ Temporary Items
 *.class
 
 # git stuff
-*.gitignore
+# *.gitignore
