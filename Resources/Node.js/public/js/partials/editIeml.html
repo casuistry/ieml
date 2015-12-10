@@ -10,9 +10,7 @@
     <form name="projectForm">
       <md-input-container>
         <label>ieml</label>
-		<!-- can also use the following to trigger validation: ng-change="changeiemlValue()"   md-maxlength="100"-->
-    <!--    <input type="text" required iemlvalid exists md-maxlength="100"  spellcheck="false" name="ieml" ng-model="iemlValue" ng-readonly="doNotValidate"/> -->
-    <input type="text" ng-readonly="{{readOnly}}" required iemlvalid exists md-maxlength="100"  spellcheck="false" name="ieml" ng-model="iemlValue" /> 
+        <input type="text" ng-readonly="{{readOnly}}" required iemlvalid exists md-maxlength="100"  spellcheck="false" name="ieml" ng-model="iemlValue" /> 
         <div ng-messages="projectForm.ieml.$error">
           <div ng-message="required">This is required.</div>
           <div ng-message="exists" class="no-animate">Value already exists in database.</div>
@@ -49,7 +47,7 @@
       </div>	  
     </form>
 	<md-button class="md-raised" ng-click="submitEdit()" ng-disabled="projectForm.$invalid"> Submit </md-button>	
-	<md-button class="md-raised" ng-click="cancelEdit()"> TO LIST </md-button>
-  <md-button class="md-raised" ng-click="prevHistory()"> BACK </md-button>
+	<md-button class="md-raised" ng-click="cancelEdit()"> Cancel </md-button>
+    <!--md-button class="md-raised" ng-click="prevHistory()"> Previous </md-button-->
   </md-content>
 </div>

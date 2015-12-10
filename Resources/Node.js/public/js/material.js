@@ -99,16 +99,11 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                         scope.dirtyInputs[attributes.name]={"isDirty":true, "original_val":modelValue};
                         return $q.when();
                     } else {
-                        if (scope.dirtyInputs[attributes.name].original_val==modelValue) return $q.when();
+                        if (scope.dirtyInputs[attributes.name].original_val==modelValue) 
+                            return $q.when();
+                        // else do validation
                     }                 
                 }
-
-                /*  if (attributes.name=="ieml" && scope.doNotValidate) {
-                // if we edit (instead of creating a new one) an entry, 
-                // no need to validate as ieml will be readonly
-                return $q.when();
-                }
-                */
               
                 if (controller.$isEmpty(modelValue)) {
                     // consider empty model valid
@@ -144,12 +139,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         link: function(scope, element, attributes, controller) {
             controller.$asyncValidators.iemlvalid = function(modelValue) {
           
-                /*if (scope.doNotValidate) {
-                // if we edit (instead of creating a new one) an entry, 
-                // no need to validate as ieml will be readonly
-                return $q.when();
-                }*/
-          
                 if (controller.$isEmpty(modelValue)) {
                     // consider empty model valid
                     return $q.when();
@@ -179,24 +168,36 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 })
 .service('sharedProperties', function ($rootScope) {
     
+    // will determine how to configure controller
+    var EntryEditType = null;
+    // ieml of current interest
     var iemlEntry;
+    // local copy of DB
     var allItems;
-    var lastEditedIEML;
-    var hasLastAction = false;
-    var returnRoute;
+
     
     return {
 
-        remeberLastAction:function (_returnRoute) {
-            returnRoute = _returnRoute;
-            lastEditedIEML = iemlEntry;
-            hasLastAction = true;
+        // 'static' variables for 'sharedProperties'
+        FromListNew : "FromListNew",
+        FromListUpdate : "FromListUpdate",
+        FromTableNew : "FromTableNew",
+        FromTableUpdate : "FromTableUpdate",
+        
+        setEntryEditType:function(editType) {
+            if (editType === this.FromListNew)
+                EntryEditType = this.FromListNew;
+            else if (editType === this.FromListUpdate)
+                EntryEditType = this.FromListUpdate;
+            else if (editType === this.FromTableNew)
+                EntryEditType = this.FromTableNew;
+            else if (editType === this.FromTableUpdate)
+                EntryEditType = this.FromTableUpdate;   
+            else 
+                EntryEditType = null;                  
         },
-
-        returnLastRoute: function () {
-            hasLastAction = false;
-            iemlEntry = lastEditedIEML;
-            return returnRoute;
+        getEntryEditType:function(){
+            return EntryEditType;
         },
         
         // used by iemlEntryEditorController
@@ -216,13 +217,11 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                     allItems[i].FR=toBeAdded.FR;
                     allItems[i].LAYER=toBeAdded.LAYER;
                     allItems[i].PARADIGM=toBeAdded.PARADIGM;
+                    allItems[i].TAILLE=toBeAdded.TAILLE;
+                    allItems[i].CANONICAL=toBeAdded.CANONICAL;
                     break;
                 }
             }
-        },
-
-        hasLastAction:function () {
-            return hasLastAction;
         },
         
         getIemlEntry: function () {
@@ -246,57 +245,71 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 }) 
 .controller('iemlEntryEditorController', function($scope,  $rootScope, $location, $window, crudFactory, sharedProperties) {
 
+    var onCancelGoTo = '/loadTerms/'; // default
+    var onSubmitGoTo = '/loadTerms/'; // default
+    var currIemlEntry = null;
+    
     $scope.data = {};
     $scope.data.isParadigm = false;
     $scope.data.layer = 'n/a';
     $scope.data.gclass = 'n/a';
+    $scope.formTitle = 'Adding new entry';
     $scope.doNotValidate = false;
-    
+                
     init();
     
     function init() {
+                
+        currIemlEntry = sharedProperties.getIemlEntry();
+        sharedProperties.setIemlEntry(null);
         
-        var v = sharedProperties.getIemlEntry();
-
-        $scope.readOnly = sharedProperties.readOnly;
-        sharedProperties.readOnly = false;
-   
-        if (v == null) {
-            //this is coming from table tile 
-            if (sharedProperties.tileIEML) $scope.iemlValue = sharedProperties.tileIEML;
-            $scope.formTitle = 'Adding new entry';
-            $scope.doNotValidate = false;
-        } else {
-            // provide values so html can be updated
-            $scope.formTitle = 'Editing ' + v.IEML;
-            $scope.iemlValue = v.IEML;
-            $scope.frenchValue = v.FR;
-            $scope.englishValue = v.EN;
-            $scope.doNotValidate = true;
-            $scope.dirtyInputs = [];
-            $scope.data.isParadigm = v.PARADIGM == "1" ? true : false;
-            $scope.data.layer = v.LAYER;
-            $scope.data.gclass = v.CLASS;
-            $scope.data.taille = v.TAILLE;
-            $scope.data.canonical = v.CANONICAL;
+        var configOption = sharedProperties.getEntryEditType();
+        if (configOption != null){
+            if (configOption === sharedProperties.FromListNew){
+                // nothing special
+            }
+            else if (configOption === sharedProperties.FromListUpdate) {
+                bindValues(currIemlEntry); // ieml exists, just update it
+            }
+            else if (configOption === sharedProperties.FromTableNew) {                 
+                $scope.iemlValue = sharedProperties.tileIEML; //this is coming from table tile
+                $scope.readOnly  = true;  // do not allow ieml editing
+                sharedProperties.tileIEML = null; // clean-up
+            }
+            else if (configOption === sharedProperties.FromTableUpdate) {
+                bindValues(currIemlEntry); // ieml exists, just update it
+                $scope.readOnly  = true; // do not allow ieml editing
+            }
+            
+            // clean-up
+            sharedProperties.setEntryEditType(null);
+        } 
+        else {
+            debugger;
         }
     };
     
-    // form was cancelled by user, we discard all entered information and just return.
-    $scope.cancelEdit = function() {
-        var earl = '/loadTerms/';
-        $location.path(earl);          
-    }; 
-
-    $scope.prevHistory = function() {    
-        //do nothing, return to default (previous ?) screen
-        $window.history.back();   
-    };      
-    
-    // form was submitted by user
-    $scope.submitEdit = function() {
+    function bindValues(binding) {
+        if (binding == null) debugger;
         
-        var el=sharedProperties.getIemlEntry();
+        $scope.formTitle = 'Editing ' + binding.IEML;
+        $scope.iemlValue = binding.IEML;
+        $scope.frenchValue = binding.FR;
+        $scope.englishValue = binding.EN;
+        $scope.doNotValidate = true; // do not validate in some cases since ieml exists
+        $scope.dirtyInputs = [];
+        $scope.data.isParadigm = binding.PARADIGM == "1" ? true : false;
+        $scope.data.layer = binding.LAYER;
+        $scope.data.gclass = binding.CLASS;
+        $scope.data.taille = binding.TAILLE;
+        $scope.data.canonical = binding.CANONICAL;
+    };
+    
+    $scope.cancelEdit = function() {       
+        $window.history.back();
+    };     
+    
+    $scope.submitEdit = function() {
         
         var toBeAdded = {
             IEML:$scope.iemlValue,
@@ -307,22 +320,15 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             CLASS:$scope.data.gclass.toString(),
             TAILLE:$scope.data.taille.toString(),
             CANONICAL:$scope.data.canonical,
-            ID:(el!=undefined && el._id!=undefined)?el._id:undefined
+            ID:(currIemlEntry!=undefined && currIemlEntry._id!=undefined)?currIemlEntry._id:undefined
         }        
                 
         if (toBeAdded.ID==undefined) {
             
             crudFactory.create(toBeAdded).success(function(data) {
 
-                // insert into all ieml tabe
-                delete data[0].token;
                 sharedProperties.addToIEMLLIST(data[0]);
-
-                if (sharedProperties.hasLastAction()) {
-                    $location.path(sharedProperties.returnLastRoute());
-                } else {
-                    $location.path('/loadTerms/');    
-                } 
+                
             }).error(function(data, status, headers, config) {
                     
                 if (!data.success) {
@@ -334,24 +340,20 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         } else { //do update   
 
             crudFactory.modify(toBeAdded).success(function(data, status, headers, config){ 
-
+            
                 sharedProperties.updateIEMLLIST(toBeAdded);
-
-                if (sharedProperties.hasLastAction()) {
-                    $location.path(sharedProperties.returnLastRoute());
-                } else {
-                    $location.path('/loadTerms/');    
-                } 
+                
             }).error(function(data, status, headers, config) {
                     
                 if (!data.success) {
                     $rootScope.showAlert('Modify operation failed', data.message?data.message:'This operation requires authentication.');
                 } else { 
                     $rootScope.showAlert('Modify operation failed', status);
-                }
-                                        
+                }     
             });
-        }        
+        }    
+
+        $window.history.back();        
     };  
 })
 .controller('loadIEMLController', function($scope,  $rootScope, $location, $mdDialog, $filter, crudFactory, sharedProperties) {
@@ -580,24 +582,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         }, function() {
             //nothing
         });
-    };    
-    
-    // http://www.codelord.net/2015/05/04/angularjs-notifying-about-changes-from-services-to-controllers/
-    // http://toddmotto.com/all-about-angulars-emit-broadcast-on-publish-subscribing/
-
-    $scope.modifyEntry = function (changedItem) {      
-        //TODO find and modify data in the List
-        $scope.List;
-    }
-    
-    $scope.addEntry = function(toBeAdded) {         
-        crudFactory.create(toBeAdded).success(function(data) {
-            $scope.List.push(toBeAdded);
-        }).error(function(data, status, headers, config) {
-            // called asynchronously if an error occurs
-            // or server returns response with an error status.
-        });      
-    };    
+    };       
     
     $scope.deleteEntry = function ( index ) {
         
@@ -638,19 +623,16 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         );
     };    
         
+    // valid index if from List
     $scope.editEntry = function ( index ) {
-
-        sharedProperties.returnLastRoute();
   
         if (index === -1) {
-            sharedProperties.setIemlEntry(null);        
-            var earl = '/edit/new';
-            $location.path(earl);          
+            sharedProperties.setEntryEditType(sharedProperties.FromListNew);            
+            $location.path('/edit/new');          
         } else {
-            var toBeEdited = $scope.List[index];
-            sharedProperties.setIemlEntry(toBeEdited);        
-            var earl = '/edit/' + index;    
-            $location.path(earl);    
+            sharedProperties.setIemlEntry($scope.List[index]);  
+            sharedProperties.setEntryEditType(sharedProperties.FromListUpdate);                
+            $location.path('/edit/' + index);    
         }  
     };
 
@@ -672,28 +654,20 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     init();
 
     function init(){
-        // Used to pupulate html
+        // Used to populate html
         $scope.tableTile = sharedProperties.tableTile;
-    };
-
-    function common(){
-        $mdDialog.hide();
-        var toBeEdited = sharedProperties.getIemlEntry();
-        var earl = '/dicEdit/IEML/'+encodeURIComponent(toBeEdited);
-        sharedProperties.remeberLastAction(earl);
-        sharedProperties["readOnly"] = true;
     };
     
     // Called from html. For a given ieml, FR/EN exist: allow only edits of non-ieml field
     $scope.editTile = function (tableTile) {
           
-        common();
+        $mdDialog.hide();
 
         var lst = sharedProperties.getAllItems();
         for (var i=0;i<lst.length; i++) {
             if (lst[i].IEML == tableTile.value) {
                 sharedProperties.setIemlEntry(lst[i]);  
-                //route to ieml edit dialog 
+                sharedProperties.setEntryEditType(sharedProperties.FromTableUpdate);           
                 $location.path('/edit/' + i);
                 return;           
             }
@@ -702,16 +676,13 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 
     // Called from html. For a given ieml, FR/EN do NOT exist: allow only edits of non-ieml field 
     $scope.createIEMLfromTile = function (tableTile) {
-
-        common();
-        
-        sharedProperties.setIemlEntry(null);
+        $mdDialog.hide();
         sharedProperties.tileIEML = tableTile.value;   
-        //route to ieml edit dialog - new entry        
-        $location.path('/edit/new');
+        sharedProperties.setEntryEditType(sharedProperties.FromTableNew);            
+        $location.path('/edit/new');   
     }
 })
-.controller('iemlDictionaryController', function($scope, $location, $mdToast,  $routeParams, $mdDialog, $document, $filter, crudFactory, sharedProperties) {
+.controller('iemlDictionaryController', function($scope, $window, $location, $mdToast,  $routeParams, $mdDialog, $document, $filter, crudFactory, sharedProperties) {
  
     var tableTitle =  decodeURIComponent($routeParams.IEML);
     var previousTableTile = tableTitle;
@@ -757,10 +728,12 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     
     function init() {
 
-    // TODO: if from bookmark, this will be undefined.
+        // TODO: if from bookmark, this will be undefined.
         $scope.filterLanguage = sharedProperties.filterLanguageSelected;
 
         var v = sharedProperties.getIemlEntry();
+        sharedProperties.setIemlEntry(null);
+        
         //if (v == null) {
         if (1==1) {
             //  the view is opened by bookmark try to get it from the URL
@@ -775,7 +748,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
              $scope.definitions = data;
         });
 
-        // crudFactory.iemltable(sharedProperties.getIemlEntry().IEML).success(function(data) {
         crudFactory.iemltable(tableTitle).success(function(data) {
         $scope.fakeReply = data.tree;
         $scope.showTables = true;
@@ -838,11 +810,8 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         }
     }; 
             
-    // form was cancelled by user, we discard all entered information and just return.
     $scope.cancelEdit = function() {    
-        //do nothing, return to default (previous ?) screen
-        var earl = '/loadTerms/';
-        $location.path(earl);     
+        $window.history.back();    
     };     
 })
 .controller('welcomeController', function($scope, $location) {
@@ -869,11 +838,9 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 })
 .controller('mainMenuController', function($scope, $location, $mdDialog, sharedProperties) {
   
-    $scope.editEntry = function ( index ) {
-        sharedProperties.returnLastRoute();      
-        sharedProperties.setIemlEntry(null);        
-        var earl = '/edit/new';
-        $location.path(earl);               
+    $scope.editEntry = function ( index ) {       
+        sharedProperties.setEntryEditType(sharedProperties.FromListNew);            
+        $location.path('/edit/new');         
     };    
 
     $scope.isShowAddNew = function () {
