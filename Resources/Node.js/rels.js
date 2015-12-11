@@ -143,7 +143,7 @@ currentIndx++;
 					new_rec.visible = true;
 					new_rec.exists = true;
 					new_rec.type = parseResult.relations[i].name;
-					if (allieml.indexOf(new_rec.start)==-1 || allieml.indexOf(new_rec.ieml)==-1 ) {
+					if (cursor.indexOf(new_rec.start)==-1 || cursor.indexOf(new_rec.ieml)==-1 ) {
 						new_rec.exists = false;
 					}
 					new_records.push(new_rec);
