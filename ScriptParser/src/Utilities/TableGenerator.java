@@ -772,8 +772,8 @@ public class TableGenerator {
 	
 	public class JsonSliceEntry {
 		
-		int positionX, positionY;
-		String value;
+		public int positionX, positionY;
+		public String value;
 		
 		JsonSliceEntry(int x, int y, String v) {
 			positionX = x;

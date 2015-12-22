@@ -12,7 +12,7 @@ public class Tester {
 		//List<String> list = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
 			
 		ArrayList<String> list = new ArrayList<String>();
-		list.add("E:T:.j.-");
+		list.add("(S:S:+B:T:)(T:).");
 		/*
 		list.addAll(Arrays.asList(
 				"E:+F:",												//has to fail - OK

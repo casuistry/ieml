@@ -1,6 +1,7 @@
 package Utilities;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import NewParser.ParserImpl;
@@ -17,6 +18,7 @@ public class RelationBuilder {
 		
 		System.out.println(System.getProperty("java.runtime.version"));
 			
+		/*
 		List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
 
 		for (String s : db) {
@@ -36,7 +38,34 @@ public class RelationBuilder {
 				e.printStackTrace();
 			}
 		}
+		*/
+		
+		//String input = "O:M:.-O:M:.-we.h.-'";
+		//String input = "O:M:.M:M:.- + S:.O:M:.M:M:.- + M:M:.O:M:.- ";
+		
+		//String input = "S:O:."; // no jumeau
+		//String input = "O:O:M:."; // jumeau
+		//String input = "E:O:."; // jumeau
+		
+		//String input = "O:O:M:.";
+		//String input = "O:M:O:.";
+		//String input = "M:O:O:.";
+		String input = "M:M:M:.";
+		
+		try {
+			String output = RelationBuilder.GetRelations(input);
+			System.out.println(output);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+	
+	public static String GrandChildOf = "GrandChildOf";
+	public static String parentRel = "ParentOf";
+	public static String childRel = "ChildOf";
+	public static String GermainJumeau ="GermainJumeau";
+	public static String GermainOpposes ="GermainOpposes";
 	
 	public static String GetRelations(String input) throws Exception {
 		
@@ -60,6 +89,7 @@ public class RelationBuilder {
 		ArrayList<String> result = new ArrayList<String>();
 		
 		result.addAll(BuildFamily(n));
+		result.addAll(BuildGermains(n));
 		result.addAll(BuildTaxonomy(n));
 		
 		StringBuilder builder = new StringBuilder("{\"relations\":[");
@@ -75,9 +105,6 @@ public class RelationBuilder {
 	public static ArrayList<String> BuildFamily(Token n) throws Exception {
 		
 		ArrayList<String> result = new ArrayList<String>();
-		
-		String parentRel = "ParentOf";
-		String childRel = "ChildOf";
 				
 		String inputName = n.GetName();
 		
@@ -92,16 +119,19 @@ public class RelationBuilder {
 				if (!n.nodes.get(0).IsEmpty()) {
 					result.add(build(inputName, n.nodes.get(0).GetName(), childRel)); 
 					result.add(build(n.nodes.get(0).GetName(), inputName, parentRel));
+					result.addAll(BuildGrandpa(n.nodes.get(0)));
 				}
 
 				if (!n.nodes.get(1).IsEmpty()) {
 					result.add(build(inputName, n.nodes.get(1).GetName(), childRel)); 
 					result.add(build(n.nodes.get(1).GetName(), inputName, parentRel));
+					result.addAll(BuildGrandpa(n.nodes.get(1)));
 				}
 
 				if (!n.nodes.get(2).IsEmpty()) {
 					result.add(build(inputName, n.nodes.get(2).GetName(), childRel)); 	
 					result.add(build(n.nodes.get(2).GetName(), inputName, parentRel));
+					result.addAll(BuildGrandpa(n.nodes.get(2)));
 				}
 			}
 
@@ -111,6 +141,213 @@ public class RelationBuilder {
 		
 		return result;
 	}
+		
+	public static ArrayList<String> BuildGrandpa(Token n) throws Exception {
+		
+		ArrayList<String> result = new ArrayList<String>();
+				
+		String inputName = n.parent.GetName();
+		
+		if (n.layer == 0) {
+			// no relations
+		} else if (n.opCode.equals(Tokenizer.addition)) {
+			// no relations
+		} else if (n.opCode.equals(Tokenizer.multiplication)) {
+			
+			if (!n.IsEmpty()) {  //GrandChildOf
+				
+				if (!n.nodes.get(0).IsEmpty()) {
+					
+					if (n.nodes.get(1).IsEmpty() && n.nodes.get(2).IsEmpty()) {
+						
+					}
+					
+					result.add(build(inputName, n.nodes.get(0).GetName(), GrandChildOf)); 
+				}
+			}
+
+		} else {
+			throw new Exception("Cannot generate GrandChildOf relations");
+		}
+		
+		return result;
+	}	
+	
+	public static ArrayList<String> BuildGermains(Token n) {
+		
+		ArrayList<String> result = new ArrayList<String>();
+		String inputName = n.GetName();
+		
+		try {
+			
+			TableGenerator tGen = new TableGenerator();
+			JsonTables json = tGen.genJSONTables(n);
+						
+			if (json.tables.size() == 1) {				
+				// In case JUMEAU:
+				// there must be a table
+				// table must be 2D or 3D
+				// otherwise there will be no diagonal	
+				int rows = json.tables.get(0).materialRow;
+				int cols = json.tables.get(0).materialCol;
+				if (rows > 1 && cols > 1) {
+					// get diagonal only if at least two semes are same
+					// return value has a list of which semes (their position) are same
+					List<List<Integer>> res = jumeauSemes(n);
+					int resSize = res.size();
+					for (List<Integer> i : res) {
+						
+						int posA = i.get(0);
+						int posB = i.get(1);
+						
+						// check number of slices, this will determine where to get the "diagonal"
+						int slices = json.tables.get(0).slices.size();
+						
+						if (slices == 1) {
+							for (JsonSliceEntry entry : json.tables.get(0).slices.get(0).getCells()) {
+								if (entry.positionX == entry.positionY && entry.positionX > 0) {
+									result.add(build(inputName, entry.value, GermainJumeau));
+								}								 
+							}
+						}
+						else {
+							// with many slices "diagonal" might be a row, depending which semes are same
+							if (resSize == 1) {
+								if (posA == 0 && posB == 1){ //O:O:M:.
+									for (JsonSlice allSlices : json.tables.get(0).slices) {
+										for (JsonSliceEntry entry : allSlices.getCells()) {
+											if (entry.positionX == entry.positionY && entry.positionX > 0) {
+												result.add(build(inputName, entry.value, GermainJumeau));
+											}								 
+										}
+									}
+								} 
+								else if (posA == 0 && posB == 2) { //O:M:O:.
+									for (int sliceCount = 0; sliceCount < json.tables.get(0).slices.size(); sliceCount++) {
+										for (JsonSliceEntry entry : json.tables.get(0).slices.get(sliceCount).getCells()) {
+											if (entry.positionX == sliceCount + 1 ) {
+												result.add(build(inputName, entry.value, GermainJumeau));
+											}								 
+										}
+									}
+								} else if (posA == 1 && posB == 2) { //M:O:O:.
+									for (int sliceCount = 0; sliceCount < json.tables.get(0).slices.size(); sliceCount++) {
+										for (JsonSliceEntry entry : json.tables.get(0).slices.get(sliceCount).getCells()) {
+											if (entry.positionY == sliceCount + 1 ) {
+												result.add(build(inputName, entry.value, GermainJumeau));
+											}								 
+										}
+									}
+								}
+								else {
+									throw new Exception("error");
+								}
+							}
+							else { //"M:M:M:.";
+								for (int sliceCount = 0; sliceCount < json.tables.get(0).slices.size(); sliceCount++) {
+									for (JsonSliceEntry entry : json.tables.get(0).slices.get(sliceCount).getCells()) {
+										if (entry.positionX == sliceCount + 1 && entry.positionY == sliceCount + 1) {
+											result.add(build(inputName, entry.value, GermainJumeau));
+										}								 
+									}
+								}
+							}
+						}
+						
+						break; // just one will do, since all is already specified in the json table
+					}						
+				}
+			}				
+			
+			if (json.tables.size() > 1) {
+				/*
+				for (int i = 0; i < n.nodes.size(); i++) {
+					for (int j = i+1; j < n.nodes.size(); j++) {
+
+						System.out.println(n.nodes.get(i).GetName() + " " + n.nodes.get(j).GetName());
+						
+						for (List<Integer> ii : swapSemes(n.nodes.get(i), n.nodes.get(j))) {
+							for (Integer jj : ii){
+								System.out.print(jj.toString() + " ");
+							}
+						}
+						
+						System.out.println();
+					}
+				}
+				*/
+			}
+							
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+		return result;
+	}
+	
+	public static ArrayList<String> germainOpposes(JsonTables json) {
+		
+		ArrayList<String> result = new ArrayList<String>();
+				
+		return result;
+	}
+	
+	public static ArrayList<String> germainJumeau(JsonTables json) {
+		
+		ArrayList<String> result = new ArrayList<String>();
+				
+		return result;
+	}
+	
+	// Return list of sequence of int. Calculates where semes are the same
+	public static ArrayList<List<Integer>> jumeauSemes(Token a) {
+		
+		ArrayList<List<Integer>> result = new ArrayList<List<Integer>>();
+		
+		for (int i = 0; i < 3; i++) {
+			for (int j = i+1; j < 3; j++) {
+				if (a.nodes.get(i).GetName().equals(a.nodes.get(j).GetName())) {
+					result.add(Arrays.asList(i, j));
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	// Return list of sequence of int. Sequence of ints represents position where semes are same, position of seme in first term
+	// that is same to the position of seme in second term
+	public static ArrayList<List<Integer>> swapSemes(Token a, Token b) {
+		
+		ArrayList<List<Integer>> result = new ArrayList<List<Integer>>();
+		
+		if (a.opCode.equals(Tokenizer.addition)) 
+			return result;
+		if (b.opCode.equals(Tokenizer.addition)) 
+			return result;
+		if (a.layer < 1) 
+			return result;
+		if (b.layer < 1) 
+			return result;
+		
+		for (int i = 0; i < 3; i++) {
+			if (a.nodes.get(i).GetName().equals(b.nodes.get(i).GetName())) {
+				
+				int swapA = (i+1) % 3; //1,2,0,1,...
+				int swapB = (i+2) % 3; //2,0,1,2,... 
+				
+				if (a.nodes.get(swapA).GetName().equals(b.nodes.get(swapB).GetName())) {
+					result.add(Arrays.asList(i, swapA, swapB));
+				}
+				if (a.nodes.get(swapB).GetName().equals(b.nodes.get(swapA).GetName())) {
+					result.add(Arrays.asList(i, swapB, swapA));
+				}
+			}
+		}
+		
+		return result;
+	}
+	
 	
 	public static ArrayList<String> BuildTaxonomy(Token n) {
 		
