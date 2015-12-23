@@ -50,7 +50,8 @@ public class RelationBuilder {
 		//String input = "O:O:M:.";
 		//String input = "O:M:O:.";
 		//String input = "M:O:O:.";
-		String input = "M:M:M:.";
+		//String input = "M:M:M:.";
+		String input = "T:O:M:. + M:O:T:.";
 		
 		try {
 			String output = RelationBuilder.GetRelations(input);
@@ -259,43 +260,29 @@ public class RelationBuilder {
 				}
 			}				
 			
-			if (json.tables.size() > 1) {
-				/*
+			if (json.tables.size() > 1) { //"T:O:M:. + M:O:T:.";
+				// In case OPPOSES:
+				
 				for (int i = 0; i < n.nodes.size(); i++) {
 					for (int j = i+1; j < n.nodes.size(); j++) {
-
-						System.out.println(n.nodes.get(i).GetName() + " " + n.nodes.get(j).GetName());
 						
-						for (List<Integer> ii : swapSemes(n.nodes.get(i), n.nodes.get(j))) {
-							for (Integer jj : ii){
-								System.out.print(jj.toString() + " ");
-							}
+						ArrayList<List<Integer>> swaps = swapSemes(n.nodes.get(i), n.nodes.get(j));
+						
+						for (List<Integer> positions : swaps) {
+							
+							result.add(build(inputName, n.nodes.get(i).GetName(), GermainOpposes));
+							result.add(build(inputName, n.nodes.get(j).GetName(), GermainOpposes));						
+							
+							break;  // skip case of two semes being same/swapped
 						}
-						
-						System.out.println();
 					}
 				}
-				*/
 			}
 							
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 
-		return result;
-	}
-	
-	public static ArrayList<String> germainOpposes(JsonTables json) {
-		
-		ArrayList<String> result = new ArrayList<String>();
-				
-		return result;
-	}
-	
-	public static ArrayList<String> germainJumeau(JsonTables json) {
-		
-		ArrayList<String> result = new ArrayList<String>();
-				
 		return result;
 	}
 	
