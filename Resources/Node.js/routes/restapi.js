@@ -323,6 +323,7 @@ module.exports.getRels = function (req, res) {
 
 				db.collection('relationships').find({"start":req.body.ieml}).toArray(
 	  				  function(err, rels) {
+
 								for (var i=0;i<relNames.length;i++) {
 									var oneRel = {};
 									oneRel.visible = false;
@@ -335,8 +336,8 @@ module.exports.getRels = function (req, res) {
 										oneRel.visible = rels[k].visible;
 										}
 									}
-									oneRel.rellist = oneRelList;
-									resultRel.push(oneRel);
+									oneRel.rellist = oneRelList;                          
+									resultRel.push(oneRel);   
 								}
 
 							console.log(JSON.stringify(resultRel));
@@ -494,9 +495,28 @@ var loadRelationships = function (ieml, result, allieml, db, next) {
 		if (allieml.indexOf(new_rec.start)==-1 || allieml.indexOf(new_rec.ieml)==-1 ) {
 			new_rec.exists = false;
 		}
+                          
 		new_records.push(new_rec);
 	}
 
+    
+    db.collection('relationships').update({ieml:ieml}, {$set:{exists:true}}, function(err, result) {
+    	if (!err) {
+            console.log('Updated new '+result+' relationships');
+        }
+        
+        db.collection('relationships').update({start:ieml}, {$set:{exists:true}}, function(err, result) {
+    	    if (!err) {
+                console.log('Updated new '+result+' relationships');
+            }
+                
+            db.collection('relationships').insert(new_records, function(err, result) { next(err, new_records); } );
+		});
+	});
+    
+    
+    
+/*    
 		db.collection('relationships').insert(new_records, function(err, result) {
     	
 		     
@@ -517,7 +537,7 @@ var loadRelationships = function (ieml, result, allieml, db, next) {
 		    ], function (err) {  next(err, new_records); }
 		  ); //end async.parallel
 		});
-	
+*/	
 };
 
 
