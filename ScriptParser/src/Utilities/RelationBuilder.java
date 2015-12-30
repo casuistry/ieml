@@ -51,7 +51,9 @@ public class RelationBuilder {
 		//String input = "O:M:O:.";
 		//String input = "M:O:O:.";
 		//String input = "M:M:M:.";
-		String input = "T:O:M:. + M:O:T:.";
+		//String input = "T:O:M:. + M:O:T:.";
+		//String input = "O:M:.M:M:.- + M:M:.O:M:.-";
+		String input = "M:M:.a.-M:M:.a.-E:.-+f.o.-'";
 		
 		try {
 			String output = RelationBuilder.GetRelations(input);
@@ -67,7 +69,9 @@ public class RelationBuilder {
 	public static String childRel = "ChildOf";
 	public static String GermainJumeau ="GermainJumeau";
 	public static String GermainOpposes ="GermainOpposes";
+	public static String GermainAssocies ="GermainAssocies";
 	
+	// main entry point
 	public static String GetRelations(String input) throws Exception {
 		
 		ParserImpl parser = new ParserImpl();
@@ -85,12 +89,14 @@ public class RelationBuilder {
 		}
 	}
 	
+	// calls all the methods responsible for building relationa,
+	// and creates a valid json document with all relations
 	public static String BuildRelations(Token n) throws Exception{
 				
 		ArrayList<String> result = new ArrayList<String>();
 		
-		result.addAll(BuildFamily(n));
-		result.addAll(BuildGermains(n));
+		result.addAll(BuildFamily(n));    // ethymologiques
+		result.addAll(BuildGermains(n));  // etymologiques - contd
 		result.addAll(BuildTaxonomy(n));
 		
 		StringBuilder builder = new StringBuilder("{\"relations\":[");
@@ -103,7 +109,8 @@ public class RelationBuilder {
 		return builder.toString();
 	}
 	
-	public static ArrayList<String> BuildFamily(Token n) throws Exception {
+	// relations etymologiques
+	private static ArrayList<String> BuildFamily(Token n) throws Exception {
 		
 		ArrayList<String> result = new ArrayList<String>();
 				
@@ -143,7 +150,8 @@ public class RelationBuilder {
 		return result;
 	}
 		
-	public static ArrayList<String> BuildGrandpa(Token n) throws Exception {
+	// relations etymologiques: special case for family relations
+	private static ArrayList<String> BuildGrandpa(Token n) throws Exception {
 		
 		ArrayList<String> result = new ArrayList<String>();
 				
@@ -174,16 +182,19 @@ public class RelationBuilder {
 		return result;
 	}	
 	
-	public static ArrayList<String> BuildGermains(Token n) {
+	// relations etymologiques - contd
+	private static ArrayList<String> BuildGermains(Token n) {
 		
 		ArrayList<String> result = new ArrayList<String>();
 		String inputName = n.GetName();
-		
+
 		try {
 			
 			TableGenerator tGen = new TableGenerator();
 			JsonTables json = tGen.genJSONTables(n);
 						
+			result.addAll(BuildGermainsAssocies(json));
+			
 			if (json.tables.size() == 1) {				
 				// In case JUMEAU:
 				// there must be a table
@@ -286,15 +297,31 @@ public class RelationBuilder {
 		return result;
 	}
 	
-	// Return list of sequence of int. Calculates where semes are the same
-	public static ArrayList<List<Integer>> jumeauSemes(Token a) {
+	private static ArrayList<String> BuildGermainsAssocies(JsonTables json) {
 		
-		ArrayList<List<Integer>> result = new ArrayList<List<Integer>>();
-		
-		for (int i = 0; i < 3; i++) {
-			for (int j = i+1; j < 3; j++) {
-				if (a.nodes.get(i).GetName().equals(a.nodes.get(j).GetName())) {
-					result.add(Arrays.asList(i, j));
+		ArrayList<String> result = new ArrayList<String>();
+				
+		for (JsonTable table : json.tables) {
+			
+			int depth = table.slices.size();
+			
+			if (depth > 1) { //three variable semes
+				
+				for (int k = 0; k < table.slices.get(0).getCells().size(); k++){ // all cells
+					
+					// between slices
+					for (int i = 0; i < depth; i++) {
+						for (int j = i + 1; j < depth; j++){
+							
+							String A = table.slices.get(i).getCells().get(k).value;
+							String B = table.slices.get(j).getCells().get(k).value;
+
+							if (A != null && !A.isEmpty() && B != null && !B.isEmpty()) {
+								result.add(build(A, B, GermainAssocies));
+								result.add(build(B, A, GermainAssocies));
+							}
+						}
+					}
 				}
 			}
 		}
@@ -302,41 +329,8 @@ public class RelationBuilder {
 		return result;
 	}
 	
-	// Return list of sequence of int. Sequence of ints represents position where semes are same, position of seme in first term
-	// that is same to the position of seme in second term
-	public static ArrayList<List<Integer>> swapSemes(Token a, Token b) {
-		
-		ArrayList<List<Integer>> result = new ArrayList<List<Integer>>();
-		
-		if (a.opCode.equals(Tokenizer.addition)) 
-			return result;
-		if (b.opCode.equals(Tokenizer.addition)) 
-			return result;
-		if (a.layer < 1) 
-			return result;
-		if (b.layer < 1) 
-			return result;
-		
-		for (int i = 0; i < 3; i++) {
-			if (a.nodes.get(i).GetName().equals(b.nodes.get(i).GetName())) {
-				
-				int swapA = (i+1) % 3; //1,2,0,1,...
-				int swapB = (i+2) % 3; //2,0,1,2,... 
-				
-				if (a.nodes.get(swapA).GetName().equals(b.nodes.get(swapB).GetName())) {
-					result.add(Arrays.asList(i, swapA, swapB));
-				}
-				if (a.nodes.get(swapB).GetName().equals(b.nodes.get(swapA).GetName())) {
-					result.add(Arrays.asList(i, swapB, swapA));
-				}
-			}
-		}
-		
-		return result;
-	}
-	
-	
-	public static ArrayList<String> BuildTaxonomy(Token n) {
+	// relations taxonomiques - not done yet
+	private static ArrayList<String> BuildTaxonomy(Token n) {
 		
 		ArrayList<String> result = new ArrayList<String>();
 	
@@ -376,7 +370,57 @@ public class RelationBuilder {
 		return result;
 	}
 	
-	public static String build(String start, String stop, String name) {
+	// Return list of sequence of int. Calculates where semes are the same
+	private static ArrayList<List<Integer>> jumeauSemes(Token a) {
+		
+		ArrayList<List<Integer>> result = new ArrayList<List<Integer>>();
+		
+		for (int i = 0; i < 3; i++) {
+			for (int j = i+1; j < 3; j++) {
+				if (a.nodes.get(i).GetName().equals(a.nodes.get(j).GetName())) {
+					result.add(Arrays.asList(i, j));
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	// Return list of sequence of int. Sequence of ints represents position where semes are same, position of seme in first term
+	// that is same to the position of seme in second term
+	private static ArrayList<List<Integer>> swapSemes(Token a, Token b) {
+		
+		ArrayList<List<Integer>> result = new ArrayList<List<Integer>>();
+		
+		if (a.opCode.equals(Tokenizer.addition)) 
+			return result;
+		if (b.opCode.equals(Tokenizer.addition)) 
+			return result;
+		if (a.layer < 1) 
+			return result;
+		if (b.layer < 1) 
+			return result;
+		
+		for (int i = 0; i < 3; i++) {
+			if (a.nodes.get(i).GetName().equals(b.nodes.get(i).GetName())) {
+				
+				int swapA = (i+1) % 3; //1,2,0,1,...
+				int swapB = (i+2) % 3; //2,0,1,2,... 
+				
+				if (a.nodes.get(swapA).GetName().equals(b.nodes.get(swapB).GetName())) {
+					result.add(Arrays.asList(i, swapA, swapB));
+				}
+				if (a.nodes.get(swapB).GetName().equals(b.nodes.get(swapA).GetName())) {
+					result.add(Arrays.asList(i, swapB, swapA));
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	// helper to create valid json
+	private static String build(String start, String stop, String name) {
 		String format = "{\"start\":\"%s\", \"stop\":\"%s\", \"name\":\"%s\"}";
 		return String.format(format, start, stop, name);
 	}

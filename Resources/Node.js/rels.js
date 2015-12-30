@@ -34,10 +34,12 @@ var main = function () {
 		
 		console.log("loading terms "+result.length);
 		for (var i=0;i<result.length;i++) {
-			cursor[i] = result[i].IEML;
+            
+            if (result[i].PARADIGM == "1") 
+                cursor[i] = result[i].IEML;
 		}
-		//console.dir(allieml);
-		//return;
+        console.log("found paradigms "+cursor.length);
+
 		onIEMLLoaded();
 	});
 };
