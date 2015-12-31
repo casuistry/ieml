@@ -26,17 +26,23 @@ var main = function () {
 	console.log("starting load...");
 
 	//load terms into local array
-	 db.collection('terms').find({}, {IEML:1}).toArray(function(err, result) {
+	 db.collection('terms').find(/*{}, {IEML:1}*/).toArray(function(err, result) {
 		if (err) {
 			console.log("ERROR"+err);
 			throw err;
 		}
 		
 		console.log("loading terms "+result.length);
+        var j = 0;
 		for (var i=0;i<result.length;i++) {
             
-            if (result[i].PARADIGM == "1") 
-                cursor[i] = result[i].IEML;
+            
+            if (result[i].PARADIGM == "1") {
+                //console.log(JSON.stringify(result[i]));
+                console.log(result[i].IEML);
+                cursor[j++] = result[i].IEML;
+            }
+                
 		}
         console.log("found paradigms "+cursor.length);
 
