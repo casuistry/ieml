@@ -265,12 +265,14 @@ module.exports.remieml = function (req, res) {
    
     async.series([
         function(callback) {
+            console.log("----deleteRelsForIEML");
             // remove relations associated with this ieml
-            deleteRelsForIEML(req.params.id, db);
-            callback();
+            deleteRelsForIEML(req.params.id, db, callback);
+            //callback();
         },
         function(callback) {
             //remove annotations assotiated with this IEML 
+            console.log("----annotations");
             db.collection('annotations').remove(
                 {ieml:req.params.id}, 
                 function(err, result) {
@@ -278,7 +280,7 @@ module.exports.remieml = function (req, res) {
                         console.log("ERROR"+err);
                     }
                     if (result) {
-                        console.log(result);
+                        console.log("Removed annotations for: " + req.params.id);
                     }
                     
                     callback();
@@ -287,6 +289,7 @@ module.exports.remieml = function (req, res) {
         },
         function(callback) {
             // remove ieml from terms DB
+            console.log("----terms");
             db.collection('terms').remove(
                 {IEML:req.params.id}, 
                 function(err, result) {
@@ -455,7 +458,7 @@ module.exports.templates = function (req, res) {
 
 // deletes relations created by java for specified ieml 
 // input ieml should still exist in terms DB
-var deleteRelsForIEML = function (ieml, db) {
+var deleteRelsForIEML = function (ieml, db, onDone) {
   
     var is_paradigm = false;
     
@@ -463,6 +466,7 @@ var deleteRelsForIEML = function (ieml, db) {
     
         // check if ieml to be deleted is a paradigm
         function(callback) {
+            console.log("----PARADIGM");
             db.collection('terms').findOne({IEML:ieml}, {PARADIGM:1}, function(err, result) {
                 if (err) {
                     console.log("ERROR"+err);
@@ -478,6 +482,7 @@ var deleteRelsForIEML = function (ieml, db) {
         // if this was a paradigm, remove all created relations
         function(callback) { 
             if (is_paradigm) {
+                console.log("----loadRelFromParser");
                 loadRelFromParser(ieml, function(err, list) {
                   if (err) 
                     console.log("ERROR"+err);
@@ -499,9 +504,14 @@ var deleteRelsForIEML = function (ieml, db) {
         },
         // update existing relations
         function(callback) {
+            console.log("----updateRelations");
             updateRelations(ieml, db);     
             callback();            
-        }
+        },
+        function(callback) {
+            onDone();
+            callback();
+        }        
         
     ], function(err) {
         if (err) 
