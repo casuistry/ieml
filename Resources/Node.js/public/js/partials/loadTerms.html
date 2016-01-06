@@ -52,7 +52,8 @@
 	  <md-virtual-repeat-container id="vertical-container">
 
 	  <md-list class="fixedRows">
-	    <md-list-item md-virtual-repeat="item in List | filter: filterText | 
+	    <md-list-item md-virtual-repeat="item in List | filter: filterText |
+	    												filter:filterItemIeml(filterText) |
                                                         filter:filterItemParadigm(filterParadigm) | 
                                                         filter:filterGrammaticalClass(filterClass) | 
                                                         filter:filterItemLayer(filterLayer)" class="repeated-item" flex> 
