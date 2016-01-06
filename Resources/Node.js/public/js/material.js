@@ -441,6 +441,17 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         }
     };    
 
+    $scope.filterItemIeml = function(selection) {
+        return function(input) {
+          if (selection.length == 0) return true;
+          
+            if (input.IEML.indexOf(selection) > -1)
+              return true;
+          
+            return false;
+        }
+    };
+
     //http://stackoverflow.com/questions/11753321/passing-arguments-to-angularjs-filters
     $scope.filterGrammaticalClass = function(selection) {
         return function(input) {
