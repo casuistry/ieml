@@ -260,39 +260,53 @@ module.exports.updateieml = function (req, res) {
 module.exports.remieml = function (req, res) {
 
 	var db = req.db;
+    
     console.log("before removing " + req.params.id);
-
-	db.collection('terms').remove(
-	    {IEML:req.params.id}, 
-		function(err, result) {
-			if (err) {
-				console.log("ERROR"+err);
-				throw err;
-			}
-			if (result) {
-				console.log("removed "  + req.params.id);
-                
-                // update existing relations
-                updateRelations(req.params.id, db);
-                
-				res.json(result);
-			}
-		}
-	);
-
-	//remove annotations assotiated with the IEML string
-	db.collection('annotations').remove(
-	    {ieml:req.params.id}, 
-		function(err, result) {
-			if (err) {
-				console.log("ERROR"+err);
-				throw err;
-			}
-			if (result) {
-				console.log(result);
-			}
-		}
-	);
+   
+    async.series([
+        function(callback) {
+            // remove relations associated with this ieml
+            deleteRelsForIEML(req.params.id, db);
+            callback();
+        },
+        function(callback) {
+            //remove annotations assotiated with this IEML 
+            db.collection('annotations').remove(
+                {ieml:req.params.id}, 
+                function(err, result) {
+                    if (err) {
+                        console.log("ERROR"+err);
+                    }
+                    if (result) {
+                        console.log(result);
+                    }
+                    
+                    callback();
+                }
+            );            
+        },
+        function(callback) {
+            // remove ieml from terms DB
+            db.collection('terms').remove(
+                {IEML:req.params.id}, 
+                function(err, result) {
+                    if (err) {
+                        console.log("ERROR"+err);
+                        throw err;
+                    }
+                    if (result) {
+                        console.log("removed "  + req.params.id);               
+                        res.json(result);
+                    }
+                    
+                    callback();
+                }
+            );            
+        },
+    ], function(err) {
+        if (err) 
+            return;
+    });        
 };
 
 module.exports.verifyIeml = function (req, res) {
@@ -439,6 +453,62 @@ module.exports.templates = function (req, res) {
   res.render('templates/' + name);
 };
 
+// deletes relations created by java for specified ieml 
+// input ieml should still exist in terms DB
+var deleteRelsForIEML = function (ieml, db) {
+  
+    var is_paradigm = false;
+    
+    async.series([
+    
+        // check if ieml to be deleted is a paradigm
+        function(callback) {
+            db.collection('terms').findOne({IEML:ieml}, {PARADIGM:1}, function(err, result) {
+                if (err) {
+                    console.log("ERROR"+err);
+                }
+                else {
+                    is_paradigm = result.PARADIGM;
+                    console.log("Found PARADIGM: " + is_paradigm);
+                }
+                
+                callback();
+            });            
+        },
+        // if this was a paradigm, remove all created relations
+        function(callback) { 
+            if (is_paradigm) {
+                loadRelFromParser(ieml, function(err, list) {
+                  if (err) 
+                    console.log("ERROR"+err);
+                  else {
+                    var rellist = list.relations;                    
+                    console.log("TO REMOVE: "+JSON.stringify(rellist));
+                    
+                    for (var i = 0; i < rellist.length; i++) {                
+                        db.collection('relationships').remove( { start : rellist[i].start, ieml : rellist[i].stop, type : rellist[i].name } , function(err, result) {
+                          if (err) {
+                            console.log("ERROR"+err);
+                          }
+                        });
+                    }                
+                  }                 
+                });                 
+            }
+            callback();            
+        },
+        // update existing relations
+        function(callback) {
+            updateRelations(ieml, db);     
+            callback();            
+        }
+        
+    ], function(err) {
+        if (err) 
+            return;
+    });
+}
+
 var loadRelsForIEML = function (ieml, db) {
 
 	var allieml=[];
@@ -543,7 +613,7 @@ var updateRelations = function (delta, db) {
 				}
                 forward = result;
                 
-                console.log("Forward: "+JSON.stringify(forward));
+                //console.log("Forward: "+JSON.stringify(forward));
                 
 				callback();
 			});            
@@ -557,7 +627,7 @@ var updateRelations = function (delta, db) {
 				}
                 backward = result;
                 
-                console.log("Backward: "+JSON.stringify(backward));
+                //console.log("Backward: "+JSON.stringify(backward));
                 
 				callback();
 			});            
@@ -574,7 +644,7 @@ var updateRelations = function (delta, db) {
                     endpoint_exists = (result.length > 0);
 			    });
                 
-                console.log("forward Analysis: "+JSON.stringify(forward[i]));
+                //console.log("forward Analysis: "+JSON.stringify(forward[i]));
                     
                 if (!delta_exists && !endpoint_exists) 
                     to_delete.push(forward[i]._id);
@@ -600,7 +670,7 @@ var updateRelations = function (delta, db) {
                     endpoint_exists = (result.length > 0);
 			    });
                 
-                console.log("backward Analysis: "+JSON.stringify(forward[i]));
+                //console.log("backward Analysis: "+JSON.stringify(forward[i]));
                 
                 if (!delta_exists && !endpoint_exists) 
                     to_delete.push(backward[i]._id);
