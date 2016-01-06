@@ -496,11 +496,15 @@ var deleteRelsForIEML = function (ieml, db, onDone) {
                             console.log("ERROR"+err);
                           }
                         });
-                    }                
+                    } 
+
+                    callback();                    
                   }                 
                 });                 
             }
-            callback();            
+            else {
+                callback();
+            }                       
         },
         // update existing relations
         function(callback) {
