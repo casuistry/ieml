@@ -51,9 +51,9 @@ public class RelationBuilder {
 		//String input = "O:M:O:.";
 		//String input = "M:O:O:.";
 		//String input = "M:M:M:.";
-		//String input = "T:O:M:. + M:O:T:.";
+		String input = "T:O:M:. + M:O:T:.";
 		//String input = "O:M:.M:M:.- + M:M:.O:M:.-";
-		String input = "M:M:.a.-M:M:.a.-E:.-+f.o.-'";
+		//String input = "M:M:.a.-M:M:.a.-E:.-+f.o.-'";
 		
 		try {
 			String output = RelationBuilder.GetRelations(input);
@@ -70,6 +70,7 @@ public class RelationBuilder {
 	public static String GermainJumeau ="GermainJumeau";
 	public static String GermainOpposes ="GermainOpposes";
 	public static String GermainAssocies ="GermainAssocies";
+	public static String GermainCroises = "GermainCroises";
 	
 	// main entry point
 	public static String GetRelations(String input) throws Exception {
@@ -271,29 +272,73 @@ public class RelationBuilder {
 				}
 			}				
 			
-			if (json.tables.size() > 1) { //"T:O:M:. + M:O:T:.";
-				// In case OPPOSES:
-				
-				for (int i = 0; i < n.nodes.size(); i++) {
-					for (int j = i+1; j < n.nodes.size(); j++) {
-						
-						ArrayList<List<Integer>> swaps = swapSemes(n.nodes.get(i), n.nodes.get(j));
-						
-						for (List<Integer> positions : swaps) {
-							
-							result.add(build(inputName, n.nodes.get(i).GetName(), GermainOpposes));
-							result.add(build(inputName, n.nodes.get(j).GetName(), GermainOpposes));						
-							
-							break;  // skip case of two semes being same/swapped
-						}
-					}
-				}
-			}
+			result.addAll(BuildGermainsOpposes(json, n));
 							
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 
+		return result;
+	}
+	
+	private static ArrayList<String> BuildGermainsOpposes(JsonTables json, Token n) {
+		
+		ArrayList<String> result = new ArrayList<String>();
+		
+		if (json.tables.size() > 1) { //"T:O:M:. + M:O:T:.";
+			// In case OPPOSES:
+			
+			for (int i = 0; i < n.nodes.size(); i++) {
+				for (int j = i+1; j < n.nodes.size(); j++) {
+					
+					ArrayList<List<Integer>> swaps = swapSemes(n.nodes.get(i), n.nodes.get(j));
+					
+					for (List<Integer> positions : swaps) {
+						
+						result.add(build(n.nodes.get(i).GetName(), n.nodes.get(j).GetName(), GermainOpposes));
+						result.add(build(n.nodes.get(j).GetName(), n.nodes.get(i).GetName(), GermainOpposes));						
+						
+						break;  // skip case of two semes being same/swapped
+					}
+					
+					result.addAll(BuildGermainsCroises(n.nodes.get(i), n.nodes.get(j)));
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	private static ArrayList<String> BuildGermainsCroises(Token a, Token b) {
+		
+		ArrayList<String> result = new ArrayList<String>();
+		
+		if (a == null || b == null)
+			return result;
+		if (a.nodes.size() == 0 || b.nodes.size() == 0)
+			return result;
+		if (a.opCode.equals(Tokenizer.addition)) 
+			return result;
+		if (b.opCode.equals(Tokenizer.addition)) 
+			return result;
+		if (a.layer < 1) 
+			return result;
+		if (b.layer < 1) 
+			return result;
+		
+		ArrayList<List<Integer>> swaps = swapSemes(a.nodes.get(0), b.nodes.get(0));
+		
+		if (swaps.size() == 0)
+			return result;
+		
+		swaps = swapSemes(a.nodes.get(1), b.nodes.get(1));
+		
+		if (swaps.size() == 0)
+			return result;
+		
+		result.add(build(a.GetName(), b.GetName(), GermainCroises));
+		result.add(build(b.GetName(), a.GetName(), GermainCroises));
+		
 		return result;
 	}
 	
@@ -392,6 +437,10 @@ public class RelationBuilder {
 		
 		ArrayList<List<Integer>> result = new ArrayList<List<Integer>>();
 		
+		if (a == null || b == null)
+			return result;
+		if (a.nodes.size() == 0 || b.nodes.size() == 0)
+			return result;		
 		if (a.opCode.equals(Tokenizer.addition)) 
 			return result;
 		if (b.opCode.equals(Tokenizer.addition)) 
