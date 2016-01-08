@@ -51,9 +51,14 @@ public class RelationBuilder {
 		//String input = "O:M:O:.";
 		//String input = "M:O:O:.";
 		//String input = "M:M:M:.";
-		String input = "T:O:M:. + M:O:T:.";
+		//String input = "T:O:M:. + M:O:T:.";
 		//String input = "O:M:.M:M:.- + M:M:.O:M:.-";
 		//String input = "M:M:.a.-M:M:.a.-E:.-+f.o.-'";
+		String input = "M:O:.M:M:.-+M:M:.M:O:.-";
+		
+		
+		
+		
 		
 		try {
 			String output = RelationBuilder.GetRelations(input);

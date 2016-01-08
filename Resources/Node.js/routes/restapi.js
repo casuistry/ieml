@@ -114,25 +114,34 @@ module.exports.newieml = function (req, res) {
 				console.log('Added! ');
 
                 // update existing relations
-                updateRelations(req.body.IEML, db);
-                
-                // create new relations only if new term is a paradigm
-                if (req.body.PARADIGM == "1")
-				    loadRelsForIEML(req.body.IEML, db);
-                
+                updateRelations(req.body.IEML, db, function() {
+                    // create new relations only if new term is a paradigm
+                    if (req.body.PARADIGM == "1")
+				        loadRelsForIEML(req.body.IEML, db, function(){});
+                });
+
 				res.json(result);
 			}
 		}
 	);
 };
-
+            
+// was_para   same_para    same_ieml    |   generate for old   |   generate for new  |   generate for old
+//                                      |   remove from DB     |   add to DB         |   add to DB
+//    0           0            0        |          0           |           1         |          0
+//    0           0            1        |          0           |           0         |          1
+//    0           1            0        |          0           |           0         |          0            
+//    0           1            1        |          0           |           0         |          0
+//    1           0            0        |          1           |           0         |          0
+//    1           0            1        |          1           |           0         |          0
+//    1           1            0        |          1           |           1         |          0
+//    1           1            1        |          0           |           0         |          0       
 module.exports.updateieml = function (req, res) {
 
     var same_ieml = true;
     var same_para = true;
     var was_para = true;
     var old_ieml = "";
-    var rellist;
         
 	var db = req.db;
     
@@ -151,6 +160,7 @@ module.exports.updateieml = function (req, res) {
 
     console.log("rec: "+JSON.stringify(rec));
     
+    // some function must be executed before changing terms DB, and some after changing terms DB
     async.series([
         
         function(callback) { // check what changed
@@ -170,11 +180,40 @@ module.exports.updateieml = function (req, res) {
                 }
                 else {
                     console.log("ERROR retrieving term");
-					callback();
                 }
-
+                
+                console.log('same_ieml ' + same_ieml);
+                console.log('same_para ' + same_para);
+                console.log('was_para ' + was_para);
+                
 				callback();
 			});
+        },  
+        function(callback) { // update relations when old ieml still exists
+        
+            if (!was_para && !same_para && !same_ieml) {
+                callback();
+            }
+            else if (!was_para && !same_para && same_ieml) {
+                // ieml was already there but we need need to generate relations for it
+                loadRelsForIEML(old_ieml, db, callback);
+            }
+            else if (was_para && !same_para && !same_ieml) {
+                // just delete old ieml's relations
+                deleteRelsForIEML(old_ieml, db, callback);   
+            }
+            else if (was_para && !same_para && same_ieml) {
+                // just remove old ieml's relations
+                deleteRelsForIEML(old_ieml, db, callback);    
+            }
+            else if (was_para && same_para && !same_ieml) {
+                // delete old relations and update existing relations and generate new relations
+                deleteRelsForIEML(old_ieml, db, callback);            
+            }
+            else {
+                console.log("UNHANDLED case");
+                callback();
+            }
         },        
         function(callback) { // do the update
             db.collection('terms').update(id, {$set:rec}, function(err, result) {
@@ -188,67 +227,29 @@ module.exports.updateieml = function (req, res) {
 				callback();                
 	        });
         },
-        function(callback) { // update  relations if necessary
+        function(callback) { // update relations when old ieml does not exist
         
-            console.log('same_ieml ' + same_ieml);
-            console.log('same_para ' + same_para);
-            console.log('was_para ' + was_para);
-            
-            // was_para   same_para    same_ieml    |   generate for old   |   generate for new  |   generate for old
-            //                                      |   remove from DB     |   add to DB         |   add to DB
-            //    0           0            0        |          0           |           1         |          0
-            //    0           0            1        |          0           |           0         |          1
-            //    0           1            0        |          0           |           0         |          0            
-            //    0           1            1        |          0           |           0         |          0
-            //    1           0            0        |          1           |           0         |          0
-            //    1           0            1        |          1           |           0         |          0
-            //    1           1            0        |          1           |           1         |          0
-            //    1           1            1        |          0           |           0         |          0
-            
             if (!was_para && !same_para && !same_ieml) {
-                // update existing relations
-                updateRelations(rec.IEML, db);
-                // generate new relations
-                loadRelsForIEML(rec.IEML, db);
+                // update existing relations and generate new relations
+                updateRelations(rec.IEML, db, function() { loadRelsForIEML(rec.IEML, db, callback);});
             }
             else if (!was_para && !same_para && same_ieml) {
-                loadRelsForIEML(old_ieml, db);
+                updateRelations(old_ieml, db, callback);
             }
             else if (was_para && !same_para && !same_ieml) {
-                loadRelFromParser(old_ieml, function(err, list) {
-                    if (err) 
-                        return callback(err);
-                    rellist = list;
-                });
-                
-                // TODO: delete those relations
+                updateRelations(old_ieml, db, callback);
             }
             else if (was_para && !same_para && same_ieml) {
-                loadRelFromParser(old_ieml, function(err, list) {
-                    if (err) 
-                        return callback(err);
-                    rellist = list;
-                });
-                
-                // TODO: delete those relations              
+                updateRelations(old_ieml, db, callback);    
             }
             else if (was_para && same_para && !same_ieml) {
-
-                loadRelFromParser(old_ieml, function(err, list) {
-                    if (err) 
-                        return callback(err);
-                    rellist = list;
-                });
-                
-                // TODO: delete those relations            
-                
-                // update existing relations
-                updateRelations(rec.IEML, db);
-                // generate new relations
-                loadRelsForIEML(rec.IEML, db);                
+                // delete old relations and update existing relations and generate new relations
+                updateRelations(rec.IEML, db, function() {loadRelsForIEML(rec.IEML, db, callback);});      
             }
-            
-            callback(); 
+            else {
+                console.log("UNHANDLED case");
+                callback();
+            }
         }        
     ],  function(err) {
            if (err) 
@@ -269,6 +270,11 @@ module.exports.remieml = function (req, res) {
             // remove relations associated with this ieml
             deleteRelsForIEML(req.params.id, db, callback);
             //callback();
+        },      
+        function(callback) {
+            // update existing relations
+            console.log("----updateRelations");
+            updateRelations(req.params.id, db, callback);               
         },
         function(callback) {
             //remove annotations assotiated with this IEML 
@@ -506,12 +512,6 @@ var deleteRelsForIEML = function (ieml, db, onDone) {
                 callback();
             }                       
         },
-        // update existing relations
-        function(callback) {
-            console.log("----updateRelations");
-            updateRelations(ieml, db);     
-            callback();            
-        },
         function(callback) {
             onDone();
             callback();
@@ -523,7 +523,7 @@ var deleteRelsForIEML = function (ieml, db, onDone) {
     });
 }
 
-var loadRelsForIEML = function (ieml, db) {
+var loadRelsForIEML = function (ieml, db, onDone) {
 
 	var allieml=[];
 	var rellist;
@@ -565,18 +565,18 @@ var loadRelsForIEML = function (ieml, db) {
 			});
         },
         function (callback) { //prepeare and load relationships db
-
-        			loadRelationships(ieml, rellist, allieml, db, function (err, loadedrecs) { 
-        			console.log("SUCCESSFULLY LOADED RELATIONSHIPS "+JSON.stringify(loadedrecs));
-        			callback();}
-        		);
-
+        	loadRelationships(ieml, rellist, allieml, db, function (err, loadedrecs) { 
+   			    console.log("SUCCESSFULLY LOADED RELATIONSHIPS "+JSON.stringify(loadedrecs));
+   			    callback();
+            });
+        },
+        function(callback){
+            onDone();
+            callback();
         }
     ], function(err) {
         if (err) return;
-       
     });
-
 };
 
 // Input ieml was either added or deleted from the list of terms.
@@ -593,7 +593,7 @@ var loadRelsForIEML = function (ieml, db) {
 //
 // Very simple, can be optimized with parallel calls
 //
-var updateRelations = function (delta, db) {
+var updateRelations = function (delta, db, onDone) {
 
     console.log("starting updateRelations method for " + delta);
 
@@ -748,7 +748,11 @@ var updateRelations = function (delta, db) {
                     callback();
                 });   
             }            
-        }        
+        },
+        function(callback) {
+            onDone();
+            callback();
+        }    
     ],  function(err) {
            if (err) 
                return;     
