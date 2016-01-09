@@ -126,16 +126,16 @@ module.exports.newieml = function (req, res) {
 	);
 };
             
-// was_para   same_para    same_ieml    |   generate for old   |   generate for new  |   generate for old
-//                                      |   remove from DB     |   add to DB         |   add to DB
-//    0           0            0        |          0           |           1         |          0
-//    0           0            1        |          0           |           0         |          1
-//    0           1            0        |          0           |           0         |          0            
-//    0           1            1        |          0           |           0         |          0
-//    1           0            0        |          1           |           0         |          0
-//    1           0            1        |          1           |           0         |          0
-//    1           1            0        |          1           |           1         |          0
-//    1           1            1        |          0           |           0         |          0       
+// was_para   same_para    same_ieml    |   generate for old   |   generate for new  |   generate for old  |     tested
+//                                      |   remove from DB     |   add to DB         |   add to DB         | 
+//    0           0            0        |          0           |           1         |          0          |       ok
+//    0           0            1        |          0           |           0         |          1          |       ok
+//    0           1            0        |          0           |           0         |          0          |  
+//    0           1            1        |          0           |           0         |          0          |
+//    1           0            0        |          1           |           0         |          0          |       ok
+//    1           0            1        |          1           |           0         |          0          |       ok
+//    1           1            0        |          1           |           1         |          0          |       ok
+//    1           1            1        |          0           |           0         |          0          |  
 module.exports.updateieml = function (req, res) {
 
     var same_ieml = true;
@@ -144,13 +144,11 @@ module.exports.updateieml = function (req, res) {
     var old_ieml = "";
         
 	var db = req.db;
-    
-    console.log("before editing " + req.body);
-    
+        
 	try {
 	    var rec=req.body;
 	    var id = require('mongoskin').ObjectID.createFromHexString(rec.ID);
-	    console.log("before editing ieml "+id);
+	    console.log("before editing ieml " + id);
 	    id = {_id: id};
 	    delete rec.ID; //rec.ID=undefined;
 	    delete rec.token;
@@ -158,7 +156,7 @@ module.exports.updateieml = function (req, res) {
         console.log(e);
     }
 
-    console.log("rec: "+JSON.stringify(rec));
+    //console.log("rec: "+JSON.stringify(rec));
     
     // some function must be executed before changing terms DB, and some after changing terms DB
     async.series([
@@ -172,10 +170,10 @@ module.exports.updateieml = function (req, res) {
 				}
                 
                 if (result.length == 1) {
-                    console.log("result: "+JSON.stringify(result[0]));
+                    //console.log("result: "+JSON.stringify(result[0]));
                     same_ieml = (result[0].IEML == rec.IEML);
                     same_para = (result[0].PARADIGM == rec.PARADIGM);
-                    was_para = result[0].PARADIGM;
+                    was_para = result[0].PARADIGM == "1";
                     old_ieml = result[0].IEML;
                 }
                 else {
@@ -598,7 +596,6 @@ var updateRelations = function (delta, db, onDone) {
     console.log("starting updateRelations method for " + delta);
 
     var delta_exists = false;
-    var endpoint_exists = false;
     var forward = [];
     var backward = [];
     var to_exists = [];
@@ -646,57 +643,66 @@ var updateRelations = function (delta, db, onDone) {
 				callback();
 			});            
         },        
-        function(callback) { // check if stop endpoint exists
-                        
+        function(callback) { // check if stop endpoint exists        
+            var endp = [];
             for (var i=0;i<forward.length;i++) {
-                db.collection('terms').find({IEML:forward[i].ieml}, {IEML:1}).toArray(function(err, result) {
-				    if (err) {
-					    console.log("ERROR"+err);
-					    callback(err);
-				    }
-                    
-                    endpoint_exists = (result.length > 0);
-			    });
-                
-                //console.log("forward Analysis: "+JSON.stringify(forward[i]));
-                    
-                if (!delta_exists && !endpoint_exists) 
-                    to_delete.push(forward[i]._id);
-                   
-                else if (delta_exists && endpoint_exists) 
-                    to_exists.push(forward[i]._id);
-                    
-                else 
-                    to_not_exists.push(forward[i]._id);
+                endp.push(forward[i].ieml);
             }
             
-            callback();
+            db.collection('terms').find({IEML:{$in:endp}}, {IEML:1}).toArray(function(err, result) {
+                if (err) {
+                    console.log("ERROR"+err);
+                    callback(err);
+                }
+                else {
+                    var existing = [];                    
+                    for (var i=0;i<result.length;i++) {
+                        existing[i] = result[i].IEML;
+                    }
+                    console.log("existing stop endpoints: "+JSON.stringify(existing));
+                    for (var j=0;j<forward.length;j++) {
+                       var endpoint_exists = existing.indexOf(forward[j].ieml)!=-1;                        
+                       if (!delta_exists && !endpoint_exists) 
+                            to_delete.push(forward[j]._id);                   
+                        else if (delta_exists && endpoint_exists) 
+                            to_exists.push(forward[j]._id);                    
+                        else 
+                            to_not_exists.push(forward[j]._id);  
+                    }
+                }  
+                callback();
+            });            
         },        
         function(callback) { // check if start endpoint exists
-           
+
+            var endp = [];
             for (var i=0;i<backward.length;i++) {
-                db.collection('terms').find({IEML:backward[i].start}, {IEML:1}).toArray(function(err, result) {
-				    if (err) {
-					    console.log("ERROR"+err);
-					    callback(err);
-				    }
-                    
-                    endpoint_exists = (result.length > 0);
-			    });
-                
-                //console.log("backward Analysis: "+JSON.stringify(forward[i]));
-                
-                if (!delta_exists && !endpoint_exists) 
-                    to_delete.push(backward[i]._id);
-                    
-                else if (delta_exists && endpoint_exists) 
-                    to_exists.push(backward[i]._id);
-                    
-                else 
-                    to_not_exists.push(backward[i]._id);                
+                endp.push(backward[i].start);
             }
             
-            callback();
+            db.collection('terms').find({IEML:{$in:endp}}, {IEML:1}).toArray(function(err, result) {
+                if (err) {
+                    console.log("ERROR"+err);
+                    callback(err);
+                }
+                else {
+                    var existing = [];                    
+                    for (var i=0;i<result.length;i++) {
+                        existing[i] = result[i].IEML;
+                    }
+                    console.log("existing start endpoints: "+JSON.stringify(existing));
+                    for (var j=0;j<backward.length;j++) {
+                       var endpoint_exists = existing.indexOf(backward[j].start)!=-1;                         
+                       if (!delta_exists && !endpoint_exists) 
+                            to_delete.push(backward[j]._id);                   
+                        else if (delta_exists && endpoint_exists) 
+                            to_exists.push(backward[j]._id);                    
+                        else 
+                            to_not_exists.push(backward[j]._id);  
+                    }
+                }  
+                callback();
+            }); 
         },
         function(callback) { // perform update on DB
             
