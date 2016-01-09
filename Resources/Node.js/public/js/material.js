@@ -697,6 +697,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
  
     var tableTitle =  decodeURIComponent($routeParams.IEML);
     var previousTableTile = tableTitle;
+     var lstAllIEML = sharedProperties.getAllItems();
       
     init();
 
@@ -705,9 +706,21 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     }
 
     $scope.crossCheck = function( input) {
-        var lst = sharedProperties.getAllItems();
-        var newTemp = $filter("filter")(lst, {IEML:input}, true);  
+        //var lst = sharedProperties.getAllItems();
+        var newTemp = $filter("filter")(lstAllIEML, {IEML:input}, true);  
         return newTemp;
+    };
+
+    $scope.lookupLabels = function (inieml) {
+        var res = {};
+        debugger; 
+        var newTemp = $filter("filter")(lstAllIEML, {IEML:inieml}, true);
+
+        res.EN = newTemp[0]?newTemp[0].EN:"none";
+        res.FR = newTemp[0]?newTemp[0].FR:"none";
+       
+        return res;
+
     };
 
     $scope.toggleRelVis = function(reltype) {
@@ -734,6 +747,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         crudFactory.get().success(function(data) {
             $scope.List = data;
             sharedProperties.setAllItems(data);
+            lstAllIEML = sharedProperties.getAllItems();
         });
     };
     
@@ -756,7 +770,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         }
 
         crudFactory.rels(tableTitle).success(function(data) {
-             $scope.definitions = data;
+            $scope.definitions = data;
         });
 
         crudFactory.iemltable(tableTitle).success(function(data) {
