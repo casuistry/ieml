@@ -22,20 +22,23 @@ var async = require('./public/libs/async');
 
 
 var cursor = [];
-var main = function () {
-	console.log("starting load...");
+var allTerms = []; // holds the ieml of all entries in terms DB
 
-	//load terms into local array
-	 db.collection('terms').find(/*{}, {IEML:1}*/).toArray(function(err, result) {
-		if (err) {
-			console.log("ERROR"+err);
-			throw err;
-		}
-		
-		console.log("loading terms "+result.length);
+var main = function () {
+    console.log("starting load...");
+
+    //load terms into local array
+     db.collection('terms').find(/*{}, {IEML:1}*/).toArray(function(err, result) {
+        if (err) {
+            console.log("ERROR"+err);
+            throw err;
+        }
+        
+        console.log("loading terms "+result.length);
         var j = 0;
-		for (var i=0;i<result.length;i++) {
+        for (var i=0;i<result.length;i++) {
             
+            allTerms[i] = result[i].IEML;
             
             if (result[i].PARADIGM == "1") {
                 //console.log(JSON.stringify(result[i]));
@@ -43,153 +46,134 @@ var main = function () {
                 cursor[j++] = result[i].IEML;
             }
                 
-		}
+        }
         console.log("found paradigms "+cursor.length);
 
-		onIEMLLoaded();
-	});
+        onIEMLLoaded();
+    });
 };
 
 var onIEMLLoaded = function () {
-		db.collection('relationships').remove({}, function(err, result) {
-    	console.log('Emptied collection relationships');
-    		onIEMLLoaded2();
-		});
+        db.collection('relationships').remove({}, function(err, result) {
+        console.log('Emptied collection relationships');
+            onIEMLLoaded2();
+        });
 };
 
 var onIEMLLoaded2 = function() {
-	
-
-	     async.forEachLimit(cursor, 1, function(record, callbackMain) {
-   // cursor.forEach(function(record) {
     
-     	
-         //call parse and update record
-        
-		
+    async.forEachLimit(cursor, 1, function(record, callbackMain) {
 
-//console.log("sending>>>"+record+" curr_id>"+currentIndx+" good>"+countGood+" bad>"+countBad);
-currentIndx++;
+        currentIndx++;
 
-         var parseResult;
-         async.series([
+        var parseResult;
+        async.series([
 
-         	function (callback){
-						        var http = require('http');
+            function (callback){
+                var http = require('http');
+                var querystring = require('querystring');
 
-								var querystring = require('querystring');
+                var postData = querystring.stringify({
+                    'iemltext' : record
+                });
 
+                var options = {
+                    hostname: 'test-ieml.rhcloud.com',
+                    port: 80,
+                    //hostname:'localhost',
+                    //port:8081,
+                    path: '/ScriptParser/rest/iemlparser/relationship',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Content-Length': postData.length
+                    }
+                };
 
-								var postData = querystring.stringify({
-								  'iemltext' : record
-								});
+                var body = '';
+                var req = http.request(options, function(res) {
+                    //console.log('STATUS: ' + res.statusCode);
+                    //console.log('HEADERS: ' + JSON.stringify(res.headers));
+                    res.setEncoding('utf8');
+                    res.on('data', function (chunk) {
+                        body += chunk;
+                    });
+                    res.on('end', function() {
+                    
+                        try {                       
+                            parseResult = JSON.parse(body);
+                            callback();
 
-								var options = {
-								  hostname: 'test-ieml.rhcloud.com',
-								  port: 80,
-								  //hostname:'localhost',
-								  //port:8081,
-								  path: '/ScriptParser/rest/iemlparser/relationship',
-								  method: 'POST',
-								  headers: {
-								    'Content-Type': 'application/x-www-form-urlencoded',
-								    'Content-Length': postData.length
-								  }
-								};
+                        } catch (e) {
+                            console.log("ERROR: problem parsing "+record);
+                            console.log("ERROR response"+body);
+                            countBad++;
+                            callback(new Error());
+                        }
+                    })
+                });
 
-								var body = '';
-								var req = http.request(options, function(res) {
-								  //console.log('STATUS: ' + res.statusCode);
-								  //console.log('HEADERS: ' + JSON.stringify(res.headers));
-								  res.setEncoding('utf8');
-								  res.on('data', function (chunk) {
-								     body += chunk;
-								  });
-								  res.on('end', function() {
-								  	
-								  	try {
-								  		
-								  		parseResult = JSON.parse(body);
-								  		callback();
+                req.on('error', function(e) {
+                  console.log('problem with request: ' + e.message);
+                });
 
-								  	} catch (e) {
-								  		console.log("ERROR: problem parsing "+record);
-								  		console.log("ERROR response"+body);
-								  		countBad++;
-								  		callback(new Error());
-								  	}
+                // write data to request body
+                req.write(postData);
+                req.end();
+            },
+            function (callback) {
 
-								    
-								  })
-								});
+                //console.dir(parseResult);
+                var new_records = [];
 
-								req.on('error', function(e) {
-								  console.log('problem with request: ' + e.message);
-								});
+                if (parseResult.relations.length==0) {
+                    console.log("EMPTY relations for "+record);
+                    countBad++;
+                    callback();
+                    return;
+                }
 
-								// write data to request body
-								req.write(postData);
-								req.end();
+                for (var i=0;i<parseResult.relations.length;i++) {
+                    var new_rec = {};
+                    new_rec.start = parseResult.relations[i].start;
+                    new_rec.ieml = parseResult.relations[i].stop;
+                    new_rec.visible = true;
+                    new_rec.exists = true;
+                    new_rec.type = parseResult.relations[i].name;
+                    if (allTerms.indexOf(new_rec.start)==-1 || allTerms.indexOf(new_rec.ieml)==-1 ) {
+                        new_rec.exists = false;
+                    }
+                    new_records.push(new_rec);
+                }
 
-         	},
-         	function (callback) {
+                db.collection('relationships').insert(new_records, function(err, result) {
+                    if (err) {
+                        console .log("Error inserting into rels DB");
+                        console.dir(new_records);
+                        callback(err);
+                        return;
+                    }
+                    countGood++;
+                    
+                    callback();
+                });
+            }
+        ], 
 
-         		//console.dir(parseResult);
-         		var new_records = [];
-
-         		if (parseResult.relations.length==0) {
-         			console.log("EMPTY relations for "+record);
-         			countBad++;
-         			callback();
-         			return;
-         		}
-
-				for (var i=0;i<parseResult.relations.length;i++) {
-					var new_rec = {};
-					new_rec.start = parseResult.relations[i].start;
-					new_rec.ieml = parseResult.relations[i].stop;
-					new_rec.visible = true;
-					new_rec.exists = true;
-					new_rec.type = parseResult.relations[i].name;
-					if (cursor.indexOf(new_rec.start)==-1 || cursor.indexOf(new_rec.ieml)==-1 ) {
-						new_rec.exists = false;
-					}
-					new_records.push(new_rec);
-				}
-
-				db.collection('relationships').insert(new_records, function(err, result) {
-			    	if (err) {
-			    		console .log("Error inserting into rels DB");
-			    		console.dir(new_records);
-			    		callback(err);
-			    		return;
-			    	}
-			    	countGood++;
-			    	
-					callback();
-				});
-
-         	}
-
-         	], 
-
-         function(err) {
-	        if (err) {
-	        	//console.log("ERROR>>>"+err);
-	        	callbackMain();
-	        	return;
-	        }
-			callbackMain ();
-       
-   		 });
+        function(err) {
+            if (err) {
+                //console.log("ERROR>>>"+err);
+                callbackMain();
+                return;
+            }
+            callbackMain ();
+         });
 
     },  function(err) {
-	    console.log("Completed loading rels for "+countGood+" terms. "+countBad+" did not have any rels. Total processed "
-	    	+ cursor.length);
-	    process.exit();
-	});
-
-
+        console.log("Completed loading rels for "+countGood+" terms. "+countBad+" did not have any rels. Total processed "
+            + cursor.length);
+        process.exit();
+    });
 }; //END OnIEMLLoaded 2
 
 main();

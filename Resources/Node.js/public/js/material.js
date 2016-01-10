@@ -718,7 +718,14 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 
         res.EN = newTemp[0]?newTemp[0].EN:"none";
         res.FR = newTemp[0]?newTemp[0].FR:"none";
-       
+        
+        if (sharedProperties.filterLanguageSelected == "English") {
+            res.DISP = newTemp[0]?newTemp[0].EN:"none";
+        }
+        else {
+            res.DISP = newTemp[0]?newTemp[0].FR:"none";
+        }
+ 
         return res;
 
     };
