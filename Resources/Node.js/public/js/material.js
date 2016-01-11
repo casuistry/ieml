@@ -448,6 +448,15 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             if (input.IEML.indexOf(selection) > -1)
               return true;
           
+            if ($scope.filterLanguage == fFrench) {
+              if (input.FR.indexOf(selection) > -1)
+                return true;
+            }
+            else {
+              if (input.EN.indexOf(selection) > -1)
+                return true;
+            }
+            
             return false;
         }
     };

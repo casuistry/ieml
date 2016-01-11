@@ -42,7 +42,8 @@ public class TableGenerator {
 		
 	public void generate(){
 		
-		List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
+		//List<String> db = Utilities.Helper.ReadFile("C:\\Users\\casuistry\\Desktop\\IEML\\Architecture\\ieml.db3.csv");
+		List<String> db = new ArrayList<String>();
 		//ArrayList<String> db = new ArrayList<String>();
 		//db.add("S:M:.e.-S:B:T:.S:B:T:.S:B:T:.-S:B:T:.S:B:T:.S:B:T:.-' , 2, 3, 4, 5, 6");
 		//db.add("M:O:.j.- , 2, 3, 4, 5, 6");
@@ -60,8 +61,8 @@ public class TableGenerator {
 		//db.add("S:M:., 2, 3, 4, 5, 6");
 		//db.add("E:O:+M:.wo.-, 2, 3, 4, 5, 6");
 		//db.add("E:F:.d.-, 2, 3, 4, 5, 6");
-		//db.add("B:B:., 2, 3, 4, 5, 6");
-		db.add("O:M:.O:M:.-we.h.-', 2, 3, 4, 5, 6");
+		db.add("B:B:., 2, 3, 4, 5, 6");
+
 		
 		
 		//
@@ -86,7 +87,7 @@ public class TableGenerator {
 				//String la   = parts[4].trim().length() > 0 ? parts[4].trim():null;
 				//String cl   = parts[5].trim().length() > 0 ? parts[5].trim():null;
 							
-				
+				ieml = "b.-S:.A:.-'F:.F:.-',";
 				
 				try {		
 					
