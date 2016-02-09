@@ -61,7 +61,7 @@ public class TableGenerator {
 		//db.add("S:M:., 2, 3, 4, 5, 6");
 		//db.add("E:O:+M:.wo.-, 2, 3, 4, 5, 6");
 		//db.add("E:F:.d.-, 2, 3, 4, 5, 6");
-		db.add("B:B:., 2, 3, 4, 5, 6");
+		db.add("S:B:., 2, 3, 4, 5, 6");
 
 		
 		
@@ -87,7 +87,7 @@ public class TableGenerator {
 				//String la   = parts[4].trim().length() > 0 ? parts[4].trim():null;
 				//String cl   = parts[5].trim().length() > 0 ? parts[5].trim():null;
 							
-				ieml = "b.-S:.A:.-'F:.F:.-',";
+				ieml = "U:.+A:F:.";
 				
 				try {		
 					

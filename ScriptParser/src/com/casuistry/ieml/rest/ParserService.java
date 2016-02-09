@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import NewParser.ParserImpl;
 import NewParser.Token;
 import Utilities.RelationBuilder;
+import Utilities.RelationGenerator;
 import Utilities.TableGenerator;
 import Utilities.TableGenerator.JsonTables;
 
@@ -228,4 +229,21 @@ public class ParserService {
 	
 	  }
 	  
+	  
+	  @POST
+	  @Path("/relationship2")
+	  @Produces("application/json")
+	  @Consumes("application/x-www-form-urlencoded")
+	  public Response relations2(@FormParam("iemltext") String iemltext, @FormParam("parad") int parad) throws JSONException {
+
+		 try {				
+				String rel = RelationGenerator.generateRelations(iemltext, parad);				
+				return Response.status(200).entity(rel).build();				
+			} catch (Exception e) {				 
+				return Response.status(500).entity(e.getMessage()).build();
+			}		
+			finally {
+				
+			} 
+	  }
 }
