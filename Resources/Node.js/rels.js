@@ -72,9 +72,10 @@ var onIEMLLoaded2 = function() {
             function (callback){
                 var http = require('http');
                 var querystring = require('querystring');
-
+                    
                 var postData = querystring.stringify({
-                    'iemltext' : record
+                    'iemltext' : record,
+                    'parad'    : 1
                 });
 
                 var options = {
@@ -82,7 +83,7 @@ var onIEMLLoaded2 = function() {
                     port: 80,
                     //hostname:'localhost',
                     //port:8081,
-                    path: '/ScriptParser/rest/iemlparser/relationship',
+                    path: '/ScriptParser/rest/iemlparser/relationship2',
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
