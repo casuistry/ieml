@@ -6,38 +6,41 @@
 
     <md-tabs md-stretch-tabs="always" md-dynamic-height="" md-border-bottom="">
       <md-tab label="DEFINITIONS">
-
-          <md-content class="md-padding">
+        <md-content class="md-padding">
           <label  style="font-style:italic;font-weight:lighter">
             <input type="checkbox" ng-model="showHidden">Show hidden
-         </label>
+          </label>
 
-         
-
-            <div ng-repeat="def in definitions"> 
-               <div layout="col" ><li  style = "width:15%;padding-top: 2px;"> {{def.reltype}}</li>   <md-switch  style = "margin: 0px 0px 0px 10px;" ng-change="toggleRelVis(def.reltype)" ng-disabled="false" aria-label="Hide" ng-model="def.visible" class="md-block/">  </div>
-            <!--  <div  layout="column" layout-align="left"> -->
-                    <div ng-repeat="lnk in def.rellist">
-                        <div layout="column"  ng-show="lnk.visible||showHidden">                               
-                             <table>
-                                 <tr>
-                                      <td style="width:400px;"> <a style="border: none;" align="left" href="#/dicEdit/IEML/{{lnk.ieml}}" target="_self" ng-show="lnk.visible||showHidden"  ng-class="{disabled:!lnk.exists, buttonflat:lnk.exists, buttonflatdis:!lnk.exists}"   class="btn">{{lnk.ieml}}</a>
-                                      </td>
-                                      
-                                         <td>
-                                          <table>
-                                            <tr> <p  align="left">{{lookupLabels(lnk.ieml).DISP}}</p></tr>
-                                            <!--tr> <p  align="left">{{lookupLabels(lnk.ieml).FR}}</p></tr-->
-                                          </table>
-                                         </td>
-                                        
-                                 </tr>
-                            </table>
-                          </div>
-                   </div>
+          <div ng-repeat="def in definitions"> 
+            
+            <div layout="col">
+              <li style = "width:15%;padding-top: 2px;" > 
+               {{def.reltype}}
+              </li>   
+              <md-switch  style = "margin: 0px 0px 0px 10px;" ng-change="toggleRelVis(def.reltype)" ng-disabled="false" aria-label="Hide" ng-model="def.visible" class="md-block/">  
             </div>
+            
+            <div ng-repeat="lnk in def.rellist">
+                <div layout="column"  ng-show="(lnk.exists && lnk.visible)||showHidden">                               
+                     <table>
+                         <tr>
+                            <td style="width:400px;"> 
+                              <a style="border: none;" align="left" href="#/dicEdit/IEML/{{lnk.ieml}}" target="_self" ng-show="(lnk.exists && lnk.visible)||showHidden"  ng-class="{disabled:!lnk.exists, buttonflat:lnk.exists, buttonflatdis:!lnk.exists}"   class="btn">{{lnk.ieml}}</a>
+                            </td>
+                              
+                            <td>
+                                <table>
+                                    <tr> <p  align="left">{{lookupLabels(lnk.ieml).DISP}}</p></tr>
+                                    <!--tr> <p  align="left">{{lookupLabels(lnk.ieml).FR}}</p></tr-->
+                                </table>
+                            </td>
+                         </tr>
+                    </table>
+                  </div>
+            </div>
+          </div>
      
-          </md-content>
+        </md-content>
       </md-tab>
 
       <md-tab label="TABLE">

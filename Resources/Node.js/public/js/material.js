@@ -722,7 +722,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 
     $scope.lookupLabels = function (inieml) {
         var res = {};
-        debugger; 
+        //debugger; 
         var newTemp = $filter("filter")(lstAllIEML, {IEML:inieml}, true);
 
         res.EN = newTemp[0]?newTemp[0].EN:"none";
