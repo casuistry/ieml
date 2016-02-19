@@ -14,19 +14,19 @@ import NewParser.Tokenizer;
 
 public class RelationGenerator {
 
-	private static String AscSub = "AscSub";
-	private static String AscAtt = "AscAtt";
-	private static String AscMod = "AscMod";
-	private static String DscSub = "DscSub";
-	private static String DscAtt = "DscAtt";
-	private static String DscMod = "DscMod";
+	private static String AscSub = "Ancestors in substance";
+	private static String AscAtt = "Ancestors in attribute";
+	private static String AscMod = "Ancestors in mode";
+	private static String DscSub = "Descendents in substance";
+	private static String DscAtt = "Descendents in attribute";
+	private static String DscMod = "Descendents in mode";
 	
-	private static String GermainJumeau ="GermainJumeau";
-	private static String GermainOpposes ="GermainOpposes";
-	private static String GermainAssocies ="GermainAssocies";
-	private static String GermainCroises = "GermainCroises";
-	private static String ContenuDans = "ContenuDans";
-	private static String Contiens = "Contiens";
+	private static String GermainJumeau ="Twin siblings";
+	private static String GermainOpposes ="Opposed siblings";
+	private static String GermainAssocies ="Associated siblings";
+	private static String GermainCroises = "Crossed siblings";
+	private static String ContenuDans = "Contained in";
+	private static String Contiens = "Contains";
 	
 	// helper to create valid json
 	private static String build(String start, String stop, String name) {
@@ -70,11 +70,12 @@ public class RelationGenerator {
 		//String string = "O:O:.+M:O:.";
 		//String string = "M:M:.-O:M:.-E:.-+s.y.-'";
 		
-		String string = "M:M:.-O:M:.-E:.-+s.y.-'+M:M:.-M:O:.-E:.-+s.y.-'"; //from Pierre
+		//String string = "M:M:.-O:M:.-E:.-+s.y.-'+M:M:.-M:O:.-E:.-+s.y.-'"; //from Pierre
 		//String string = "O:M:.";                     //no germains
 		//String string = "M:O:.M:M:.-+M:M:.M:O:.-";   //germains oppose
 		//String string = "O:M:.O:M:.-+M:O:.M:O:.-";   //germain croises
 		//String string = "O:M:.O:M:.-";                 //contenu check
+		String string = "O:O:.F:.-"; //test for reversed asc/dsc
 		
 		List<String> result = new ArrayList<String>();
 		try {
@@ -449,10 +450,10 @@ public class RelationGenerator {
 			if (!n.IsEmpty()) {
 				
 				if (!n.nodes.get(0).IsEmpty()) {
-					String rel1 = build(inputName, n.nodes.get(0).GetName(), DscSub);					
+					String rel1 = build(inputName, n.nodes.get(0).GetName(), AscSub);					
 					if (!result.containsKey(rel1))
 						result.put(rel1, rel1);
-					String rel2 = build(n.nodes.get(0).GetName(), inputName, AscSub);
+					String rel2 = build(n.nodes.get(0).GetName(), inputName, DscSub);
 					if (!result.containsKey(rel2))
 						result.put(rel2, rel2);					
 //					HashMap<String, String> t = BuildFamilyRecursive(n.nodes.get(0));
@@ -463,10 +464,10 @@ public class RelationGenerator {
 				}
 
 				if (!n.nodes.get(1).IsEmpty()) {
-					String rel1 = build(inputName, n.nodes.get(1).GetName(), DscAtt);					
+					String rel1 = build(inputName, n.nodes.get(1).GetName(), AscAtt);					
 					if (!result.containsKey(rel1))
 						result.put(rel1, rel1);
-					String rel2 = build(n.nodes.get(1).GetName(), inputName, AscAtt);
+					String rel2 = build(n.nodes.get(1).GetName(), inputName, DscAtt);
 					if (!result.containsKey(rel2))
 						result.put(rel2, rel2);					
 //					HashMap<String, String> t = BuildFamilyRecursive(n.nodes.get(1));
@@ -477,10 +478,10 @@ public class RelationGenerator {
 				}
 
 				if (!n.nodes.get(2).IsEmpty()) {
-					String rel1 = build(inputName, n.nodes.get(2).GetName(), DscMod);					
+					String rel1 = build(inputName, n.nodes.get(2).GetName(), AscMod);					
 					if (!result.containsKey(rel1))
 						result.put(rel1, rel1);
-					String rel2 = build(n.nodes.get(2).GetName(), inputName, AscMod);
+					String rel2 = build(n.nodes.get(2).GetName(), inputName, DscMod);
 					if (!result.containsKey(rel2))
 						result.put(rel2, rel2);					
 					HashMap<String, String> t = BuildFamilyRecursive(n.nodes.get(2));
