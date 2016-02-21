@@ -64,7 +64,7 @@ public class RelationGenerator {
 				
 		//String string = "T:M:.e.-M:M:.i.-E:.-+wa.e.-'";
 	    
-		//String string = "O:S:T:.";
+		String string = "O:U:.U:.-";
 		//String string = "O:M:.";
 		//String string = "(S:+O:)O:.";
 		//String string = "O:O:.+M:O:.";
@@ -75,7 +75,7 @@ public class RelationGenerator {
 		//String string = "M:O:.M:M:.-+M:M:.M:O:.-";   //germains oppose
 		//String string = "O:M:.O:M:.-+M:O:.M:O:.-";   //germain croises
 		//String string = "O:M:.O:M:.-";                 //contenu check
-		String string = "O:O:.F:.-"; //test for reversed asc/dsc
+		//String string = "O:O:.F:.-"; //test for reversed asc/dsc
 		
 		List<String> result = new ArrayList<String>();
 		try {
@@ -134,7 +134,11 @@ public class RelationGenerator {
 		
 		ArrayList<Set<String>> cRels = new ArrayList<Set<String>>();  
 		ArrayList<Token> cRelsTokens = new ArrayList<Token>();
-				
+
+		// Hack: GetExpanded can return strings that are supposed to be equivalent but their string representation is
+		// different because of empties.
+		HashMap<String, String> dupFinder = new HashMap<String, String>();
+		
 		try {
 			//get the root
 			Token rootToken = GetTokenInternal(input);
@@ -144,6 +148,14 @@ public class RelationGenerator {
 			for (String perms : permutations.keySet()) {		
 
 				Token token = GetTokenInternal(perms);
+				
+				if (!dupFinder.containsKey(token.GetName())) {
+					dupFinder.put(token.GetName(), token.GetName());
+				}
+				else {
+					continue;
+				}
+				
 				//if additive at top layer, ignore as it cannot be a table or a cell
 				if (token.layer > 0 && token.opCode.equals(Tokenizer.addition))
 					continue;								
