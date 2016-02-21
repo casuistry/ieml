@@ -218,28 +218,46 @@ public class RelationGenerator {
 				for (int i = 0; i < cRels.size(); i++){
 					
 					Set<String> setA = cRels.get(i);
-					//we only want tables, so skip sequences singulieres
-					if (setA.size() < 2 )
-						continue;
 					
-					result.add(build(rootToken.GetName(), cRelsTokens.get(i).GetName(), Contiens));
+					// for all
 					result.add(build(cRelsTokens.get(i).GetName(), rootToken.GetName(), ContenuDans));
+					
+					// for tables only 
+					if (setA.size() > 1) {
+						result.add(build(rootToken.GetName(), cRelsTokens.get(i).GetName(), Contiens));
+					}					
 					
 					for (int j = i+1; j < cRels.size(); j++){
 						
 						Set<String> setB = cRels.get(j);					
-						//we only want tables, so skip sequences singulieres
-						if (setB.size() < 2)
+								
+						if (setA.size() < 2 && setB.size() < 2) //both cells
 							continue;
-											
-						if (setA.containsAll(setB)) {
-							result.add(build(cRelsTokens.get(i).GetName(), cRelsTokens.get(j).GetName(), Contiens));
-							result.add(build(cRelsTokens.get(j).GetName(), cRelsTokens.get(i).GetName(), ContenuDans));
+						
+						if (setA.size() > 1 && setB.size() > 1) { // both tables
+							
+							if (setA.containsAll(setB)) {
+								result.add(build(cRelsTokens.get(i).GetName(), cRelsTokens.get(j).GetName(), Contiens));
+								result.add(build(cRelsTokens.get(j).GetName(), cRelsTokens.get(i).GetName(), ContenuDans));
+							}
+							
+							if (setB.containsAll(setA)) {
+								result.add(build(cRelsTokens.get(j).GetName(), cRelsTokens.get(i).GetName(), Contiens));
+								result.add(build(cRelsTokens.get(i).GetName(), cRelsTokens.get(j).GetName(), ContenuDans));
+							} 
 						}
-						if (setB.containsAll(setA)) {
-							result.add(build(cRelsTokens.get(j).GetName(), cRelsTokens.get(i).GetName(), Contiens));
-							result.add(build(cRelsTokens.get(i).GetName(), cRelsTokens.get(j).GetName(), ContenuDans));
-						} 
+						
+						if (setA.size() > 1 && setB.size() < 2) { // table and cell
+							if (setA.containsAll(setB)) {
+								result.add(build(cRelsTokens.get(j).GetName(), cRelsTokens.get(i).GetName(), ContenuDans));
+							}
+						}
+
+						if (setA.size() < 2 && setB.size() > 1) { // call and table
+							if (setB.containsAll(setA)) {
+								result.add(build(cRelsTokens.get(i).GetName(), cRelsTokens.get(j).GetName(), ContenuDans));
+							}
+						}
 					}
 				}
 			}
