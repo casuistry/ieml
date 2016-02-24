@@ -27,6 +27,7 @@ public class RelationGenerator {
 	private static String GermainCroises = "Crossed siblings";
 	private static String ContenuDans = "Contained in";
 	private static String Contiens = "Contains";
+	private static String BelongsToParadigm = "Belongs to Paradigm";
 	
 	// helper to create valid json
 	private static String build(String start, String stop, String name) {
@@ -232,7 +233,7 @@ public class RelationGenerator {
 					Set<String> setA = cRels.get(i);
 					
 					// for all
-					result.add(build(cRelsTokens.get(i).GetName(), rootToken.GetName(), ContenuDans));
+					result.add(build(cRelsTokens.get(i).GetName(), rootToken.GetName(), BelongsToParadigm));
 					
 					// for tables only 
 					if (setA.size() > 1) {

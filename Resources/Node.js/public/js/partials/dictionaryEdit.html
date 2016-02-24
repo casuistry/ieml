@@ -7,10 +7,20 @@
     <md-tabs md-stretch-tabs="always" md-dynamic-height="" md-border-bottom="">
       <md-tab label="DEFINITIONS">
         <md-content class="md-padding">
+        
+          <div>
+            <p align="left"><b>{{tableTitle}}</b> {{lookupLabels(tableTitle).DISP}}</p>
+            <p align="left"><b>Class</b> {{DefinedEntryClass}}</p>
+            <p align="left"><b>Layer</b> {{DefinedEntry.LAYER}}</p>
+            <p align="left"><b>Cardinality</b> {{DefinedEntry.TAILLE}}</p>
+          </div>
+        
+          <br/>
+          
           <label  style="font-style:italic;font-weight:lighter">
             <input type="checkbox" ng-model="showHidden">Show hidden
           </label>
-
+          
           <div ng-repeat="def in definitions"> 
             
             <div layout="col">

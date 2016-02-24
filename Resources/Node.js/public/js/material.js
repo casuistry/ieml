@@ -218,6 +218,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                     allItems[i].LAYER=toBeAdded.LAYER;
                     allItems[i].PARADIGM=toBeAdded.PARADIGM;
                     allItems[i].TAILLE=toBeAdded.TAILLE;
+                    allItems[i].CARDINALITY=toBeAdded.CARDINALITY;
                     allItems[i].CANONICAL=toBeAdded.CANONICAL;
                     break;
                 }
@@ -302,6 +303,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         $scope.data.layer = binding.LAYER;
         $scope.data.gclass = binding.CLASS;
         $scope.data.taille = binding.TAILLE;
+        $scope.data.cardinality = binding.CARDINALITY;
         $scope.data.canonical = binding.CANONICAL;
     };
     
@@ -319,6 +321,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             LAYER:$scope.data.layer.toString(),
             CLASS:$scope.data.gclass.toString(),
             TAILLE:$scope.data.taille.toString(),
+            CARDINALITY:$scope.data.cardinality.toString(),
             CANONICAL:$scope.data.canonical,
             ID:(currIemlEntry!=undefined && currIemlEntry._id!=undefined)?currIemlEntry._id:undefined
         }        
@@ -706,7 +709,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
  
     var tableTitle =  decodeURIComponent($routeParams.IEML);
     var previousTableTile = tableTitle;
-     var lstAllIEML = sharedProperties.getAllItems();
+    var lstAllIEML = sharedProperties.getAllItems();
       
     init();
 
@@ -772,19 +775,24 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         // TODO: if from bookmark, this will be undefined.
         $scope.filterLanguage = sharedProperties.filterLanguageSelected;
 
-        var v = sharedProperties.getIemlEntry();
         sharedProperties.setIemlEntry(null);
         
-        //if (v == null) {
-        if (1==1) {
-            //  the view is opened by bookmark try to get it from the URL
-            init_0();
-            tableTitle = decodeURIComponent($routeParams.IEML);
+        crudFactory.get().success(function(data) {
+            $scope.List = data;
+            sharedProperties.setAllItems(data);
+            lstAllIEML = sharedProperties.getAllItems();
             $scope.tableTitle = tableTitle;
-        } else {
-            tableTitle = v.IEML;
-        }
-
+            // get other info from entry
+            $scope.DefinedEntry = $filter("filter")(lstAllIEML, {IEML:tableTitle}, true)[0];
+            $scope.DefinedEntryClass = "n/a"
+            if ($scope.DefinedEntry.CLASS == "1") 
+                $scope.DefinedEntryClass = "Auxilliary";
+            if ($scope.DefinedEntry.CLASS == "2") 
+                $scope.DefinedEntryClass = "Verb";
+            if ($scope.DefinedEntry.CLASS == "4") 
+                $scope.DefinedEntryClass = "Noun";            
+        });
+        
         crudFactory.rels(tableTitle).success(function(data) {
             $scope.definitions = data;
         });
