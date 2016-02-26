@@ -724,10 +724,20 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     };
 
     $scope.lookupLabels = function (inieml) {
+        
         var res = {};
-        //debugger; 
+        
+        if (inieml == undefined) 
+            return res;
+        
         var newTemp = $filter("filter")(lstAllIEML, {IEML:inieml}, true);
 
+        if (newTemp == undefined) 
+            return res;
+        
+        if (newTemp.length == 0) 
+            return res;
+        
         res.EN = newTemp[0]?newTemp[0].EN:"none";
         res.FR = newTemp[0]?newTemp[0].FR:"none";
         
@@ -739,7 +749,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         }
  
         return res;
-
     };
 
     $scope.toggleRelVis = function(reltype) {
@@ -761,6 +770,136 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         });
     };
 
+    function orderRelationsList() {
+
+        function getRelVal(name) {
+            
+            /*private static String AscSub = "Ancestors in substance";
+            private static String AscAtt = "Ancestors in attribute";
+            private static String AscMod = "Ancestors in mode";
+            private static String DscSub = "Descendents in substance";
+            private static String DscAtt = "Descendents in attribute";
+            private static String DscMod = "Descendents in mode";
+            
+            private static String GermainJumeau ="Twin siblings";
+            private static String GermainOpposes ="Opposed siblings";
+            private static String GermainAssocies ="Associated siblings";
+            private static String GermainCroises = "Crossed siblings";
+            private static String ContenuDans = "Contained in";
+            private static String Contiens = "Contains";
+            private static String BelongsToParadigm = "Belongs to Paradigm"; */
+            
+            if (name == "Belongs to Paradigm")
+                return 0;
+            if (name == "Contains")
+                return 1;     
+            if (name == "Contained in")
+                return 2;    
+            if (name == "Associated siblings")
+                return 3;
+            if (name == "Opposed siblings")
+                return 4;     
+            if (name == "Twin siblings")
+                return 5;
+            if (name == "Crossed siblings")
+                return 6;     
+            if (name == "Ancestors in substance")
+                return 7;
+            if (name == "Ancestors in attribute")
+                return 8;     
+            if (name == "Ancestors in mode")
+                return 9;
+            if (name == "Descendents in substance")
+                return 10;      
+            if (name == "Descendents in attribute")
+                return 11;
+            if (name == "Descendents in mode")
+                return 12;     
+            return 13;
+        }
+        
+        function relationsOrderFunction(a, b){
+            var a_val = getRelVal(a.reltype);
+            var b_val = getRelVal(b.reltype);
+            if (a_val < b_val)
+                return -1;
+            if (a_val > b_val)
+                return 1;            
+            return 0;
+        }
+        
+        function iemlOrderFunction(a_name, b_name){
+       
+            if (!a_name.exists && !b_name.exists)
+                return 0;
+            if (a_name.exists && !b_name.exists)
+                return -1;
+            if (!a_name.exists && b_name.exists)
+                return 1;
+            
+            var a_arr = $filter("filter")(lstAllIEML, {IEML:a_name.ieml}, true);
+            var b_arr = $filter("filter")(lstAllIEML, {IEML:b_name.ieml}, true);
+            
+            if (a_arr == undefined || b_arr == undefined) 
+                return 0;
+            
+            if (a_arr.length == 0 || b_arr.length == 0) 
+                return 0;
+                
+            var a = a_arr[0];
+            var b = b_arr[0];
+            
+            //http://www.javascriptkit.com/javatutors/arraysort.shtml
+            //http://stackoverflow.com/questions/979256/sorting-an-array-of-javascript-objects
+            //Compare "a" and "b" in some fashion, and return -1, 0, or 1
+            if (parseInt(a.LAYER) < parseInt(b.LAYER))
+                return -1;
+            if (parseInt(a.LAYER) > parseInt(b.LAYER))
+                return 1;
+            if (parseInt(a.TAILLE) < parseInt(b.TAILLE))
+                return -1;
+            if (parseInt(a.TAILLE) > parseInt(b.TAILLE))
+                return 1;
+            
+            if (a.CANONICAL.length == b.CANONICAL.length) {
+
+                var i=0, len=a.CANONICAL.length;
+                for (; i<len; i++) {  
+                    var comp = a.CANONICAL[i].localeCompare(b.CANONICAL[i]);
+                    if (comp == 0)
+                        continue;
+                    return comp;
+                }                        
+            } else if (a.CANONICAL.length < b.CANONICAL.length) {
+                var i=0, len=a.CANONICAL.length;
+                for (; i<len; i++) {  
+                    var comp = a.CANONICAL[i].localeCompare(b.CANONICAL[i]);
+                    if (comp == 0)
+                        continue;
+                    return comp;
+                }
+            } else {
+                var i=0, len=b.CANONICAL.length;
+                for (; i<len; i++) {  
+                    var comp = a.CANONICAL[i].localeCompare(b.CANONICAL[i]);
+                    if (comp == 0)
+                        continue;
+                    return comp;
+                }                
+            }
+
+            return 0;
+        }
+        
+        // sort relation names
+        $scope.definitions.sort(relationsOrderFunction);
+        // sort relation endpoints based on ieml order
+        $scope.definitions.forEach(function(el){
+            if (el.rellist.length > 1)
+                el.rellist.sort(iemlOrderFunction);
+        });
+    };
+    
     //TODO  can be redesigned to always load before any view
     function init_0() {
         crudFactory.get().success(function(data) {
@@ -795,6 +934,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         
         crudFactory.rels(tableTitle).success(function(data) {
             $scope.definitions = data;
+            orderRelationsList();
         });
 
         crudFactory.iemltable(tableTitle).success(function(data) {
@@ -814,7 +954,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                         var input = $scope.fakeReply.Tables[i].table[j].slice[k].value;
                         if (input != "") {
                             var means = $scope.crossCheck(input);
-                            if (means.length > 0) {
+                            if (means != undefined || means.length > 0) {
                                 //{ieml:"b.u.-",terms:[{lang:"FR",means:"parole"},{lang:"EN",means:"speech"}],paradigm:"0",layer:"2",class:"2"}
                                 var f = means[0].FR;
                                 var e = means[0].EN;
