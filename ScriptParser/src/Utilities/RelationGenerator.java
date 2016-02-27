@@ -38,14 +38,32 @@ public class RelationGenerator {
 		return String.format(format, start, stop, name);
 	}
 	
-	private static String buildJSON(List<String> result) {
+	private static String buildJSON(List<String> result, List<String> onTheFly) {
+		
 		StringBuilder builder = new StringBuilder("{\"relations\":[");
+		
 		for (int i = 0; i < result.size(); i++){
 			builder.append(result.get(i));
 			if (i < result.size() - 1)
 				builder.append(",");
 		}
-		builder.append("]}");
+		
+		if (onTheFly.size() == 0)
+			builder.append("]}");
+		else {
+			
+			builder.append("],");
+			builder.append("\"relations_nonperst\":[");
+			
+			for (int i = 0; i < onTheFly.size(); i++){
+				builder.append(onTheFly.get(i));
+				if (i < onTheFly.size() - 1)
+					builder.append(",");
+			}
+			
+			builder.append("]}");
+		}
+
 		return builder.toString();	
 	}
 	
@@ -65,54 +83,56 @@ public class RelationGenerator {
 				
 		//String string = "T:M:.e.-M:M:.i.-E:.-+wa.e.-'";
 	    
-		String string = "O:U:.U:.-";
+		//String string = "O:U:.U:.-";
 		//String string = "O:M:.";
 		//String string = "(S:+O:)O:.";
 		//String string = "O:O:.+M:O:.";
 		//String string = "M:M:.-O:M:.-E:.-+s.y.-'";
 		
-		//String string = "M:M:.-O:M:.-E:.-+s.y.-'+M:M:.-M:O:.-E:.-+s.y.-'"; //from Pierre
+		String string = "M:M:.-O:M:.-E:.-+s.y.-'+M:M:.-M:O:.-E:.-+s.y.-'"; //from Pierre
 		//String string = "O:M:.";                     //no germains
 		//String string = "M:O:.M:M:.-+M:M:.M:O:.-";   //germains oppose
 		//String string = "O:M:.O:M:.-+M:O:.M:O:.-";   //germain croises
 		//String string = "O:M:.O:M:.-";                 //contenu check
 		//String string = "O:O:.F:.-"; //test for reversed asc/dsc
+		//String string = "E:S:.";
 		
-		List<String> result = new ArrayList<String>();
+//		List<String> result = new ArrayList<String>();
 		try {
-			result = generateRelationsImpl(string, 1);
+//			result = generateRelationsImpl(string, 1);
 			
-			System.out.println(generateRelations(string, 1));
+			String s = generateRelations(string, 1);
+			System.out.println(s);
 			
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
-		HashMap<String, String> check = new HashMap<String, String>();
+//		HashMap<String, String> check = new HashMap<String, String>();
 		
-		for (String rel : result) {					
-			if (!check.containsKey(rel))
-				check.put(rel, rel);
-			else
-				System.out.println("Duplicate: " + rel);
-		}
+//		for (String rel : result) {					
+//			if (!check.containsKey(rel))
+//				check.put(rel, rel);
+//			else
+//				System.out.println("Duplicate: " + rel);
+//		}
 		
-		try {
-			
-			BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\relations.log"));
-			
-			for (String rel : result){		
-				bw.write(rel);
-				bw.newLine();
-			}
-			
-			bw.close();
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			
+//			BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\relations.log"));
+//			
+//			for (String rel : result){		
+//				bw.write(rel);
+//				bw.newLine();
+//			}
+//			
+//			bw.close();
+//			
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		System.out.println("Done ");
 	}
@@ -121,11 +141,73 @@ public class RelationGenerator {
 	public static String generateRelations(String input, int paradigm) {
 		
 		try {
+			
 			List<String> result = generateRelationsImpl(input, paradigm);
-			return buildJSON(result);			
+			List<String> onTheFly = generateRelationsImpl_nonpersist(input);
+			
+			HashMap<String, String> check = new HashMap<String, String>();
+			
+			for (String rel : result) {					
+				if (!check.containsKey(rel))
+					check.put(rel, rel);
+				else
+					System.out.println("Duplicate relation: " + rel);
+			}
+			
+			for (String rel : onTheFly) {					
+				if (!check.containsKey(rel))
+					check.put(rel, rel);
+				else
+					System.out.println("Duplicate ascendent: " + rel);
+			}
+
+//			for (String r : check.keySet()) {
+//				System.out.println(r);
+//			}
+//			try {
+//			
+//			BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\relations.log"));
+//			
+//			for (String rel : check.keySet()){		
+//				bw.write(rel);
+//				bw.newLine();
+//			}
+//			
+//			bw.close();
+//			
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+			
+			return buildJSON(result, onTheFly);	
+	
 		} catch (Exception e) {
 			return e.getMessage();
 		}
+	}
+	
+	private static List<String> generateRelationsImpl_nonpersist(String input) {
+		ArrayList<String> result = new ArrayList<String>();
+		
+		try {
+			//get the root
+			Token rootToken = GetTokenInternal(input);
+			
+			//extract parental relations by reading the data structure
+			HashMap<String, String> temp_rels = new HashMap<String, String>();
+			HashMap<String, String> temp = BuildAscendentTree(rootToken);
+			for (String k : temp.keySet()) {
+				if (!temp_rels.containsKey(k))
+					temp_rels.put(k, k);
+			}		
+			result.addAll(temp_rels.keySet());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 	
 	private static List<String> generateRelationsImpl(String input, int paradigm) throws Exception {
@@ -227,48 +309,51 @@ public class RelationGenerator {
 					}
 				}
 
-				//extract contain relations by reading the data structure
-				for (int i = 0; i < cRels.size(); i++){
-					
-					Set<String> setA = cRels.get(i);
-					
-					// for all
-					result.add(build(cRelsTokens.get(i).GetName(), rootToken.GetName(), BelongsToParadigm));
-					
-					// for tables only 
-					if (setA.size() > 1) {
-						result.add(build(rootToken.GetName(), cRelsTokens.get(i).GetName(), Contiens));
-					}					
-					
-					for (int j = i+1; j < cRels.size(); j++){
+				// if only one element, it will be itself and cannot have caontain relations
+				if (cRels.size() > 1) {
+					//extract contain relations by reading the data structure
+					for (int i = 0; i < cRels.size(); i++){
 						
-						Set<String> setB = cRels.get(j);					
+						Set<String> setA = cRels.get(i);
+						
+						// for all
+						result.add(build(cRelsTokens.get(i).GetName(), rootToken.GetName(), BelongsToParadigm));
+						
+						// for tables only 
+						if (setA.size() > 1) {
+							result.add(build(rootToken.GetName(), cRelsTokens.get(i).GetName(), Contiens));
+						}					
+						
+						for (int j = i+1; j < cRels.size(); j++){
+							
+							Set<String> setB = cRels.get(j);					
+									
+							if (setA.size() < 2 && setB.size() < 2) //both cells
+								continue;
+							
+							if (setA.size() > 1 && setB.size() > 1) { // both tables
 								
-						if (setA.size() < 2 && setB.size() < 2) //both cells
-							continue;
-						
-						if (setA.size() > 1 && setB.size() > 1) { // both tables
-							
-							if (setA.containsAll(setB)) {
-								result.add(build(cRelsTokens.get(i).GetName(), cRelsTokens.get(j).GetName(), Contiens));
-								result.add(build(cRelsTokens.get(j).GetName(), cRelsTokens.get(i).GetName(), ContenuDans));
+								if (setA.containsAll(setB)) {
+									result.add(build(cRelsTokens.get(i).GetName(), cRelsTokens.get(j).GetName(), Contiens));
+									result.add(build(cRelsTokens.get(j).GetName(), cRelsTokens.get(i).GetName(), ContenuDans));
+								}
+								
+								if (setB.containsAll(setA)) {
+									result.add(build(cRelsTokens.get(j).GetName(), cRelsTokens.get(i).GetName(), Contiens));
+									result.add(build(cRelsTokens.get(i).GetName(), cRelsTokens.get(j).GetName(), ContenuDans));
+								} 
 							}
 							
-							if (setB.containsAll(setA)) {
-								result.add(build(cRelsTokens.get(j).GetName(), cRelsTokens.get(i).GetName(), Contiens));
-								result.add(build(cRelsTokens.get(i).GetName(), cRelsTokens.get(j).GetName(), ContenuDans));
-							} 
-						}
-						
-						if (setA.size() > 1 && setB.size() < 2) { // table and cell
-							if (setA.containsAll(setB)) {
-								result.add(build(cRelsTokens.get(j).GetName(), cRelsTokens.get(i).GetName(), ContenuDans));
+							if (setA.size() > 1 && setB.size() < 2) { // table and cell
+								if (setA.containsAll(setB)) {
+									result.add(build(cRelsTokens.get(j).GetName(), cRelsTokens.get(i).GetName(), ContenuDans));
+								}
 							}
-						}
 
-						if (setA.size() < 2 && setB.size() > 1) { // call and table
-							if (setB.containsAll(setA)) {
-								result.add(build(cRelsTokens.get(i).GetName(), cRelsTokens.get(j).GetName(), ContenuDans));
+							if (setA.size() < 2 && setB.size() > 1) { // call and table
+								if (setB.containsAll(setA)) {
+									result.add(build(cRelsTokens.get(i).GetName(), cRelsTokens.get(j).GetName(), ContenuDans));
+								}
 							}
 						}
 					}
@@ -481,9 +566,9 @@ public class RelationGenerator {
 			if (!n.IsEmpty()) {
 				
 				if (!n.nodes.get(0).IsEmpty()) {
-					String rel1 = build(inputName, n.nodes.get(0).GetName(), AscSub);					
-					if (!result.containsKey(rel1))
-						result.put(rel1, rel1);
+//					String rel1 = build(inputName, n.nodes.get(0).GetName(), AscSub);					
+//					if (!result.containsKey(rel1))
+//						result.put(rel1, rel1);
 					String rel2 = build(n.nodes.get(0).GetName(), inputName, DscSub);
 					if (!result.containsKey(rel2))
 						result.put(rel2, rel2);					
@@ -495,9 +580,9 @@ public class RelationGenerator {
 				}
 
 				if (!n.nodes.get(1).IsEmpty()) {
-					String rel1 = build(inputName, n.nodes.get(1).GetName(), AscAtt);					
-					if (!result.containsKey(rel1))
-						result.put(rel1, rel1);
+//					String rel1 = build(inputName, n.nodes.get(1).GetName(), AscAtt);					
+//					if (!result.containsKey(rel1))
+//						result.put(rel1, rel1);
 					String rel2 = build(n.nodes.get(1).GetName(), inputName, DscAtt);
 					if (!result.containsKey(rel2))
 						result.put(rel2, rel2);					
@@ -509,13 +594,13 @@ public class RelationGenerator {
 				}
 
 				if (!n.nodes.get(2).IsEmpty()) {
-					String rel1 = build(inputName, n.nodes.get(2).GetName(), AscMod);					
-					if (!result.containsKey(rel1))
-						result.put(rel1, rel1);
+//					String rel1 = build(inputName, n.nodes.get(2).GetName(), AscMod);					
+//					if (!result.containsKey(rel1))
+//						result.put(rel1, rel1);
 					String rel2 = build(n.nodes.get(2).GetName(), inputName, DscMod);
 					if (!result.containsKey(rel2))
 						result.put(rel2, rel2);					
-					HashMap<String, String> t = BuildFamilyRecursive(n.nodes.get(2));
+//					HashMap<String, String> t = BuildFamilyRecursive(n.nodes.get(2));
 //					for (String k : t.keySet()) {
 //						if (!result.containsKey(k))
 //							result.put(k, k);
@@ -525,6 +610,70 @@ public class RelationGenerator {
 
 		} else {
 			throw new Exception("Cannot generate family relations");
+		}
+		
+		return result;
+	}
+	
+	private static HashMap<String, String> BuildAscendentTree(Token n) throws Exception {
+		
+		HashMap<String, String> result = new HashMap<String, String>();
+				
+		String inputName = n.GetName();
+		
+		if (n.layer == 0) {
+			// no relations
+		} else if (n.opCode.equals(Tokenizer.addition)) {
+			// no relations
+		} else if (n.opCode.equals(Tokenizer.multiplication)) {
+			
+			if (!n.IsEmpty()) {
+				
+				if (!n.nodes.get(0).IsEmpty()) {
+					String rel1 = build(inputName, n.nodes.get(0).GetName(), AscSub);					
+					if (!result.containsKey(rel1))
+						result.put(rel1, rel1);
+//					String rel2 = build(n.nodes.get(0).GetName(), inputName, DscSub);
+//					if (!result.containsKey(rel2))
+//						result.put(rel2, rel2);					
+					HashMap<String, String> t = BuildAscendentTree(n.nodes.get(0));
+					for (String k : t.keySet()) {
+						if (!result.containsKey(k))
+							result.put(k, k);
+					}
+				}
+
+				if (!n.nodes.get(1).IsEmpty()) {
+					String rel1 = build(inputName, n.nodes.get(1).GetName(), AscAtt);					
+					if (!result.containsKey(rel1))
+						result.put(rel1, rel1);
+//					String rel2 = build(n.nodes.get(1).GetName(), inputName, DscAtt);
+//					if (!result.containsKey(rel2))
+//						result.put(rel2, rel2);					
+					HashMap<String, String> t = BuildAscendentTree(n.nodes.get(1));
+					for (String k : t.keySet()) {
+						if (!result.containsKey(k))
+							result.put(k, k);
+					}
+				}
+
+				if (!n.nodes.get(2).IsEmpty()) {
+					String rel1 = build(inputName, n.nodes.get(2).GetName(), AscMod);					
+					if (!result.containsKey(rel1))
+						result.put(rel1, rel1);
+//					String rel2 = build(n.nodes.get(2).GetName(), inputName, DscMod);
+//					if (!result.containsKey(rel2))
+//						result.put(rel2, rel2);					
+					HashMap<String, String> t = BuildAscendentTree(n.nodes.get(2));
+					for (String k : t.keySet()) {
+						if (!result.containsKey(k))
+							result.put(k, k);
+					}
+				}
+			}
+
+		} else {
+			throw new Exception("Cannot generate ascendent relations");
 		}
 		
 		return result;
