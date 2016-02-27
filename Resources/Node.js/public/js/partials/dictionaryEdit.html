@@ -5,7 +5,7 @@
     <h2 align="center">{{tableTitle}}</h2> 
 
     <md-tabs md-stretch-tabs="always" md-dynamic-height="" md-border-bottom="">
-      <md-tab label="DEFINITIONS">
+      <md-tab label="DEFINITION">
         <md-content class="md-padding">
         
           <div>
@@ -86,13 +86,37 @@
           </md-tabs>
 		</div>
 
-  
-		
-    		<div ng-show="!showTables">
-    		<h2>{{tableError}}</h2>
-    		</div>
-		
-		
+   		<div ng-show="!showTables">
+        
+           <div ng-repeat="def in definitions | filter:filterContainedRelations()"> 
+            
+            <div layout="col">
+              <li style = "width:15%;padding-top: 2px;" > 
+               {{def.reltype}}
+              </li>    
+            </div>
+            
+            <div ng-repeat="lnk in def.rellist">
+                <div layout="column"  ng-show="(lnk.exists && lnk.visible)||showHidden">                               
+                     <table>
+                         <tr>
+                            <td style="width:400px;"> 
+                              <a style="border: none;" align="left" href="#/dicEdit/IEML/{{lnk.ieml}}" target="_self" ng-show="(lnk.exists && lnk.visible)||showHidden"  ng-class="{disabled:!lnk.exists, buttonflat:lnk.exists, buttonflatdis:!lnk.exists}"   class="btn">{{lnk.ieml}}</a>
+                            </td>
+                              
+                            <td>
+                                <table>
+                                    <tr> <p  align="left">{{lookupLabels(lnk.ieml).DISP}}</p></tr>
+                                </table>
+                            </td>
+                         </tr>
+                    </table>
+                  </div>
+            </div>
+          </div>
+          
+    		<!--h2>{{tableError}}</h2-->
+   		</div>	
 		
         </md-content>
       </md-tab>

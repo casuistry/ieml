@@ -900,6 +900,24 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         });
     };
     
+    // if a table cannot be generated for a particular input,
+    // we show tables that contain the input. This filters all 
+    // relations for the 'contain' relations.
+    $scope.filterContainedRelations = function() {
+        
+        /*  private static String ContenuDans = "Contained in";
+            private static String Contiens = "Contains";
+            private static String BelongsToParadigm = "Belongs to Paradigm"; */
+            
+        return function(input) {
+            if (input.reltype == "Belongs to Paradigm" || 
+                input.reltype == "Contained in" )
+              return true;
+          
+            return false;
+        }
+    };
+    
     //TODO  can be redesigned to always load before any view
     function init_0() {
         crudFactory.get().success(function(data) {
