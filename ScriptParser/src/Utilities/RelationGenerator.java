@@ -89,19 +89,20 @@ public class RelationGenerator {
 		//String string = "O:O:.+M:O:.";
 		//String string = "M:M:.-O:M:.-E:.-+s.y.-'";
 		
-		//String string = "M:M:.-O:M:.-E:.-+s.y.-'+M:M:.-M:O:.-E:.-+s.y.-'"; //from Pierre
+		String string = "M:M:.-O:M:.-E:.-+s.y.-'+M:M:.-M:O:.-E:.-+s.y.-'"; //from Pierre
 		//String string = "O:M:.";                     //no germains
 		//String string = "M:O:.M:M:.-+M:M:.M:O:.-";   //germains oppose
 		//String string = "O:M:.O:M:.-+M:O:.M:O:.-";   //germain croises
 		//String string = "O:M:.O:M:.-";                 //contenu check
 		//String string = "O:O:.F:.-"; //test for reversed asc/dsc
-		String string = "k.-O:M:.-+M:O:.-s.y.-'";
+		//String string = "k.-O:M:.-+M:O:.-s.y.-'";
+		//String string = "E:E:U:.";
 		
 //		List<String> result = new ArrayList<String>();
 		try {
 //			result = generateRelationsImpl(string, 1);
 			
-			String s = generateRelations(string, 3);
+			String s = generateRelations(string, 1);
 			System.out.println(s);
 			
 		} catch (Exception e1) {
@@ -149,7 +150,7 @@ public class RelationGenerator {
 				result = generateRelationsImpl(input, paradigm);
 			}
 			else {
-				onTheFly = generateRelationsImpl_nonpersist(input);
+				//onTheFly = generateRelationsImpl_nonpersist(input);
 			}
 						
 			HashMap<String, String> check = new HashMap<String, String>();
@@ -278,7 +279,7 @@ public class RelationGenerator {
 			
 			//extract parental relations by reading the data structure
 			HashMap<String, String> temp_rels = new HashMap<String, String>();
-			HashMap<String, String> temp = BuildFamilyRecursive(rootToken);
+			HashMap<String, String> temp = BuildFamily(rootToken);
 			for (String k : temp.keySet()) {
 				if (!temp_rels.containsKey(k))
 					temp_rels.put(k, k);
@@ -558,7 +559,35 @@ public class RelationGenerator {
 		return false;
 	}
 
-	private static HashMap<String, String> BuildFamilyRecursive(Token n) throws Exception {
+	private static HashMap<String, String> getAscRecursive(String start, String relation, Token n) throws Exception {
+		
+		HashMap<String, String> result = new HashMap<String, String>();
+		
+		String rel1 = build(start, n.GetName(), relation);
+		result.put(rel1, rel1);
+		    
+		if (n.layer == 0) {
+			// no relations
+		} else if (n.opCode.equals(Tokenizer.addition)) {
+			// no relations
+		} else if (n.opCode.equals(Tokenizer.multiplication)) {
+			
+			for (int i = 0; i < 3; i++) {
+				
+				Token child = n.nodes.get(i);
+				if (!child.IsEmpty()) {
+					HashMap<String, String> temp = getAscRecursive(start, relation, child);
+					for (String key : temp.keySet()){
+						result.put(key, key);
+					}
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	private static HashMap<String, String> BuildFamily(Token n) throws Exception {
 		
 		HashMap<String, String> result = new HashMap<String, String>();
 				
@@ -579,11 +608,11 @@ public class RelationGenerator {
 					String rel2 = build(n.nodes.get(0).GetName(), inputName, DscSub);
 					if (!result.containsKey(rel2))
 						result.put(rel2, rel2);					
-//					HashMap<String, String> t = BuildFamilyRecursive(n.nodes.get(0));
-//					for (String k : t.keySet()) {
-//						if (!result.containsKey(k))
-//							result.put(k, k);
-//					}
+					HashMap<String, String> t = getAscRecursive(inputName, AscSub, n.nodes.get(0));
+					for (String k : t.keySet()) {
+						if (!result.containsKey(k))
+							result.put(k, k);
+					}
 				}
 
 				if (!n.nodes.get(1).IsEmpty()) {
@@ -593,11 +622,11 @@ public class RelationGenerator {
 					String rel2 = build(n.nodes.get(1).GetName(), inputName, DscAtt);
 					if (!result.containsKey(rel2))
 						result.put(rel2, rel2);					
-//					HashMap<String, String> t = BuildFamilyRecursive(n.nodes.get(1));
-//					for (String k : t.keySet()) {
-//						if (!result.containsKey(k))
-//							result.put(k, k);
-//					}
+					HashMap<String, String> t = getAscRecursive(inputName, AscAtt, n.nodes.get(1));
+					for (String k : t.keySet()) {
+						if (!result.containsKey(k))
+							result.put(k, k);
+					}
 				}
 
 				if (!n.nodes.get(2).IsEmpty()) {
@@ -607,11 +636,11 @@ public class RelationGenerator {
 					String rel2 = build(n.nodes.get(2).GetName(), inputName, DscMod);
 					if (!result.containsKey(rel2))
 						result.put(rel2, rel2);					
-//					HashMap<String, String> t = BuildFamilyRecursive(n.nodes.get(2));
-//					for (String k : t.keySet()) {
-//						if (!result.containsKey(k))
-//							result.put(k, k);
-//					}
+					HashMap<String, String> t = getAscRecursive(inputName, AscMod, n.nodes.get(2));
+					for (String k : t.keySet()) {
+						if (!result.containsKey(k))
+							result.put(k, k);
+					}
 				}
 			}
 

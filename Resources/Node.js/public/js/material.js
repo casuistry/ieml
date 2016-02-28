@@ -54,7 +54,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         exists : function(input, inputType) {
             return $http.get('../api/exists/' + inputType + '/' + input);
         },
-
+        
         iemlvalid : function(input) {            
           $http.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
           return $http.post('http://test-ieml.rhcloud.com/ScriptParser/rest/iemlparser', 'iemltext='+encodeURIComponent(input));
@@ -71,11 +71,12 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         },
 
         rels : function(input)  {
-                var data ={};
-                data.ieml = input;
-                $http.defaults.headers.post["Content-Type"] = "application/json";
-                return $http.post('../api/rels', data);
-        },
+            var data ={};
+            data.ieml = input;
+            $http.defaults.headers.post["Content-Type"] = "application/json";
+            return $http.post('../api/rels', data);
+        },  
+        
         toggleRels : function(ids) {
             var newData = {};
             $http.defaults.headers.post["Content-Type"] = "application/json";
@@ -218,7 +219,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                     allItems[i].LAYER=toBeAdded.LAYER;
                     allItems[i].PARADIGM=toBeAdded.PARADIGM;
                     allItems[i].TAILLE=toBeAdded.TAILLE;
-                    allItems[i].CARDINALITY=toBeAdded.CARDINALITY;
                     allItems[i].CANONICAL=toBeAdded.CANONICAL;
                     break;
                 }
@@ -303,7 +303,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         $scope.data.layer = binding.LAYER;
         $scope.data.gclass = binding.CLASS;
         $scope.data.taille = binding.TAILLE;
-        $scope.data.cardinality = binding.CARDINALITY;
         $scope.data.canonical = binding.CANONICAL;
     };
     
@@ -321,7 +320,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             LAYER:$scope.data.layer.toString(),
             CLASS:$scope.data.gclass.toString(),
             TAILLE:$scope.data.taille.toString(),
-            CARDINALITY:$scope.data.cardinality.toString(),
             CANONICAL:$scope.data.canonical,
             ID:(currIemlEntry!=undefined && currIemlEntry._id!=undefined)?currIemlEntry._id:undefined
         }        
@@ -954,7 +952,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             $scope.definitions = data;
             orderRelationsList();
         });
-
+        
         crudFactory.iemltable(tableTitle).success(function(data) {
         $scope.fakeReply = data.tree;
         $scope.showTables = true;
