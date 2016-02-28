@@ -485,9 +485,12 @@ var deleteRelsForIEML = function (ieml, db, onDone) {
         },
         // if this was a paradigm, remove all created relations
         function(callback) { 
-            if (is_paradigm) {
+            //if (is_paradigm) {
                 console.log("----loadRelFromParser");
-                loadRelFromParser(ieml, function(err, list) {
+                var isP = 0;
+                if (is_paradigm) 
+                    isP = 1;
+                loadRelFromParser(ieml, isP, function(err, list) {
                   if (err) 
                     console.log("ERROR"+err);
                   else {
@@ -505,10 +508,10 @@ var deleteRelsForIEML = function (ieml, db, onDone) {
                     callback();                    
                   }                 
                 });                 
-            }
-            else {
-                callback();
-            }                       
+            //}
+            //else {
+            //    callback();
+            //}                       
         },
         function(callback) {
             onDone();
@@ -525,13 +528,34 @@ var loadRelsForIEML = function (ieml, db, onDone) {
 
 	var allieml=[];
 	var rellist;
-
+    var is_paradigm = false;
+    
     console.log("loadRelsForIEML method");
 
 	async.series([
         
+        // check if ieml to be deleted is a paradigm
+        function(callback) {
+            console.log("----PARADIGM");
+            db.collection('terms').findOne({IEML:ieml}, {PARADIGM:1}, function(err, result) {
+                if (err) {
+                    console.log("ERROR"+err);
+                }
+                else {
+                    is_paradigm = result.PARADIGM;
+                    console.log("Found PARADIGM: " + is_paradigm);
+                }
+                
+                callback();
+            });            
+        },
         function(callback) {  //call parser REST for the list of relationships
-            loadRelFromParser(ieml, function(err, list) {
+        
+            var isP = 0;
+            if (is_paradigm) 
+                isP = 1;     
+            
+            loadRelFromParser(ieml, isP, function(err, list) {
                 if (err) return callback(err);
                 rellist = list;
                 callback(); 
@@ -562,7 +586,7 @@ var loadRelsForIEML = function (ieml, db, onDone) {
                 callback();
 			});
         },
-        function (callback) { //prepeare and load relationships db
+        function (callback) { //prepare and load relationships db
         	loadRelationships(ieml, rellist, allieml, db, function (err, loadedrecs) { 
    			    console.log("SUCCESSFULLY LOADED RELATIONSHIPS "+JSON.stringify(loadedrecs));
    			    callback();
@@ -766,7 +790,7 @@ var updateRelations = function (delta, db, onDone) {
     );
 };
 
-var loadRelFromParser = function (ieml, callback) {
+var loadRelFromParser = function (ieml, isP, callback) {
 
 	    var http = require('http');
 
@@ -775,7 +799,7 @@ var loadRelFromParser = function (ieml, callback) {
 
 		var postData = querystring.stringify({
 		  'iemltext' : ieml,
-          'parad'    : 1
+          'parad'    : isP
 		});
 
 		var options = {

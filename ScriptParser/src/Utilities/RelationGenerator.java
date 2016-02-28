@@ -89,19 +89,19 @@ public class RelationGenerator {
 		//String string = "O:O:.+M:O:.";
 		//String string = "M:M:.-O:M:.-E:.-+s.y.-'";
 		
-		String string = "M:M:.-O:M:.-E:.-+s.y.-'+M:M:.-M:O:.-E:.-+s.y.-'"; //from Pierre
+		//String string = "M:M:.-O:M:.-E:.-+s.y.-'+M:M:.-M:O:.-E:.-+s.y.-'"; //from Pierre
 		//String string = "O:M:.";                     //no germains
 		//String string = "M:O:.M:M:.-+M:M:.M:O:.-";   //germains oppose
 		//String string = "O:M:.O:M:.-+M:O:.M:O:.-";   //germain croises
 		//String string = "O:M:.O:M:.-";                 //contenu check
 		//String string = "O:O:.F:.-"; //test for reversed asc/dsc
-		//String string = "E:S:.";
+		String string = "k.-O:M:.-+M:O:.-s.y.-'";
 		
 //		List<String> result = new ArrayList<String>();
 		try {
 //			result = generateRelationsImpl(string, 1);
 			
-			String s = generateRelations(string, 1);
+			String s = generateRelations(string, 3);
 			System.out.println(s);
 			
 		} catch (Exception e1) {
@@ -142,9 +142,16 @@ public class RelationGenerator {
 		
 		try {
 			
-			List<String> result = generateRelationsImpl(input, paradigm);
-			List<String> onTheFly = generateRelationsImpl_nonpersist(input);
+			List<String> result = new ArrayList<String>();
+			List<String> onTheFly = new ArrayList<String>();
 			
+			if (paradigm == 0 || paradigm == 1) {
+				result = generateRelationsImpl(input, paradigm);
+			}
+			else {
+				onTheFly = generateRelationsImpl_nonpersist(input);
+			}
+						
 			HashMap<String, String> check = new HashMap<String, String>();
 			
 			for (String rel : result) {					
@@ -166,19 +173,19 @@ public class RelationGenerator {
 //			}
 //			try {
 //			
-//			BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\relations.log"));
+//				BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\relations.log"));
+//				
+//				for (String rel : check.keySet()){		
+//					bw.write(rel);
+//					bw.newLine();
+//				}
+//				
+//				bw.close();
 //			
-//			for (String rel : check.keySet()){		
-//				bw.write(rel);
-//				bw.newLine();
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
 //			}
-//			
-//			bw.close();
-//			
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 			
 			return buildJSON(result, onTheFly);	
 	

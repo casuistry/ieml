@@ -40,14 +40,14 @@ var main = function () {
             
             allTerms[i] = result[i].IEML;
             
-            if (result[i].PARADIGM == "1") {
+            //if (result[i].PARADIGM == "1") {
                 //console.log(JSON.stringify(result[i]));
-                console.log(result[i].IEML);
-                cursor[j++] = result[i].IEML;
-            }
-                
+                //console.log(result[i].IEML);
+                //cursor[j++] = result[i].IEML;
+                cursor[j++] = result[i];
+            //}  
         }
-        console.log("found paradigms "+cursor.length);
+        //console.log("found paradigms "+cursor.length);
 
         onIEMLLoaded();
     });
@@ -73,10 +73,16 @@ var onIEMLLoaded2 = function() {
                 var http = require('http');
                 var querystring = require('querystring');
                     
+                var isP = 0;
+                if (record.PARADIGM == "1")
+                    isP = 1;          
+                
                 var postData = querystring.stringify({
-                    'iemltext' : record,
-                    'parad'    : 1
+                    'iemltext' : record.IEML,
+                    'parad'    : isP
                 });
+                
+                //console.log(postData);
 
                 var options = {
                     hostname: 'test-ieml.rhcloud.com',
@@ -106,7 +112,7 @@ var onIEMLLoaded2 = function() {
                             callback();
 
                         } catch (e) {
-                            console.log("ERROR: problem parsing "+record);
+                            console.log("ERROR: problem parsing "+record.IEML);
                             console.log("ERROR response"+body);
                             countBad++;
                             callback(new Error());
@@ -128,7 +134,7 @@ var onIEMLLoaded2 = function() {
                 var new_records = [];
 
                 if (parseResult.relations.length==0) {
-                    console.log("EMPTY relations for "+record);
+                    console.log("EMPTY relations for "+record.IEML);
                     countBad++;
                     callback();
                     return;
