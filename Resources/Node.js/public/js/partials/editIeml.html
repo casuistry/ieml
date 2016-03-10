@@ -34,17 +34,28 @@
 		  <div ng-message="exists">Value already exists in database.</div>	
         </div>
       </md-input-container>
+
       <div layout="row">
         <md-checkbox ng-model="data.isParadigm">
           Paradigm
+        </md-checkbox>	
+      </div>
+      
+      <div ng-show="data.isParadigm" ng-repeat="item in enableRelationsArray">
+        <md-checkbox ng-checked="exists(item, enableRelationsArraySelected)" ng-click="toggle(item, enableRelationsArraySelected)">
+          {{ item }} 
         </md-checkbox>
-		<md-button class="md-raised" style="text-transform: none;" ng-disabled="true" ng-model="data.layer"> 
-		  Layer {{data.layer}}
-		</md-button> 
-		<md-button class="md-raised" style="text-transform: none;" ng-disabled="true" ng-model="data.gclass"> 
-		  Class {{data.gclass}}
-		</md-button> 		
-      </div>	  
+      </div>
+            
+      <div layout="row">
+        <md-button class="md-raised" style="text-transform: none;" ng-disabled="true" ng-model="data.layer"> 
+          Layer {{data.layer}}
+        </md-button> 
+        <md-button class="md-raised" style="text-transform: none;" ng-disabled="true" ng-model="data.gclass"> 
+          Class {{data.gclass}}
+        </md-button> 		
+      </div>	
+         
     </form>
 	<md-button class="md-raised" ng-click="submitEdit()" ng-disabled="projectForm.$invalid"> Submit </md-button>	
 	<md-button class="md-raised" ng-click="cancelEdit()"> Cancel </md-button>

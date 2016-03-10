@@ -493,7 +493,7 @@ var deleteRelsForIEML = function (ieml, db, onDone) {
                     console.log("ERROR"+err);
                   else {
                     var rellist = list.relations;                    
-                    console.log("TO REMOVE: "+JSON.stringify(rellist));
+                    //console.log("TO REMOVE: "+JSON.stringify(rellist));
                     
                     for (var i = 0; i < rellist.length; i++) {                
                         db.collection('relationships').remove( { start : rellist[i].start, ieml : rellist[i].stop, type : rellist[i].name } , function(err, result) {
@@ -565,7 +565,7 @@ var loadRelsForIEML = function (ieml, isP, db, onDone) {
         },
         function (callback) { //prepare and load relationships db
         	loadRelationships(ieml, rellist, allieml, db, function (err, loadedrecs) { 
-   			    console.log("SUCCESSFULLY LOADED RELATIONSHIPS "+JSON.stringify(loadedrecs));
+   			    //console.log("SUCCESSFULLY LOADED RELATIONSHIPS "+JSON.stringify(loadedrecs));
    			    callback();
             });
         },
@@ -660,7 +660,7 @@ var updateRelations = function (delta, db, onDone) {
                     for (var i=0;i<result.length;i++) {
                         existing[i] = result[i].IEML;
                     }
-                    console.log("existing stop endpoints: "+JSON.stringify(existing));
+                    //console.log("existing stop endpoints: "+JSON.stringify(existing));
                     for (var j=0;j<forward.length;j++) {
                        var endpoint_exists = existing.indexOf(forward[j].ieml)!=-1;                        
                        if (!delta_exists && !endpoint_exists) 
@@ -691,7 +691,7 @@ var updateRelations = function (delta, db, onDone) {
                     for (var i=0;i<result.length;i++) {
                         existing[i] = result[i].IEML;
                     }
-                    console.log("existing start endpoints: "+JSON.stringify(existing));
+                    //console.log("existing start endpoints: "+JSON.stringify(existing));
                     for (var j=0;j<backward.length;j++) {
                        var endpoint_exists = existing.indexOf(backward[j].start)!=-1;                         
                        if (!delta_exists && !endpoint_exists) 
@@ -867,7 +867,7 @@ console.dir(req.body.itemids);
         
         function(callback) {  //find current value of visible
            
-           		console.log('beofre find relationship');
+           		console.log('before find relationship');
         		db.collection('relationships').findOne(id, {},  function(err, result) {
     			    if (err) callback(err); 
 
@@ -900,5 +900,63 @@ console.dir(req.body.itemids);
         		else res.sendStatus(200); });
  
 
+};
+
+module.exports.getRelVisibility = function (req, res) {
+
+	var db = req.db;
+    console.log("getRelVisibility " + req.body.ieml);
+    
+   	db.collection('relviz').find({id:req.body.ieml}).toArray(
+	    function(err, result) {
+			if (err) {
+				console.log("ERROR"+err);
+				throw err;
+			}
+			if (result) {
+				console.log('found relviz');
+				//console.dir(result);
+				res.json(result);
+			}
+		}
+	);
+};
+
+module.exports.addRelVisibility = function (req, res) {
+
+	var db = req.db;
+    var query = {id: req.body.ieml};
+    var val = {id: req.body.ieml, viz: req.body.stuff};
+    console.log("addRelVisibility " + JSON.stringify(val));
+       
+    db.collection('relviz').update(query, val, { upsert: true },  function(err, result) {
+		if (err) {
+			console.log("ERROR"+err);
+			throw err;
+		}        
+        else {
+            console.log('relviz updated ' + JSON.stringify(result)); 
+            res.json(result);
+        }
+	});   
+};
+
+module.exports.remRelVisibility = function (req, res) {
+
+	var db = req.db;
+    var query = {id: req.body.ieml};
+    var val = {id: req.body.ieml, viz: req.body.stuff};
+    console.log("addRelVisibility " + JSON.stringify(val));
+       
+    db.collection('relviz').remove(query, function(err, result) {
+		if (err) {
+			console.log("ERROR"+err);
+			throw err;
+		}        
+        else {
+            console.log('relviz removed ' + JSON.stringify(result)); 
+            res.json(result);
+        }
+	});   
 };
 

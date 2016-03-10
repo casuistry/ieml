@@ -17,21 +17,21 @@
         
           <br/>
           
-          <label  style="font-style:italic;font-weight:lighter">
+          <!--label  style="font-style:italic;font-weight:lighter">
             <input type="checkbox" ng-model="showHidden">Show hidden
-          </label>
+          </label-->
           
           <div ng-repeat="def in definitions"> 
             
-            <div layout="col">
+            <div layout="col" ng-show="def.visible">
               <li style = "width:15%;padding-top: 2px;" > 
                {{def.reltype}}
               </li>   
-              <md-switch  style = "margin: 0px 0px 0px 10px;" ng-change="toggleRelVis(def.reltype)" ng-disabled="false" aria-label="Hide" ng-model="def.visible" class="md-block/">  
+              <!--md-switch  style = "margin: 0px 0px 0px 10px;" ng-change="toggleRelVis(def.reltype)" ng-disabled="false" aria-label="Hide" ng-model="def.visible" class="md-block/"-->  
             </div>
             
             <div ng-repeat="lnk in def.rellist">
-                <div layout="column"  ng-show="(lnk.exists && lnk.visible)||showHidden">                               
+                <div layout="column" ng-show="def.visible">                               
                      <table>
                          <tr>
                             <td style="width:400px;"> 

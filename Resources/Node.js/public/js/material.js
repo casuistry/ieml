@@ -83,7 +83,30 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             newData.token=sharedProperties.secToken;
             newData.itemids = ids;
             return $http.post('../api/toggleRelVisibility', newData);
-        }
+        },
+        
+        getRelVis : function(input) {  
+            var data ={};
+            $http.defaults.headers.post["Content-Type"] = "application/json";
+            data.ieml = input;
+            data.stuff = "";   
+            return $http.post('../api/getRelVisibility', data);
+        }, 
+
+        addRelVis : function(input, arr) {  
+            var data ={};
+            $http.defaults.headers.post["Content-Type"] = "application/json";
+            data.ieml = input;
+            data.stuff = arr;   
+            return $http.post('../api/addRelVisibility', data);
+        },
+        
+        remRelVis : function(input) {  
+            var data ={};
+            $http.defaults.headers.post["Content-Type"] = "application/json";
+            data.ieml = input;  
+            return $http.post('../api/remRelVisibility', data);
+        }        
     }
 })
 .directive('exists', function($q, $timeout, $http, crudFactory) {
@@ -246,8 +269,6 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 }) 
 .controller('iemlEntryEditorController', function($scope,  $rootScope, $location, $window, crudFactory, sharedProperties) {
 
-    var onCancelGoTo = '/loadTerms/'; // default
-    var onSubmitGoTo = '/loadTerms/'; // default
     var currIemlEntry = null;
     
     $scope.data = {};
@@ -256,7 +277,31 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
     $scope.data.gclass = 'n/a';
     $scope.formTitle = 'Adding new entry';
     $scope.doNotValidate = false;
-                
+             
+	var AscSub = "Ancestors in substance";
+	var AscAtt = "Ancestors in attribute";
+	var AscMod = "Ancestors in mode";
+	var DscSub = "Descendents in substance";
+	var DscAtt = "Descendents in attribute";
+	var DscMod = "Descendents in mode";
+	var GermainJumeau ="Twin siblings";
+	var GermainOpposes ="Opposed siblings";
+	var GermainAssocies ="Associated siblings";
+	var GermainCroises = "Crossed siblings";
+    //BelongsToParadigm = "Belongs to Paradigm";
+
+    $scope.enableRelationsArray = [AscSub, AscAtt, AscMod, DscSub, DscAtt, DscMod, GermainJumeau, GermainOpposes, GermainAssocies, GermainCroises];
+    $scope.enableRelationsArraySelected = [];
+    
+    $scope.toggle = function (item, list) {
+        var idx = list.indexOf(item);
+        if (idx > -1) list.splice(idx, 1);
+        else list.push(item);
+    };
+    $scope.exists = function (item, list) {
+        return list.indexOf(item) > -1;
+    };
+      
     init();
     
     function init() {
@@ -265,21 +310,34 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
         sharedProperties.setIemlEntry(null);
         
         var configOption = sharedProperties.getEntryEditType();
-        if (configOption != null){
+        if (configOption != null){           
+            
             if (configOption === sharedProperties.FromListNew){
                 // nothing special
             }
             else if (configOption === sharedProperties.FromListUpdate) {
                 bindValues(currIemlEntry); // ieml exists, just update it
+                crudFactory.getRelVis(currIemlEntry.IEML).success(function(data, status){               
+                    if (data.length > 0)
+                        $scope.enableRelationsArraySelected = data[0].viz.slice();
+                });
             }
             else if (configOption === sharedProperties.FromTableNew) {                 
                 $scope.iemlValue = sharedProperties.tileIEML; //this is coming from table tile
                 $scope.readOnly  = true;  // do not allow ieml editing
                 sharedProperties.tileIEML = null; // clean-up
+                crudFactory.getRelVis($scope.iemlValue).success(function(data, status){               
+                    if (data.length > 0)
+                        $scope.enableRelationsArraySelected = data[0].viz.slice();
+                });                
             }
             else if (configOption === sharedProperties.FromTableUpdate) {
                 bindValues(currIemlEntry); // ieml exists, just update it
                 $scope.readOnly  = true; // do not allow ieml editing
+                crudFactory.getRelVis(currIemlEntry.IEML).success(function(data, status){     
+                    if (data.length > 0)
+                        $scope.enableRelationsArraySelected = data[0].viz.slice();
+                });
             }
             
             // clean-up
@@ -330,6 +388,13 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
 
                 sharedProperties.addToIEMLLIST(data[0]);
                 
+                if (toBeAdded.PARADIGM=="1" && $scope.enableRelationsArraySelected.length > 0) {
+                    crudFactory.addRelVis(toBeAdded.IEML, $scope.enableRelationsArraySelected);
+                }
+                else {
+                    crudFactory.remRelVis(toBeAdded.IEML)
+                }                
+                
             }).error(function(data, status, headers, config) {
                     
                 if (!data.success) {
@@ -344,6 +409,13 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             
                 sharedProperties.updateIEMLLIST(toBeAdded);
                 
+                if (toBeAdded.PARADIGM=="1" && $scope.enableRelationsArraySelected.length > 0) {
+                    crudFactory.addRelVis(toBeAdded.IEML, $scope.enableRelationsArraySelected);
+                }
+                else {
+                    crudFactory.remRelVis(toBeAdded.IEML)
+                }                  
+                
             }).error(function(data, status, headers, config) {
                     
                 if (!data.success) {
@@ -353,7 +425,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                 }     
             });
         }    
-
+        
         $window.history.back();        
     };  
 })
@@ -948,9 +1020,40 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                 $scope.DefinedEntryClass = "Noun";            
         });
         
-        crudFactory.rels(tableTitle).success(function(data) {
-            $scope.definitions = data;
-            orderRelationsList();
+        crudFactory.rels(tableTitle).success(function(allrels) {
+            
+            var parent_paradigm = "none";
+            
+            //get the viz
+            for (var i = 0; i < allrels.length; i++) {
+                if (allrels[i].reltype == "Belongs to Paradigm") {
+                    parent_paradigm = allrels[i].rellist[0].ieml;
+                    break;
+                }
+            }
+            
+            // if null, it could be a paradigm or something weird, try wit itself
+            if (parent_paradigm == "none") 
+                parent_paradigm = tableTitle;
+            
+            crudFactory.getRelVis(parent_paradigm).success(function(data, status){ 
+                
+                if (data.length > 0) {
+                    var temp_arr = data[0].viz.slice();
+                                                            
+                    //remove inhibited relations
+                    for (var i = 0; i < temp_arr.length; i++) {
+                        for (var j = 0; j < allrels.length; j++) {
+                            if (allrels[j].reltype == temp_arr[i]) {
+                                allrels[j].visible = false;
+                            }
+                        }
+                    }                    
+                }
+                
+                $scope.definitions = allrels;
+                orderRelationsList();
+            });
         });
         
         crudFactory.iemltable(tableTitle).success(function(data) {
@@ -970,7 +1073,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
                         var input = $scope.fakeReply.Tables[i].table[j].slice[k].value;
                         if (input != "") {
                             var means = $scope.crossCheck(input);
-                            if (means != undefined || means.length > 0) {
+                            if (means != undefined && means.length > 0) {
                                 //{ieml:"b.u.-",terms:[{lang:"FR",means:"parole"},{lang:"EN",means:"speech"}],paradigm:"0",layer:"2",class:"2"}
                                 var f = means[0].FR;
                                 var e = means[0].EN;
