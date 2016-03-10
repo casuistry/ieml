@@ -41,6 +41,7 @@
         </md-checkbox>	
       </div>
       
+      <p> Inhibit: <p/>
       <div ng-show="data.isParadigm" ng-repeat="item in enableRelationsArray">
         <md-checkbox ng-checked="exists(item, enableRelationsArraySelected)" ng-click="toggle(item, enableRelationsArraySelected)">
           {{ item }} 
