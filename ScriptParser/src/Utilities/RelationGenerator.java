@@ -89,14 +89,14 @@ public class RelationGenerator {
 		//String string = "O:O:.+M:O:.";
 		//String string = "M:M:.-O:M:.-E:.-+s.y.-'";
 		
-		String string = "M:M:.-O:M:.-E:.-+s.y.-'+M:M:.-M:O:.-E:.-+s.y.-'"; //from Pierre
+		//String string = "M:M:.-O:M:.-E:.-+s.y.-'+M:M:.-M:O:.-E:.-+s.y.-'"; //from Pierre
 		//String string = "O:M:.";                     //no germains
 		//String string = "M:O:.M:M:.-+M:M:.M:O:.-";   //germains oppose
 		//String string = "O:M:.O:M:.-+M:O:.M:O:.-";   //germain croises
 		//String string = "O:M:.O:M:.-";                 //contenu check
 		//String string = "O:O:.F:.-"; //test for reversed asc/dsc
 		//String string = "k.-O:M:.-+M:O:.-s.y.-'";
-		//String string = "E:E:U:.";
+		String string = "E:E:F:.";
 		
 //		List<String> result = new ArrayList<String>();
 		try {
@@ -302,7 +302,11 @@ public class RelationGenerator {
 					}
 					
 					for (int i = 0; i < setRef.size(); i++ ) {
-						for (int j = i + 1; j < setRef.size(); j++) {
+						for (int j = 0; j < setRef.size(); j++) {
+							
+							if (tokenRef.get(i).GetName() == tokenRef.get(j).GetName()) 
+								continue;
+							
 							Set<String> intersection = new HashSet<String>(setRef.get(i));
 							intersection.retainAll(setRef.get(j));
 							
