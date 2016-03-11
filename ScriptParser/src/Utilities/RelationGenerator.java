@@ -304,7 +304,9 @@ public class RelationGenerator {
 					for (int i = 0; i < setRef.size(); i++ ) {
 						for (int j = 0; j < setRef.size(); j++) {
 							
-							if (tokenRef.get(i).GetName() == tokenRef.get(j).GetName()) 
+							String a = tokenRef.get(i).GetName();
+							String b = tokenRef.get(j).GetName();
+							if (a.equals(b)) 
 								continue;
 							
 							Set<String> intersection = new HashSet<String>(setRef.get(i));
