@@ -98,6 +98,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             $http.defaults.headers.post["Content-Type"] = "application/json";
             data.ieml = input;
             data.stuff = arr;   
+            data.token=sharedProperties.secToken;
             return $http.post('../api/addRelVisibility', data);
         },
         
@@ -105,6 +106,7 @@ angular.module('materialApp', ['ngRoute', 'ngMaterial', 'ngMessages', 'd3graph',
             var data ={};
             $http.defaults.headers.post["Content-Type"] = "application/json";
             data.ieml = input;  
+            data.token=sharedProperties.secToken;
             return $http.post('../api/remRelVisibility', data);
         }        
     }

@@ -167,7 +167,6 @@ module.exports.updateieml = function (req, res) {
                     //console.log("result: "+JSON.stringify(result[0]));
                     same_ieml = (result[0].IEML == rec.IEML);
                     same_para = (result[0].PARADIGM == rec.PARADIGM);
-                    was_para = result[0].PARADIGM == "1";
                     old_ieml = result[0].IEML;
                 }
                 else {
@@ -176,38 +175,17 @@ module.exports.updateieml = function (req, res) {
                 
                 console.log('same_ieml ' + same_ieml);
                 console.log('same_para ' + same_para);
-                console.log('was_para ' + was_para);
                 
 				callback();
 			});
         },  
         function(callback) { 
-        
-            deleteRelsForIEML(old_ieml, db, callback);
-            
-            // if (!was_para && !same_para && !same_ieml) {
-                // callback();
-            // }
-            // else if (!was_para && !same_para && same_ieml) {
-                // // ieml was already there but we need need to generate relations for it
-                // loadRelsForIEML(old_ieml, db, callback);
-            // }
-            // else if (was_para && !same_para && !same_ieml) {
-                // // just delete old ieml's relations
-                // deleteRelsForIEML(old_ieml, db, callback);   
-            // }
-            // else if (was_para && !same_para && same_ieml) {
-                // // just remove old ieml's relations
-                // deleteRelsForIEML(old_ieml, db, callback);    
-            // }
-            // else if (was_para && same_para && !same_ieml) {
-                // // delete old relations and update existing relations and generate new relations
-                // deleteRelsForIEML(old_ieml, db, callback);            
-            // }
-            // else {
-                // console.log("UNHANDLED case");
-                // callback();
-            // }
+            if (same_ieml && same_para) {
+                callback();
+            }       
+            else {
+                deleteRelsForIEML(old_ieml, db, callback);                
+            }            
         },        
         function(callback) { // do the update
             db.collection('terms').update(id, {$set:rec}, function(err, result) {
@@ -222,32 +200,14 @@ module.exports.updateieml = function (req, res) {
 	        });
         },
         function(callback) { // update relations when old ieml does not exist
-        
-            var isP = 0;
-            if (rec.PARADIGM == "1") isP = 1;
-            updateRelations(rec.IEML, db, function() { loadRelsForIEML(rec.IEML, isP, db, callback);});
-        
-            // if (!was_para && !same_para && !same_ieml) {
-                // // update existing relations and generate new relations
-                // updateRelations(rec.IEML, db, function() { loadRelsForIEML(rec.IEML, db, callback);});
-            // }
-            // else if (!was_para && !same_para && same_ieml) {
-                // updateRelations(old_ieml, db, callback);
-            // }
-            // else if (was_para && !same_para && !same_ieml) {
-                // updateRelations(old_ieml, db, callback);
-            // }
-            // else if (was_para && !same_para && same_ieml) {
-                // updateRelations(old_ieml, db, callback);    
-            // }
-            // else if (was_para && same_para && !same_ieml) {
-                // // delete old relations and update existing relations and generate new relations
-                // updateRelations(rec.IEML, db, function() {loadRelsForIEML(rec.IEML, db, callback);});      
-            // }
-            // else {
-                // console.log("UNHANDLED case");
-                // callback();
-            // }
+            if (same_ieml && same_para) {
+                callback();
+            }
+            else {
+                var isP = 0;
+                if (rec.PARADIGM == "1") isP = 1;
+                updateRelations(rec.IEML, db, function() { loadRelsForIEML(rec.IEML, isP, db, callback);});
+            }
         }        
     ],  function(err) {
            if (err) 

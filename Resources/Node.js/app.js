@@ -129,61 +129,55 @@ app.post('/authenticate', function(req, res) {
 
 app.use(function(req, res, next) {
 
+    console.log(req._parsedUrl.pathname);
 
-   console.log(req._parsedUrl.pathname);
+    //only protect certain urls
+    if (req._parsedUrl.pathname.indexOf("/api/newieml")==0||
+        req._parsedUrl.pathname.indexOf("/api/updateieml")==0||
+        req._parsedUrl.pathname.indexOf("/api/remieml")==0||
+        req._parsedUrl.pathname.indexOf("/api/addRelVisibility")==0||
+        req._parsedUrl.pathname.indexOf("/api/remRelVisibility")==0) {
 
+        console.log("veryfiying token");
+        // check header or url parameters or post parameters for token
+        var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
-//only pritect certain urls
-if (req._parsedUrl.pathname.indexOf("/api/newieml")==0||
-req._parsedUrl.pathname.indexOf("/api/updateieml")==0||
-req._parsedUrl.pathname.indexOf("/api/remieml")==0) {
-//  if (false){
+        // decode token
+        if (token) {
+
+            console.log("token value:"+token);
+            delete req.body.token;
     
+            // verifies secret and checks exp
+            jwt.verify(token, app.get('superSecret'), function(err, decoded) {      
+                if (err) {
+                    console.log('token invalid!');
+                    return res.status(403).send({ 
+                        success: false, 
+                        message: 'Authentication required.' 
+                    });
+                    //return res.json({ success: false, message: 'Authentication required.' });     //or bad token message
+                } else {
+                    // if everything is good, save to request for use in other routes
+                    console.log("decoded value:"+decoded);
+                    req.decoded = decoded;    
+                    next();
+                }
+            });
 
-    console.log("veryfiying token");
+        } else {
 
-  // check header or url parameters or post parameters for token
-  var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
-  // decode token
-  if (token) {
-
-    console.log("token value:"+token);
-    
-    delete req.body.token;
-    
-    // verifies secret and checks exp
-    jwt.verify(token, app.get('superSecret'), function(err, decoded) {      
-      if (err) {
-        console.log('token invalid!');
-        
-         return res.status(403).send({ 
-        success: false, 
-        message: 'Authentication required.' 
-    });
-        //return res.json({ success: false, message: 'Authentication required.' });     //or bad token message
-      } else {
-        // if everything is good, save to request for use in other routes
-        console.log("decoded value:"+decoded);
-        req.decoded = decoded;    
+            // if there is no token
+            // return an error
+            return res.status(403).send({ 
+                success: false, 
+                message: 'Authentication required.' 
+            });   
+        }
+    } else {
+        console.log("unsecured resource");   
         next();
-      }
-    });
-
-  } else {
-
-    // if there is no token
-    // return an error
-    return res.status(403).send({ 
-        success: false, 
-        message: 'Authentication required.' 
-    });
-    
-  }
-} else {
-  console.log("unsecured resourse");   
-  next();
-}
+    }
 });
 
 
