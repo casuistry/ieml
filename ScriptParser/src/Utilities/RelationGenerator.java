@@ -96,44 +96,46 @@ public class RelationGenerator {
 		//String string = "O:M:.O:M:.-";                 //contenu check
 		//String string = "O:O:.F:.-"; //test for reversed asc/dsc
 		//String string = "k.-O:M:.-+M:O:.-s.y.-'";
-		String string = "E:E:F:.";
+		String string = "M:M:.u.-M:M:.u.-E:.-+d.u.-'";
+		//String string = "M:M:M:.";
 		
-//		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<String>();
 		try {
-//			result = generateRelationsImpl(string, 1);
-			
-			String s = generateRelations(string, 1);
-			System.out.println(s);
+			System.out.println("-->");
+			result = generateRelationsImpl(string, 1);
+			System.out.println("<--");
+			//String s = generateRelations(string, 1);
+			//System.out.println(s);
 			
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
-//		HashMap<String, String> check = new HashMap<String, String>();
+		HashMap<String, String> check = new HashMap<String, String>();
 		
-//		for (String rel : result) {					
-//			if (!check.containsKey(rel))
-//				check.put(rel, rel);
-//			else
-//				System.out.println("Duplicate: " + rel);
-//		}
+		for (String rel : result) {					
+			if (!check.containsKey(rel))
+				check.put(rel, rel);
+			else
+				System.out.println("Duplicate: " + rel);
+		}
 		
-//		try {
-//			
-//			BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\relations.log"));
-//			
-//			for (String rel : result){		
-//				bw.write(rel);
-//				bw.newLine();
-//			}
-//			
-//			bw.close();
-//			
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try {
+			
+			BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\casuistry\\Desktop\\IEML\\relations.log"));
+			
+			for (String rel : result){		
+				bw.write(rel);
+				bw.newLine();
+			}
+			
+			bw.close();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		System.out.println("Done ");
 	}
@@ -238,6 +240,8 @@ public class RelationGenerator {
 			HashMap<String, String> permutations = GetExpanded(rootToken);
 			for (String perms : permutations.keySet()) {		
 
+				System.out.println(perms);
+				
 				Token token = GetTokenInternal(perms);
 				
 				if (!dupFinder.containsKey(token.GetName())) {
@@ -452,7 +456,7 @@ public class RelationGenerator {
 							result.put(s, s);	
 						}
 					}
-				}
+				}				
 				
 				if (att.size() > 1) {
 					for (String _att : att.keySet()) {
@@ -477,6 +481,58 @@ public class RelationGenerator {
 						}
 					}
 				}
+				
+				if (sub.size() > 1 && att.size() > 1) {
+					for (String _sub : sub.keySet()) {
+						
+						String __sub = GetTokenInternal(_sub).GenerateSequenceForTable(false);
+						
+						for (String _att : att.keySet()) {
+							
+							String __att = GetTokenInternal(_att).GenerateSequenceForTable(false);
+							
+							String s = __sub+__att+n.nodes.get(2).GetName()+Tokenizer.c_marks.get(n.layer);
+							if (!result.containsKey(s)) {
+								result.put(s, s);	
+							}
+						}
+					}
+				}			
+				
+				if (sub.size() > 1 && mod.size() > 1) {
+					for (String _sub : sub.keySet()) {
+						
+						String __sub = GetTokenInternal(_sub).GenerateSequenceForTable(false);
+						
+						for (String _mod : mod.keySet()) {
+							
+							String __mod = GetTokenInternal(_mod).GenerateSequenceForTable(false);
+							
+							String s = __sub+n.nodes.get(1).GetName()+__mod+Tokenizer.c_marks.get(n.layer);
+							if (!result.containsKey(s)) {
+								result.put(s, s);	
+							}
+						}
+
+					}
+				}
+				
+				if (att.size() > 1 && mod.size() > 1) {
+					for (String _att : att.keySet()) {
+						
+						String __att = GetTokenInternal(_att).GenerateSequenceForTable(false);
+						
+						for (String _mod : mod.keySet()) {
+							
+							String __mod = GetTokenInternal(_mod).GenerateSequenceForTable(false);
+							
+							String s = n.nodes.get(0).GetName()+__att+__mod+Tokenizer.c_marks.get(n.layer);
+							if (!result.containsKey(s)) {
+								result.put(s, s); 
+							}							
+						}
+					}
+				}				
 			}
 		}	
 		else {
