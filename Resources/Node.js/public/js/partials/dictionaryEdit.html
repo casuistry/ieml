@@ -30,12 +30,12 @@
               <!--md-switch  style = "margin: 0px 0px 0px 10px;" ng-change="toggleRelVis(def.reltype)" ng-disabled="false" aria-label="Hide" ng-model="def.visible" class="md-block/"-->  
             </div>
             
-            <div ng-repeat="lnk in def.rellist">
-                <div layout="column" ng-show="def.visible">                               
+            <div ng-repeat="lnk in def.rellist" ng-show="def.visible">
+                <div layout="column" ng-show="lnk.exists">                               
                      <table>
                          <tr>
                             <td style="width:400px;"> 
-                              <a style="border: none;" align="left" href="#/dicEdit/IEML/{{lnk.ieml}}" target="_self" ng-show="(lnk.exists && lnk.visible)||showHidden"  ng-class="{disabled:!lnk.exists, buttonflat:lnk.exists, buttonflatdis:!lnk.exists}"   class="btn">{{lnk.ieml}}</a>
+                              <a style="border: none;" align="left" href="#/dicEdit/IEML/{{lnk.ieml}}" target="_self" ng-class="{disabled:!lnk.exists, buttonflat:lnk.exists, buttonflatdis:!lnk.exists}"   class="btn">{{lnk.ieml}}</a>
                             </td>
                               
                             <td>
