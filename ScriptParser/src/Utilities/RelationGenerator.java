@@ -240,7 +240,7 @@ public class RelationGenerator {
 			HashMap<String, String> permutations = GetExpanded(rootToken);
 			for (String perms : permutations.keySet()) {		
 
-				System.out.println(perms);
+				//System.out.println(perms);
 				
 				Token token = GetTokenInternal(perms);
 				
