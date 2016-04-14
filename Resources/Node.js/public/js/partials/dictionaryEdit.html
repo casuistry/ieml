@@ -61,19 +61,19 @@
           <md-tabs md-dynamic-height="" md-border-bottom="" ng-repeat="maintable in materialTables">
             <md-tab label="{{subtable.tabTitle}}" ng-repeat="subtable in maintable.table" >
               <md-content class="md-padding">
-                <md-grid-list md-cols="{{maintable.Col}}" md-row-height="75px" md-gutter="3px">
+                <md-grid-list md-cols="{{maintable.Col}}" md-row-height="100px" md-gutter="3px">
                   <md-grid-tile ng-click="showLables(tile)" ng-repeat="tile in subtable.slice" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}" style=" border-style: solid;
                     border-width: 1px; border-color: black;" ng-class="tile.background">  
 										
-		            <md-list-item ng-show="tile.editable">
-        		      <div flex class="md-list-item-text">
+		            <md-list-item ng-show="tile.editable" style="margin:0 0px 0 0px; padding:0 0px 0 0px">
+        		      <div flex class="md-list-item-text" layout-fill>
 					    <p align="center">{{tile.value}}</p>
          		        <p ng-show="filterLanguage=='English'" align="center">{{tile.means.en}}</p>
          		        <p ng-show="filterLanguage!='English'"align="center">{{tile.means.fr}}</p>					
         		      </div>
     		        </md-list-item>					
 
-		            <md-list-item ng-show="tile.creatable">
+		            <md-list-item ng-show="tile.creatable" style="margin:0 0px 0 0px; padding:0 0px 0 0px">
         		      <div flex class="md-list-item-text ">
          		        <p align="center">{{tile.value}}</p>			
         		      </div>

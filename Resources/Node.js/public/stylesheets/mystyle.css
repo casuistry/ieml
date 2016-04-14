@@ -89,10 +89,14 @@
   
 /* if the text is too long in the table's cells ...*/ 
 .gridListDynamicTiles .md-list-item-text p {
-      text-overflow: ellipsis;
+      /*text-overflow: ellipsis;
       white-space: nowrap;
-      overflow: hidden; 
-	  font-size: 10px;}
+      overflow: hidden; */
+	  font-size: 10px;
+      margin:0 0px 0 0px; 
+      padding:0;
+      /*border: 5px solid navy;*/
+}
 	  
 /* styles needed to aling main menu icons with lables*/
 i.material-icons {
